@@ -14,3 +14,15 @@ ss::Button::Button(Type type = Type::Press, const char* text = "Button", const c
 		break;
 	}
 }
+
+void ss::Button::set_text(char* text) {
+	Button::text.setString(text);
+}
+
+string ss::Button::get_text() {
+	return text.getString();
+}
+
+void ss::Button::set_font(char* font) {
+	Button::font.loadFromFile(font);
+}
