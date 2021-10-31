@@ -1,4 +1,5 @@
 #pragma once
+#include<iostream>
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
 #include<SFML/Audio.hpp>
@@ -8,6 +9,7 @@ using namespace std;
 
 namespace ss {
 	class Button {
+	public:
 		enum Type {
 			Press,
 			Toggle
@@ -18,6 +20,7 @@ namespace ss {
 			Texture
 		};
 
+	private:
 		bool pressed = false;
 		unsigned int border = 0;
 		Type type;
@@ -27,7 +30,7 @@ namespace ss {
 		sf::Texture texture;
 		sf::Font font;
 		sf::Vector2f position;
-
+		
 	public:
 		Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect);
 		//Sets the button text to the given parameter
