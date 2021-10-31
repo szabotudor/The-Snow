@@ -18,11 +18,15 @@ namespace ss {
 			Texture
 		};
 
+		bool pressed = false;
+		unsigned int border = 0;
 		Type type;
 		BackgroundType background_type;
 		sf::Text text;
+		sf::RectangleShape rect;
+		sf::Texture texture;
 		sf::Font font;
-		sf::RenderWindow window;
+		sf::Vector2f position;
 
 	public:
 		Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect);
@@ -32,5 +36,9 @@ namespace ss {
 		string get_text();
 		//Loads specified font and uses it on the button
 		void set_font(char* font);
+		//Sets the position of the button (by layer)
+		void set_position(sf::Vector2f position);
+		//Sets the window the button should be drawn to
+		void draw(sf::RenderWindow& window);
 	};
 }
