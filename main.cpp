@@ -1,4 +1,5 @@
 #include<iostream>
+#include<Snow.h>
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
 #include<SFML/Audio.hpp>
@@ -22,8 +23,9 @@ void poll_events(sf::RenderWindow &window, sf::Event &event) {
 
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(256, 144), "The Snow", sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(256, 144), "The Snow");
     sf::Event event;
+    ss::Button button(ss::Button::Press, "accesibil", "Pixel.ttf", ss::Button::Empty);
 
     while (window.isOpen()) {
         poll_events(window, event);
@@ -32,7 +34,7 @@ int main() {
         window.clear(sf::Color::Transparent);
 
     //Main loop
-        
+        button.draw(window);
     //End of main loop
 
         //Displays the window
