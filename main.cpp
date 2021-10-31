@@ -22,7 +22,7 @@ void poll_events(sf::RenderWindow &window, sf::Event &event) {
 
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(256, 144), "The Snow", sf::Style::None | sf::Style::Fullscreen);
+    sf::RenderWindow window(sf::VideoMode(256, 144), "The Snow", sf::Style::Fullscreen);
     sf::Event event;
     sf::Text text; sf::Font font;
     font.loadFromFile("Pixel.ttf");
