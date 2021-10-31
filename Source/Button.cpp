@@ -1,9 +1,11 @@
 #include "..\Include\Snow.h"
 
-ss::Button::Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect) {
+ss::Button::Button(Type type, const char* text, const char* font, BackgroundType background_type) {
 	Button::type = type;
 	Button::text.setString(text);
+	Button::text.setPosition(0, 0);
 	Button::font.loadFromFile(font);
+	Button::text.setFont(Button::font);
 
 	switch (background_type) {
 	case ss::Button::Rect:
