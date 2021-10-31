@@ -7,7 +7,6 @@ ss::Button::Button(sf::Color bgd_color, sf::Color border_color, sf::Color text_c
 	Button::font.loadFromFile(font);
 	Button::text.setFont(Button::font);
 
-	cout << strlen(text);
 	Button::rect.setSize(sf::Vector2f(Button::text.getCharacterSize() * (strlen(text) - 1) + border_thickness * 2, Button::text.getCharacterSize() + border_thickness * 2));
 	Button::text.setFillColor(text_color);
 	Button::rect.setFillColor(bgd_color);
