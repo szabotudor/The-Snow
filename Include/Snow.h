@@ -22,7 +22,7 @@ namespace ss {
 
 	private:
 		bool pressed = false;
-		unsigned int border = 0;
+		int border = 0;
 		Type type;
 		BackgroundType background_type;
 		sf::Text text;
@@ -44,6 +44,8 @@ namespace ss {
 		void set_font(char* font);
 		//Sets the position of the button (by layer)
 		void set_position(sf::Vector2f position);
+		//Sets the position of the button (by layer)
+		void set_position(int x, int y);
 		//Sets the window the button should be drawn to
 		void draw(sf::RenderWindow& window);
 	};
