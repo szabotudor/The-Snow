@@ -1,32 +1,46 @@
+#include<iostream>
 #include<SFML/Graphics.hpp>
+#include<SFML/System.hpp>
+#include<SFML/Audio.hpp>
+#include<SFML/Network.hpp>
 
 using namespace std;
 
-int main() {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!", sf::Style::Default);
-    window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(60);
 
-    sf::CircleShape shape(100.f);
-    sf::RectangleShape rect(sf::Vector2f(20, 80));
-    shape.setFillColor(sf::Color::Green);
-    rect.setOutlineColor(sf::Color::Red);
-    rect.setOutlineThickness(3);
-    rect.setFillColor(sf::Color(30, 100, 240));
-    rect.setPosition(10, 10);
+void poll_events(sf::RenderWindow &window, sf::Event &event) {
+    while (window.pollEvent(event)) {
+        switch (event.type) {
+        case sf::Event::Closed:
+            window.close();
+        case sf::Event::KeyPressed:
+            if (event.key.code == sf::Keyboard::Escape) {
+                window.close();
+            }
+        }
+    }
+}
+
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(256, 144), "The Snow", sf::Style::None | sf::Style::Fullscreen);
+    sf::Event event;
+    sf::Text text; sf::Font font;
+    font.loadFromFile("Pixel.ttf");
+    text.setFont(font);
+    text.setString("Start writing to buffer");
 
     while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
+        poll_events(window, event);
 
-        window.clear();
-        window.draw(shape);
-        window.draw(rect);
+        //Clears the window
+        window.clear(sf::Color::Transparent);
+
+    //Main loop
+        window.draw(text);
+    //End of main loop
+
+        //Displays the window
         window.display();
     }
-
     return 0;
 }
