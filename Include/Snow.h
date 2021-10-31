@@ -1,10 +1,10 @@
 #pragma once
-#include<iostream>
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
 #include<SFML/Audio.hpp>
 #include<SFML/Network.hpp>
 
+using namespace std;
 
 namespace ss {
 	class Button {
@@ -26,5 +26,11 @@ namespace ss {
 
 	public:
 		Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect);
+		//Sets the button text to the given parameter
+		void set_text(char* text);
+		//Returns the text set on the button
+		string get_text();
+		//Loads specified font and uses it on the button
+		void set_font(char* font);
 	};
 }
