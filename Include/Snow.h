@@ -32,7 +32,10 @@ namespace ss {
 		sf::Vector2f position;
 		
 	public:
-		Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect);
+		Button(sf::Color bgd_color, sf::Color border_color, sf::Color text_color, int border_thickness, const char* text, const char* font = "Pixel.ttf");
+		Button(sf::Color text_color, const char* text, const char* font = "Pixel.ttf");
+		//Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect);
+		
 		//Sets the button text to the given parameter
 		void set_text(char* text);
 		//Returns the text set on the button

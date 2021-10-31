@@ -1,5 +1,29 @@
 #include "..\Include\Snow.h"
 
+ss::Button::Button(sf::Color bgd_color, sf::Color border_color, sf::Color text_color, int border_thickness, const char* text, const char* font) {
+	Button::text.setPosition(0, 0);
+	Button::text.setString(text);
+	Button::font.loadFromFile(font);
+	Button::text.setFont(Button::font);
+
+	Button::text.setColor(text_color);
+	Button::rect.setFillColor(bgd_color);
+	Button::rect.setOutlineColor(border_color);
+
+	Button::background_type = Button::Rect;
+}
+
+ss::Button::Button(sf::Color text_color, const char* text, const char* font) {
+	Button::text.setPosition(0, 0);
+	Button::text.setString(text);
+	Button::font.loadFromFile(font);
+	Button::text.setFont(Button::font);
+
+	Button::text.setColor(text_color);
+
+	Button::background_type = Button::Empty;
+}
+/*
 ss::Button::Button(Type type, const char* text, const char* font, BackgroundType background_type) {
 	Button::type = type;
 	Button::text.setString(text);
@@ -16,6 +40,7 @@ ss::Button::Button(Type type, const char* text, const char* font, BackgroundType
 		break;
 	}
 }
+*/
 
 void ss::Button::set_text(char* text) {
 	Button::text.setString(text);
