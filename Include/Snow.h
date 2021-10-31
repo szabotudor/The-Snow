@@ -22,7 +22,7 @@ namespace ss {
 
 	private:
 		bool pressed = false;
-		int border = 0;
+		unsigned int border = 0;
 		Type type;
 		BackgroundType background_type;
 		sf::Text text;
