@@ -3,13 +3,17 @@
 using namespace std;
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!", sf::Style::Default);
+    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(60);
+
     sf::CircleShape shape(100.f);
     sf::RectangleShape rect(sf::Vector2f(20, 80));
     shape.setFillColor(sf::Color::Green);
     rect.setOutlineColor(sf::Color::Red);
     rect.setOutlineThickness(3);
     rect.setFillColor(sf::Color(30, 100, 240));
+    rect.setPosition(10, 10);
 
     while (window.isOpen()) {
         sf::Event event;
