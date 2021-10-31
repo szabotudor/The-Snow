@@ -33,13 +33,11 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-#Ignore Visual Studio generated files
+# Visual Studio 2015/2017 cache/options directory
+.vs/
 The Snow.vcxproj.filters
 The Snow.vcxproj.user
 The Snow.vcxproj
-
-# Visual Studio 2015/2017 cache/options directory
-.vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
