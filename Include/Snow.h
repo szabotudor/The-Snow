@@ -39,6 +39,7 @@ namespace ss {
 			ON
 		};
 		State state = State::OFF;
+		bool hovered = false;
 		bool pressed = false;
 		bool just_pressed = false;
 		bool just_released = false;
@@ -46,7 +47,7 @@ namespace ss {
 		sf::Mouse::Button button = sf::Mouse::Button::Left;
 
 	private:
-		unsigned int border = 0;
+		int border = 0;
 		Type type;
 		BackgroundType background_type;
 		sf::Text text;
