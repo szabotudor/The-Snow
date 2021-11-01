@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Button.cpp" />
+    <ClCompile Include="Source\Snow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
