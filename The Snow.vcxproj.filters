@@ -7,5 +7,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
+    <ClInclude Include="Include\Button.h" />
   </ItemGroup>
 </Project>

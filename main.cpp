@@ -1,7 +1,5 @@
 #include<Snow.h>
 
-using namespace std;
-
 
 void poll_events(sf::RenderWindow &window, sf::Event &event) {
     while (window.pollEvent(event)) {
