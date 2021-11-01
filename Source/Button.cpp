@@ -71,21 +71,20 @@ void ss::Button::set_font(char* font) {
 }
 
 void ss::Button::set_position(sf::Vector2f position) {
-	Button::position = position;
-	Button::text.setPosition(position);
-	position.x -= border;
-	position.y -= border;
-	Button::rect.setPosition(position);
-	position.x += border;
-	position.y += border;
+	sf::Vector2f pos(position.x, position.y);
+	Button::position = pos;
+	Button::text.setPosition(pos);
+	pos.x -= border;
+	pos.y -= border;
+	Button::rect.setPosition(pos);
 }
 
 void ss::Button::set_position(int x, int y) {
 	sf::Vector2f pos(x, y);
 	Button::position = pos;
 	Button::text.setPosition(pos);
-	x = x - border;
-	y = y - border;
+	x -= border;
+	y -= border;
 	Button::rect.setPosition(x, y);
 }
 
@@ -99,5 +98,33 @@ void ss::Button::draw(sf::RenderWindow& window) {
 	case ss::Button::Texture:
 		break;
 		//window.draw(texture);
+	}
+}
+
+void ss::Button::update(sf::RenderWindow& window) {
+	sf::Vector2i pos = sf::Mouse::getPosition(window);
+	
+	if (just_released) {
+		just_released = false;
+	}
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+		if (pos.x > position.x and pos.x < position.x + rect.getSize().x and pos.y > position.y and pos.y < position.y + rect.getSize().y) {
+			switch (type) {
+			case ss::Button::Press:
+				if (!pressed) {
+					pressed = true;
+					just_pressed = true;
+				}
+				else {
+					just_pressed = false;
+				}
+			case ss::Button::Toggle:
+				break;
+			}
+		}
+	}
+	else if (pressed) {
+		just_released = true;
+		pressed = false;
 	}
 }
