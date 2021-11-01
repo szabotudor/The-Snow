@@ -25,7 +25,7 @@ void poll_events(sf::RenderWindow &window, sf::Event &event) {
 int main() {
     sf::RenderWindow window(sf::VideoMode(256 * 2, 144 * 2), "The Snow");
     sf::Event event;
-    ss::Button button(sf::Color(20, 40, 60), sf::Color(120, 150, 180), sf::Color(255, 255, 255), 20, "Button");
+    ss::Button button(sf::Color(20, 40, 60), sf::Color(120, 150, 180), sf::Color(255, 255, 255), 5, "Button");
     button.set_position(40, 40);
 
     while (window.isOpen()) {
