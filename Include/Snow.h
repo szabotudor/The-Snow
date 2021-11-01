@@ -16,18 +16,25 @@ namespace ss {
 	
 	class Button {
 	public:
-		bool pressed = false;
-		bool just_pressed = false;
-		bool just_released = false;
-		enum Type {
+		enum class Type {
 			Press,
 			Toggle
 		};
-		enum BackgroundType {
+		enum class BackgroundType {
 			Rect,
 			Empty,
 			Texture
 		};
+		enum class State {
+			OFF,
+			ON
+		};
+		State state = State::OFF;
+		bool pressed = false;
+		bool just_pressed = false;
+		bool just_released = false;
+		//Button used to click the button
+		sf::Mouse::Button button = sf::Mouse::Button::Left;
 
 	private:
 		unsigned int border = 0;
@@ -59,5 +66,7 @@ namespace ss {
 		void draw(sf::RenderWindow& window);
 		//Updates the button state, based on mouse location and clicks
 		void update(sf::RenderWindow& window);
+		//Call to set press type (toggle, or normal)
+		void set_toggle(bool ON);
 	};
 }
