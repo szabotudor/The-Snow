@@ -28,6 +28,13 @@ int main() {
         window.clear(sf::Color::Transparent);
 
     //Main loop
+        button.update(window);
+        if (button.just_pressed) {
+            cout << "Button just pressed" << endl;
+        }
+        if (button.just_released) {
+            cout << "Button just released" << endl;
+        }
         button.draw(window);
     //End of main loop
 
