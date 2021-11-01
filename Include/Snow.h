@@ -13,7 +13,7 @@ namespace ss {
 	void _process();
 	//Stops all processes and background threads running in the helper library
 	void quit();
-
+	
 	class Button {
 	public:
 		enum Type {
