@@ -16,6 +16,9 @@ namespace ss {
 	
 	class Button {
 	public:
+		bool pressed = false;
+		bool just_pressed = false;
+		bool just_released = false;
 		enum Type {
 			Press,
 			Toggle
@@ -27,7 +30,6 @@ namespace ss {
 		};
 
 	private:
-		bool pressed = false;
 		unsigned int border = 0;
 		Type type;
 		BackgroundType background_type;
@@ -55,5 +57,7 @@ namespace ss {
 		void set_position(int x, int y);
 		//Sets the window the button should be drawn to
 		void draw(sf::RenderWindow& window);
+		//Updates the button state, based on mouse location and clicks
+		void update(sf::RenderWindow& window);
 	};
 }
