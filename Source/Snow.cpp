@@ -9,5 +9,6 @@ namespace ss {
 
 	void quit() {
 		process_thread.join();
+		cout << "\nAll threads stopped";
 	}
 }

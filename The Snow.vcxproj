@@ -152,7 +152,6 @@
     <ClCompile Include="Source\Snow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Button.h" />
     <ClInclude Include="Include\Snow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
