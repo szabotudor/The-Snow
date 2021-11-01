@@ -1,4 +1,5 @@
 #pragma once
+#include<thread>
 #include<iostream>
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
@@ -8,6 +9,11 @@
 using namespace std;
 
 namespace ss {
+	//Funtion that runs in a background thread (not meant for use by user)
+	void _process();
+	//Stops all processes and background threads running in the helper library
+	void quit();
+
 	class Button {
 	public:
 		enum Type {
