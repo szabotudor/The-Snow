@@ -34,5 +34,6 @@ int main() {
         //Displays the window
         window.display();
     }
+    ss::quit();
     return 0;
 }

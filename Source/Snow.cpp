@@ -1,7 +1,13 @@
 #include<Snow.h>
 
-inline void ss::process() {
-	for (int i = 0; i < 5; i++) {
-		cout << i << endl;
+void ss::_process() {
+	cout << "process thread started";
+}
+
+namespace ss {
+	thread process_thread(ss::_process);
+
+	void quit() {
+		process_thread.join();
 	}
 }
