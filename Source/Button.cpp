@@ -8,7 +8,7 @@ ss::Button::Button(const char* text) {
 
 	Button::text.setFillColor(sf::Color::White);
 
-	Button::background_type = Button::Empty;
+	Button::background_type = Button::BackgroundType::Empty;
 }
 
 ss::Button::Button(sf::Color bgd_color, sf::Color border_color, sf::Color text_color, int border_thickness, const char* text, const char* font) {
@@ -24,7 +24,7 @@ ss::Button::Button(sf::Color bgd_color, sf::Color border_color, sf::Color text_c
 	Button::rect.setOutlineColor(border_color);
 	Button::rect.setOutlineThickness(border_thickness);
 
-	Button::background_type = Button::Rect;
+	Button::background_type = Button::BackgroundType::Rect;
 	Button::border = border_thickness;
 }
 
@@ -36,7 +36,7 @@ ss::Button::Button(sf::Color text_color, const char* text, const char* font) {
 
 	Button::text.setFillColor(text_color);
 
-	Button::background_type = Button::Empty;
+	Button::background_type = Button::BackgroundType::Empty;
 }
 /*
 ss::Button::Button(Type type, const char* text, const char* font, BackgroundType background_type) {
@@ -90,12 +90,12 @@ void ss::Button::set_position(int x, int y) {
 
 void ss::Button::draw(sf::RenderWindow& window) {
 	switch (background_type) {
-	case ss::Button::Rect:
+	case ss::Button::BackgroundType::Rect:
 		window.draw(rect);
 		window.draw(text);
-	case ss::Button::Empty:
+	case ss::Button::BackgroundType::Empty:
 		window.draw(text);
-	case ss::Button::Texture:
+	case ss::Button::BackgroundType::Texture:
 		break;
 		//window.draw(texture);
 	}
@@ -107,24 +107,45 @@ void ss::Button::update(sf::RenderWindow& window) {
 	if (just_released) {
 		just_released = false;
 	}
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+	//Check wether Left Click is pressed
+	if (sf::Mouse::isButtonPressed(button)) {
+		//Checks wether the mouse cursor is inside the button
 		if (pos.x > position.x and pos.x < position.x + rect.getSize().x and pos.y > position.y and pos.y < position.y + rect.getSize().y) {
 			switch (type) {
-			case ss::Button::Press:
+			case ss::Button::Type::Press:
 				if (!pressed) {
 					pressed = true;
 					just_pressed = true;
+					state = State::ON;
 				}
 				else {
 					just_pressed = false;
+					state = State::OFF;
 				}
-			case ss::Button::Toggle:
-				break;
+			case ss::Button::Type::Toggle:
+				if (!pressed) {
+					pressed = true;
+					if (state == State::OFF) {
+						state = State::ON;
+					}
+					else if (state == State::ON) {
+						state = State::OFF;
+					}
+				}
 			}
 		}
 	}
 	else if (pressed) {
 		just_released = true;
 		pressed = false;
+	}
+}
+
+void ss::Button::set_toggle(bool ON) {
+	if (ON) {
+		type = Button::Type::Toggle;
+	}
+	else {
+		type = Button::Type::Press;
 	}
 }
