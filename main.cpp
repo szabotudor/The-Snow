@@ -1,9 +1,4 @@
-#include<iostream>
 #include<Snow.h>
-#include<SFML/Graphics.hpp>
-#include<SFML/System.hpp>
-#include<SFML/Audio.hpp>
-#include<SFML/Network.hpp>
 
 using namespace std;
 
