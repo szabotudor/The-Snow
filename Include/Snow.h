@@ -1,4 +1,5 @@
 #pragma once
+#include<thread>
 #include<iostream>
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
@@ -8,6 +9,10 @@
 using namespace std;
 
 namespace ss {
+	inline void process();
+	thread process_thread(process);
+
+	//Class that automates buttons
 	class Button {
 	public:
 		enum Type {
@@ -32,6 +37,7 @@ namespace ss {
 		sf::Vector2f position;
 		
 	public:
+		Button(const char* text = "Button");
 		Button(sf::Color bgd_color, sf::Color border_color, sf::Color text_color, int border_thickness, const char* text, const char* font = "Pixel.ttf");
 		Button(sf::Color text_color, const char* text, const char* font = "Pixel.ttf");
 		//Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect);
