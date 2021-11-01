@@ -9,11 +9,20 @@
 using namespace std;
 
 namespace ss {
-	//Funtion that runs in a background thread (not meant for use by user)
-	void _process();
-	//Stops all processes and background threads running in the helper library
-	void quit();
-	
+	/*
+	class Snow {
+	public:
+		Snow();
+		//Stops all processes and background threads running in the helper library
+		void quit();
+	private:
+		//Funtion that runs in a background thread (not meant for use by user)
+		void _process();
+		bool _run;
+		thread process_thread;
+	};
+	*/
+
 	class Button {
 	public:
 		enum class Type {
