@@ -20,6 +20,7 @@ int main() {
     sf::Event event;
     ss::Button button(sf::Color(20, 40, 60), sf::Color(120, 150, 180), sf::Color(255, 255, 255), 5, "Button");
     button.set_position(40, 40);
+    button.set_toggle(true);
 
     while (window.isOpen()) {
         poll_events(window, event);
@@ -30,10 +31,10 @@ int main() {
     //Main loop
         button.update(window);
         if (button.just_pressed) {
-            cout << "Button just pressed" << endl;
+            cout << "Button just pressed" << "; State: " << (button.state == ss::Button::State::ON) << endl;
         }
         if (button.just_released) {
-            cout << "Button just released" << endl;
+            cout << "Button just released" << "; State: " << (button.state == ss::Button::State::ON) << endl;
         }
         button.draw(window);
     //End of main loop
