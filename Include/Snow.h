@@ -2,6 +2,7 @@
 #include<thread>
 #include<iostream>
 #include<SDL.h>
+#include<SDL_image.h>
 #include<SFML/Graphics.hpp>
 #include<SFML/System.hpp>
 #include<SFML/Audio.hpp>
