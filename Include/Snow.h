@@ -19,6 +19,7 @@ namespace ss {
 		Uint32 time = 0;
 		bool _run = true;
 
+		//Poll game events
 		void poll_events();
 	public:
 		Snow(const char* name, Vector resolution = Vector(512, 288), Uint32 SDL_falgs = SDL_WINDOW_SHOWN, unsigned int framerate = 60);
