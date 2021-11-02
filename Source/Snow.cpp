@@ -21,7 +21,6 @@ ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsign
 	render = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
 
 	frame_delay = 1000 / framerate;
-	time = SDL_GetTicks();
 }
 
 void ss::Snow::update() {
@@ -39,11 +38,16 @@ void ss::Snow::update() {
 		keystate[i] = (bool)checkstate[i];
 	}
 
-	current_frame_delay = frame_delay - (SDL_GetTicks() - time);
-	if (current_frame_delay > 0 and current_frame_delay < frame_delay + 1) {
-		SDL_Delay(current_frame_delay);
+	current_frame_delay = (SDL_GetTicks() - time);
+	//cout << SDL_GetTicks() << " " << time << " " << current_frame_delay << endl;
+	if (current_frame_delay > 0 and current_frame_delay <= frame_delay) {
+		frame_wait_time = frame_delay - current_frame_delay;
+		SDL_Delay(frame_wait_time);
 	}
 	time = SDL_GetTicks();
+	if (frame_wait_time + current_frame_delay) {
+		fps = 1000 / (frame_wait_time + current_frame_delay);
+	}
 }
 
 void ss::Snow::clear_screen(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
@@ -52,17 +56,12 @@ void ss::Snow::clear_screen(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 	SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
 }
 
-Uint32 ss::Snow::get_time() {
+long long ss::Snow::get_time() {
 	return time;
 }
 
 int ss::Snow::get_fps() {
-	if (!current_frame_delay) {
-		return 0;
-	}
-	else {
-		return 1000 / current_frame_delay;
-	}
+	return fps;
 }
 
 SDL_Renderer* ss::Snow::get_renderer() {
@@ -96,7 +95,8 @@ bool ss::Snow::is_key_just_released(Uint8 key) {
 	}
 }
 
-bool ss::Snow::running() {
+bool ss::Snow::running(float &delta_time) {
+	delta_time = current_frame_delay + frame_wait_time;
 	return _run;
 }
 

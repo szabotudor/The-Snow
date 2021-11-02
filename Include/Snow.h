@@ -1,5 +1,5 @@
 #pragma once
-#include<thread>
+#include<chrono>
 #include<iostream>
 #include<string>
 #include<SDL.h>
@@ -22,7 +22,9 @@ namespace ss {
 		SDL_Event event;
 		int frame_delay = 16;
 		int current_frame_delay;
-		Uint32 time = 0;
+		unsigned int fps;
+		unsigned int frame_wait_time;
+		long long time;
 		bool _run = true;
 		//Uint8* previous_keystate = { 0 };
 		//Uint8* keystate = { 0 };
@@ -39,7 +41,7 @@ namespace ss {
 		//Function to clear the screen to a color
 		void clear_screen(Uint8 r = 0, Uint8 g = 0, Uint8 b = 0, Uint8 a = 255);
 		//Returns the time since init
-		Uint32 get_time();
+		long long get_time();
 		//Returns the frames per second
 		int get_fps();
 		//Redurns the SDL renderer
@@ -51,7 +53,7 @@ namespace ss {
 		//Returnes true if the SDL_KeyScancode is just released this frame pressed (eg: SDL_SCANCODE_RETURN)
 		bool is_key_just_released(Uint8 key);
 		//Checks if the engine is still running
-		bool running();
+		bool running(float &delta_time);
 		//Stops all processes and background threads running in the helper library
 		void quit();
 	};
