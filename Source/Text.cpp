@@ -10,7 +10,6 @@ ss::Text::Text(SDL_Renderer* renderer, const char* text, const char* font, Uint8
 	color.b = 255;
 	color.a = 255;
 	surface = TTF_RenderText_Solid(Text::font, text, color);
-	cout << TTF_GetError();
 	texture = SDL_CreateTextureFromSurface(render, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
@@ -30,8 +29,14 @@ void ss::Text::set_font(const char* font, Uint8 font_size) {
 void ss::Text::set_text(const char* text) {
 	surface = TTF_RenderText_Solid(Text::font, text, color);
 	texture = SDL_CreateTextureFromSurface(render, surface);
+	rect.w = surface->w;
+	rect.h = surface->h;
 	SDL_FreeSurface(surface);
 	Text::text = text;
+}
+
+void ss::Text::set_text(string text) {
+	set_text(text.c_str());
 }
 
 void ss::Text::draw() {

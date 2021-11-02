@@ -19,6 +19,8 @@ namespace ss {
 		void set_font(const char* font, Uint8 font_size);
 		//Sets the text to the given string
 		void set_text(const char* text);
+		//Sets the text to the given string
+		void set_text(string text);
 		//Draws the text on screen
 		void draw();
 		//Returns the text set on the Text object
