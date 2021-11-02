@@ -2,7 +2,7 @@
 
 
 int main(int argc, char* args[]) {
-	ss::Snow game("The Snow");
+	ss::Snow game("The Snow", ss::Vector(512, 288), SDL_WINDOW_SHOWN);
 	ss::Text text(game.get_renderer(), "Test String", "Pixel.ttf", 20);
 
 	while (game.running()) {

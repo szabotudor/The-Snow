@@ -12,6 +12,9 @@ using namespace std;
 
 namespace ss {
 	class Snow {
+	public:
+		Vector resolution;
+	private:
 		SDL_Window* window = NULL;
 		SDL_Surface* surface = NULL;
 		SDL_Renderer* render = NULL;
@@ -19,6 +22,7 @@ namespace ss {
 		int frame_delay = 16;
 		Uint32 time = 0;
 		bool _run = true;
+		Uint8* keystate = { 0 };
 
 		//Poll game events
 		void poll_events();
@@ -32,6 +36,8 @@ namespace ss {
 		Uint32 get_time();
 		//Redurns the SDL renderer
 		SDL_Renderer* get_renderer();
+		//Returnes true if the SDL_KeyScancode is pressed (eg: SDL_SCANCODE_RETURN)
+		bool is_key_pressed(Uint8 key);
 		//Checks if the engine is still running
 		bool running();
 		//Stops all processes and background threads running in the helper library

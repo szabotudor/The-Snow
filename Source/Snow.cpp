@@ -14,6 +14,7 @@ ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsign
 		cout << "Could not initialize SDL video: " << SDL_GetError();
 	}
 
+	Snow::resolution = resolution;
 	window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, resolution.x, resolution.y, SDL_flags);
 	surface = SDL_GetWindowSurface(window);
 	render = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
@@ -28,6 +29,7 @@ void ss::Snow::update() {
 	}
 	SDL_RenderPresent(render);
 	poll_events();
+	keystate = (Uint8*)SDL_GetKeyboardState(NULL);
 
 	unsigned int delay = frame_delay - (SDL_GetTicks() - time);
 	if (delay > 0 and delay < frame_delay + 1) {
@@ -48,6 +50,10 @@ Uint32 ss::Snow::get_time() {
 
 SDL_Renderer* ss::Snow::get_renderer() {
 	return render;
+}
+
+bool ss::Snow::is_key_pressed(Uint8 key) {
+	return keystate[key];
 }
 
 bool ss::Snow::running() {
