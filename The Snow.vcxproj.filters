@@ -5,11 +5,13 @@
     <ClCompile Include="Source\Snow.cpp" />
     <ClCompile Include="Source\Button.cpp" />
     <ClCompile Include="Source\Vector.cpp" />
+    <ClCompile Include="Source\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
     <ClInclude Include="Include\Vector.h" />
     <ClInclude Include="Include\Button.h" />
+    <ClInclude Include="Include\Text.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Pixel.ttf" />
