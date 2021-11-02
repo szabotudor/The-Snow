@@ -23,6 +23,7 @@ namespace ss {
 		int frame_delay = 16;
 		int current_frame_delay;
 		unsigned int fps;
+		unsigned int target_fps = 60;
 		unsigned int frame_wait_time;
 		long long time;
 		bool _run = true;
@@ -54,6 +55,10 @@ namespace ss {
 		bool is_key_just_released(Uint8 key);
 		//Checks if the engine is still running
 		bool running(float &delta_time);
+		//Sets the target fps (set to negative for unlimited)
+		void set_target_framerate(unsigned int framerate);
+		//Gets the target fps priorly set
+		unsigned int get_target_framerate();
 		//Stops all processes and background threads running in the helper library
 		void quit();
 	};

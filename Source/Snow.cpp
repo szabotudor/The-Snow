@@ -15,6 +15,7 @@ ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsign
 		cout << "Could not initialize SDL video: " << SDL_GetError();
 	}
 
+	target_fps = framerate;
 	Snow::resolution = resolution;
 	window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, resolution.x, resolution.y, SDL_flags);
 	surface = SDL_GetWindowSurface(window);
@@ -24,13 +25,14 @@ ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsign
 }
 
 void ss::Snow::update() {
+	poll_events();
 	if (!_run) {
 		return;
 	}
 
 	SDL_RenderPresent(render);
 
-	poll_events();
+
 	int numkeys;
 	const Uint8* checkstate = SDL_GetKeyboardState(&numkeys);
 	for (int i = 0; i < numkeys; i++) {
@@ -41,12 +43,15 @@ void ss::Snow::update() {
 	current_frame_delay = (SDL_GetTicks() - time);
 	//cout << SDL_GetTicks() << " " << time << " " << current_frame_delay << endl;
 	if (current_frame_delay > 0 and current_frame_delay <= frame_delay) {
-		frame_wait_time = frame_delay - current_frame_delay;
+		frame_wait_time = frame_delay - current_frame_delay + 1;
 		SDL_Delay(frame_wait_time);
 	}
 	time = SDL_GetTicks();
 	if (frame_wait_time + current_frame_delay) {
 		fps = 1000 / (frame_wait_time + current_frame_delay);
+	}
+	else {
+		fps = 1001;
 	}
 }
 
@@ -98,6 +103,15 @@ bool ss::Snow::is_key_just_released(Uint8 key) {
 bool ss::Snow::running(float &delta_time) {
 	delta_time = current_frame_delay + frame_wait_time;
 	return _run;
+}
+
+void ss::Snow::set_target_framerate(unsigned int framerate) {
+	target_fps = framerate;
+	frame_delay = 1000 / framerate;
+}
+
+unsigned int ss::Snow::get_target_framerate() {
+	return target_fps;
 }
 
 void ss::Snow::quit() {
