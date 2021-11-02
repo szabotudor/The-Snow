@@ -3,9 +3,11 @@
 
 int main(int argc, char* args[]) {
 	ss::Snow game("The Snow");
+	ss::Text text(game.get_renderer(), "Test String", "Pixel.ttf", 20);
 
 	while (game.running()) {
 		game.clear_screen();
+		text.draw();
 		game.update();
 	}
 	return 0;
