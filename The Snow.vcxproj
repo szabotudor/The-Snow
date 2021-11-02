@@ -160,7 +160,7 @@
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="BULKYPIX.TTF" />
+    <Font Include="bulkypix.ttf" />
     <Font Include="Pixel.ttf" />
   </ItemGroup>
   <ItemGroup>
