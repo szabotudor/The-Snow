@@ -1,13 +1,6 @@
 #include<Snow.h>
 
 
-void poll_event(SDL_Event event, bool &_run) {
-	if (event.type == SDL_QUIT) {
-		_run = false;
-	}
-}
-
-
 int main(int argc, char* args[]) {
 	ss::Snow game("The Snow");
 
