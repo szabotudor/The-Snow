@@ -1,46 +1,43 @@
 #include<Snow.h>
 
 
-void poll_events(sf::RenderWindow &window, sf::Event &event) {
-    while (window.pollEvent(event)) {
-        switch (event.type) {
-        case sf::Event::Closed:
-            window.close();
-        case sf::Event::KeyPressed:
-            if (event.key.code == sf::Keyboard::Escape) {
-                window.close();
-            }
-        }
-    }
+void poll_event(SDL_Event event, bool &_run) {
+	if (event.type == SDL_QUIT) {
+		_run = false;
+	}
 }
 
 
-int main() {
-    sf::RenderWindow window(sf::VideoMode(256 * 2, 144 * 2), "The Snow");
-    sf::Event event;
-    ss::Button button(sf::Color(20, 40, 60), sf::Color(120, 150, 180), sf::Color(255, 255, 255), 5, "Button");
-    button.set_position(40, 40);
-    button.set_toggle(false);
+int main(int argc, char* args[]) {
+	//Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO)) {
+		cout << "Could not initialize SDL video";
+		return -1;
+	}
 
-    while (window.isOpen()) {
-        poll_events(window, event);
+	bool _run = true;
+	SDL_Window* window;
+	SDL_Surface* surface;
+	SDL_Event event;
 
-        //Clears the window
-        window.clear(sf::Color::Transparent);
+	//Create window, and get it's surface
+	window = SDL_CreateWindow("The Snow", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 512, 288, SDL_WINDOW_SHOWN);
+	surface = SDL_GetWindowSurface(window);
 
-    //Main loop
-        button.update(window);
-        if (button.just_pressed) {
-            cout << "Button just pressed" << "; State: " << (button.state == ss::Button::State::ON) << endl;
-        }
-        if (button.just_released) {
-            cout << "Button just released" << "; State: " << (button.state == ss::Button::State::ON) << endl;
-        }
-        button.draw(window);
-    //End of main loop
+	while (_run) {
+		//Poll window events
+		while (SDL_PollEvent(&event)) {
+			poll_event(event, _run);
+		}
+		//Fill the window to clear previous frame
+		SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 30, 50, 70));
 
-        //Displays the window
-        window.display();
-    }
-    return 0;
+		//Main loop
+
+		//End of main loop
+
+		//Update the window to show drawn opjects
+		SDL_UpdateWindowSurface(window);
+	}
+	SDL_Quit();
 }
