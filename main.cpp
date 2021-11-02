@@ -2,12 +2,30 @@
 
 
 int main(int argc, char* args[]) {
-	ss::Snow game("The Snow", ss::Vector(512, 288), SDL_WINDOW_SHOWN);
+	ss::Snow game("The Snow", ss::Vector(512, 288), SDL_WINDOW_SHOWN, 60);
 	ss::Text text(game.get_renderer(), "Test String", "Pixel.ttf", 20);
+	float _dt = 0.0f;
+	int div_fps = 60;
+	int avg_fps[60] = { 0 }, i = 0;
 
-	while (game.running()) {
+	while (game.running(_dt)) {
 		game.clear_screen();
-		text.set_text("FPS: " + to_string(game.get_fps()) + "\nElapsed _Init time: " + to_string(game.get_time()));
+		if (i < div_fps) {
+			avg_fps[i] = game.get_fps();
+			i++;
+		}
+		else {
+			i = 0;
+			int sum = 0;
+			for (int j = 0; j < div_fps; j++) {
+				sum += avg_fps[j];
+				avg_fps[j] = 0;
+			}
+			sum /= div_fps;
+			div_fps = sum;
+
+			text.set_text("FPS: " + to_string(sum) + " | Aprox frame delta(ms): " + to_string(_dt));
+		}
 		text.draw();
 		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
 			cout << "Space just pressed" << endl;
