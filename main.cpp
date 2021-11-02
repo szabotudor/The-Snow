@@ -7,7 +7,14 @@ int main(int argc, char* args[]) {
 
 	while (game.running()) {
 		game.clear_screen();
+		text.set_text("FPS: " + to_string(game.get_fps()) + "\nElapsed _Init time: " + to_string(game.get_time()));
 		text.draw();
+		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
+			cout << "Space just pressed" << endl;
+		}
+		else if (game.is_key_just_released(SDL_SCANCODE_SPACE)) {
+			cout << "Space just released" << endl;
+		}
 		game.update();
 	}
 	return 0;
