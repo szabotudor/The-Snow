@@ -40,6 +40,7 @@ namespace ss {
 			ON
 		};
 		State state = State::OFF;
+		bool disabled = false;
 		bool hovered = false;
 		bool pressed = false;
 		bool just_pressed = false;

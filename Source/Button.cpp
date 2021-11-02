@@ -106,6 +106,9 @@ bool is_hovered(int x, int y, int bx, int by, int w, int h) {
 }
 
 void ss::Button::update(sf::RenderWindow& window) {
+	if (disabled) {
+		return;
+	}
 	sf::Vector2i pos = sf::Mouse::getPosition(window);
 	if (!hovered) {
 		hovered = is_hovered(pos.x, pos.y, position.x, position.y, rect.getSize().x, rect.getSize().y);
