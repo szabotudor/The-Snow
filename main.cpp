@@ -5,6 +5,11 @@ void poll_event(SDL_Event event, bool &_run) {
 	if (event.type == SDL_QUIT) {
 		_run = false;
 	}
+	if (event.type == SDL_KEYDOWN) {
+		if (event.key.keysym.sym == SDLK_ESCAPE) {
+			_run = false;
+		}
+	}
 }
 
 
@@ -20,8 +25,10 @@ int main(int argc, char* args[]) {
 	SDL_Surface* surface;
 	SDL_Event event;
 
+	SDL_Surface* image = IMG_Load("preview.png");
+
 	//Create window, and get it's surface
-	window = SDL_CreateWindow("The Snow", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 512, 288, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("The Snow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920 / 4, 1080 / 4, SDL_WINDOW_SHOWN);
 	surface = SDL_GetWindowSurface(window);
 
 	while (_run) {
@@ -33,7 +40,7 @@ int main(int argc, char* args[]) {
 		SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 30, 50, 70));
 
 		//Main loop
-
+		SDL_BlitSurface(image, NULL, surface, NULL);
 		//End of main loop
 
 		//Update the window to show drawn opjects
