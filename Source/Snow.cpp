@@ -30,7 +30,6 @@ void ss::Snow::update() {
 	poll_events();
 
 	unsigned int delay = frame_delay - (SDL_GetTicks() - time);
-	cout << delay << endl;
 	if (delay > 0 and delay < frame_delay + 1) {
 		SDL_Delay(delay);
 	}
