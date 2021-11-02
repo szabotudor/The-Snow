@@ -39,5 +39,7 @@ int main(int argc, char* args[]) {
 		//Update the window to show drawn opjects
 		SDL_UpdateWindowSurface(window);
 	}
+	//Destroy the window and close SDL
+	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
