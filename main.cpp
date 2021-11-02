@@ -20,7 +20,7 @@ int main() {
     sf::Event event;
     ss::Button button(sf::Color(20, 40, 60), sf::Color(120, 150, 180), sf::Color(255, 255, 255), 5, "Button");
     button.set_position(40, 40);
-    button.set_toggle(true);
+    button.set_toggle(false);
 
     while (window.isOpen()) {
         poll_events(window, event);
