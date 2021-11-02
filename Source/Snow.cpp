@@ -2,6 +2,7 @@
 
 
 void ss::Snow::poll_events() {
+	SDL_PumpEvents();
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT) {
 			quit();
@@ -27,13 +28,20 @@ void ss::Snow::update() {
 	if (!_run) {
 		return;
 	}
-	SDL_RenderPresent(render);
-	poll_events();
-	keystate = (Uint8*)SDL_GetKeyboardState(NULL);
 
-	unsigned int delay = frame_delay - (SDL_GetTicks() - time);
-	if (delay > 0 and delay < frame_delay + 1) {
-		SDL_Delay(delay);
+	SDL_RenderPresent(render);
+
+	poll_events();
+	int numkeys;
+	const Uint8* checkstate = SDL_GetKeyboardState(&numkeys);
+	for (int i = 0; i < numkeys; i++) {
+		previous_keystate[i] = keystate[i];
+		keystate[i] = (bool)checkstate[i];
+	}
+
+	current_frame_delay = frame_delay - (SDL_GetTicks() - time);
+	if (current_frame_delay > 0 and current_frame_delay < frame_delay + 1) {
+		SDL_Delay(current_frame_delay);
 	}
 	time = SDL_GetTicks();
 }
@@ -48,12 +56,44 @@ Uint32 ss::Snow::get_time() {
 	return time;
 }
 
+int ss::Snow::get_fps() {
+	if (!current_frame_delay) {
+		return 0;
+	}
+	else {
+		return 1000 / current_frame_delay;
+	}
+}
+
 SDL_Renderer* ss::Snow::get_renderer() {
 	return render;
 }
 
 bool ss::Snow::is_key_pressed(Uint8 key) {
-	return keystate[key];
+	if (!keystate) {
+		return false;
+	}
+	else {
+		return keystate[key];
+	}
+}
+
+bool ss::Snow::is_key_just_pressed(Uint8 key) {
+	if (!keystate or !previous_keystate) {
+		return false;
+	}
+	else {
+		return (!previous_keystate[key] and keystate[key]);
+	}
+}
+
+bool ss::Snow::is_key_just_released(Uint8 key) {
+	if (!keystate or !previous_keystate) {
+		return false;
+	}
+	else {
+		return (previous_keystate[key] and !keystate[key]);
+	}
 }
 
 bool ss::Snow::running() {
