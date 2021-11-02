@@ -9,6 +9,14 @@ void poll_event(SDL_Event event, bool &_run) {
 
 
 int main(int argc, char* args[]) {
+	ss::Snow game("The Snow");
+
+	while (game.running()) {
+		game.clear_screen();
+		game.update();
+	}
+	return 0;
+	/*
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		cout << "Could not initialize SDL video";
@@ -85,4 +93,5 @@ int main(int argc, char* args[]) {
 	//Destroy the window and close SDL
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+	*/
 }
