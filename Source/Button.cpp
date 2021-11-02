@@ -2,16 +2,14 @@
 
 
 
-void ss::Button::draw(sf::RenderWindow& window) {
+void ss::Button::draw(SDL_Window& window) {
 	switch (background_type) {
 	case ss::Button::BackgroundType::Rect:
-		window.draw(rect);
-		window.draw(text);
+		break;
 	case ss::Button::BackgroundType::Empty:
-		window.draw(text);
+		break;
 	case ss::Button::BackgroundType::Texture:
 		break;
-		//window.draw(texture);
 	}
 }
 
@@ -19,25 +17,31 @@ bool is_hovered(int x, int y, int bx, int by, int w, int h) {
 	return x > bx and x < (bx + w) and y > by and y < (by + h);
 }
 
-void ss::Button::update(sf::RenderWindow& window) {
+void ss::Button::update(SDL_Window& window) {
 	if (disabled) {
 		return;
 	}
-	sf::Vector2i pos = sf::Mouse::getPosition(window);
+
+	int x, y;
+	SDL_GetMouseState(&x, &y);
 	if (!hovered) {
-		hovered = is_hovered(pos.x, pos.y, position.x, position.y, rect.getSize().x, rect.getSize().y);
+		hovered = is_hovered(x, y, position.x, position.y, rect->w, rect->h);
 		if (hovered) {
+			/*
 			text.setFillColor(text.getFillColor() + sf::Color(30, 30, 30, 0));
 			text.setPosition(text.getPosition() - sf::Vector2f(0, border / 2));
 			rect.setPosition(rect.getPosition() - sf::Vector2f(0, border / 2));
+			*/
 		}
 	}
 	else {
-		hovered = is_hovered(pos.x, pos.y, position.x, position.y, rect.getSize().x, rect.getSize().y);
+		hovered = is_hovered(x, y, position.x, position.y, rect->w, rect->h);
 		if (!hovered) {
+			/*
 			text.setFillColor(text.getFillColor() - sf::Color(30, 30, 30, 0));
 			text.setPosition(text.getPosition() + sf::Vector2f(0, border / 2));
 			rect.setPosition(rect.getPosition() + sf::Vector2f(0, border / 2));
+			*/
 		}
 	}
 	
@@ -45,7 +49,7 @@ void ss::Button::update(sf::RenderWindow& window) {
 		just_released = false;
 	}
 	//Check wether Left Click is pressed
-	if (sf::Mouse::isButtonPressed(button)) {
+	if (SDL_GetMouseState(&x, &y) == mouse_button) {
 		//Checks wether the mouse cursor is inside the button
 		if (hovered) {
 			switch (type) {

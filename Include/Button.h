@@ -32,13 +32,12 @@ namespace ss {
 		BackgroundType background_type;
 		string text;
 		SDL_Rect* rect;
-
 		Vector position;
 
 	public:
 		Button(const char* text = "Button");
-		Button(sf::Color bgd_color, sf::Color border_color, sf::Color text_color, int border_thickness, const char* text, const char* font = "Pixel.ttf");
-		Button(sf::Color text_color, const char* text, const char* font = "Pixel.ttf");
+		Button(SDL_Color bgd_color, SDL_Color border_color, SDL_Color text_color, int border_thickness, const char* text, const char* font = "Pixel.ttf");
+		Button(SDL_Color text_color, const char* text, const char* font = "Pixel.ttf");
 		//Button(Type type = Type::Press, const char* text = "Button", const char* font = "Pixel.ttf", BackgroundType background_type = BackgroundType::Rect);
 
 		//Sets the button text to the given parameter
@@ -54,7 +53,7 @@ namespace ss {
 
 
 		//Updates the button state, based on mouse location and clicks
-		void update(sf::RenderWindow& window);
+		void update(SDL_Window& window);
 		//Call to set press type (toggle, or normal)
 		void set_toggle(bool ON);
 	};
