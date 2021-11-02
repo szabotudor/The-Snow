@@ -24,6 +24,7 @@ int main(int argc, char* args[]) {
 	SDL_Window* window;
 	SDL_Surface* surface;
 	SDL_Event event;
+	SDL_Renderer* renderer;
 
 	SDL_Surface* image = IMG_Load("preview.png");
 

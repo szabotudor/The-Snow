@@ -4,9 +4,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Snow.cpp" />
     <ClCompile Include="Source\Button.cpp" />
+    <ClCompile Include="Source\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
+    <ClInclude Include="Include\Vector.h" />
+    <ClInclude Include="Include\Button.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Pixel.ttf" />
