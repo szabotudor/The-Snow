@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="Pixel.ttf" />
+    <Font Include="BULKYPIX.TTF" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />
