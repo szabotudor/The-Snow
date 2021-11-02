@@ -6,6 +6,7 @@
 #include<SDL_ttf.h>
 #include<Vector.h>
 #include<Button.h>
+#include<Text.h>
 
 using namespace std;
 
@@ -29,6 +30,8 @@ namespace ss {
 		void clear_screen(Uint8 r = 30, Uint8 g = 50, Uint8 b = 70, Uint8 a = 255);
 		//Returns the time since init
 		Uint32 get_time();
+		//Redurns the SDL renderer
+		SDL_Renderer* get_renderer();
 		//Checks if the engine is still running
 		bool running();
 		//Stops all processes and background threads running in the helper library

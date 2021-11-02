@@ -46,6 +46,10 @@ Uint32 ss::Snow::get_time() {
 	return time;
 }
 
+SDL_Renderer* ss::Snow::get_renderer() {
+	return render;
+}
+
 bool ss::Snow::running() {
 	return _run;
 }
