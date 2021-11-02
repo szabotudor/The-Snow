@@ -21,6 +21,7 @@ ss::Text::Text(SDL_Renderer* renderer, const char* text, const char* font, Uint8
 void ss::Text::set_font(const char* font, Uint8 font_size) {
 	Text::font = TTF_OpenFont(font, font_size);
 	surface = TTF_RenderText_Solid(Text::font, text.c_str(), color);
+	SDL_DestroyTexture(texture);
 	texture = SDL_CreateTextureFromSurface(render, surface);
 	SDL_FreeSurface(surface);
 	Text::font_size = font_size;
@@ -28,6 +29,7 @@ void ss::Text::set_font(const char* font, Uint8 font_size) {
 
 void ss::Text::set_text(const char* text) {
 	surface = TTF_RenderText_Solid(Text::font, text, color);
+	SDL_DestroyTexture(texture);
 	texture = SDL_CreateTextureFromSurface(render, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
