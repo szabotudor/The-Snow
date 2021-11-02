@@ -1,4 +1,7 @@
 #pragma once
+#include<string.h>
+
+using namespace std;
 
 
 namespace ss {
@@ -31,6 +34,8 @@ namespace ss {
 		Type type;
 		BackgroundType background_type;
 		string text;
+		TTF_Font* font;
+		SDL_Surface* button_surface;
 		SDL_Rect* rect;
 		Vector position;
 
@@ -50,8 +55,6 @@ namespace ss {
 		void set_position(int x, int y);
 		//Sets the window the button should be drawn to
 		void draw(SDL_Window& window);
-
-
 		//Updates the button state, based on mouse location and clicks
 		void update(SDL_Window& window);
 		//Call to set press type (toggle, or normal)
