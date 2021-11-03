@@ -25,15 +25,15 @@ namespace ss {
 		bool disabled = false;
 		bool hovered = false;
 		bool pressed = false;
+		bool held = false;
 		bool just_pressed = false;
 		bool just_released = false;
 		//Mouse button used to click the button
-		const unsigned int mouse_button = SDL_BUTTON_LEFT;
 
 	private:
 		int border = 0;
-		Type type;
-		BackgroundType background_type;
+		Type type = Type::Press;
+		BackgroundType background_type = BackgroundType::Rect;
 		string text;
 		SDL_Color text_color, border_color, fill_color;
 		TTF_Font* font;
@@ -60,8 +60,12 @@ namespace ss {
 		//Sets the window the button should be drawn to
 		void draw();
 		//Updates the button state, based on mouse location and clicks
-		void update(SDL_Window& window);
-		//Call to set press type (toggle, or normal)
+		void update();
+		//Returnes true if the mouse is over the button
+		bool is_hovered();
+		//Call to set press type (toggle = true, or normal = false)
 		void set_toggle(bool ON);
+		//Call to get press type (toggle = true, or normal = false)
+		bool get_toggle();
 	};
 }
