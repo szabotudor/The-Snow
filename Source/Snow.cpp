@@ -43,7 +43,7 @@ void ss::Snow::update() {
 	current_frame_delay = (SDL_GetTicks() - time);
 	//cout << SDL_GetTicks() << " " << time << " " << current_frame_delay << endl;
 	if (current_frame_delay > 0 and current_frame_delay <= frame_delay) {
-		frame_wait_time = frame_delay - current_frame_delay + 1;
+		frame_wait_time = frame_delay - current_frame_delay + (int)(fps >= target_fps);
 		SDL_Delay(frame_wait_time);
 	}
 	time = SDL_GetTicks();
