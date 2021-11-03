@@ -12,8 +12,8 @@ namespace ss {
 		SDL_Surface* surface;
 		SDL_Renderer* render;
 		SDL_Rect rect;
-		Vector position;
 	public:
+		Vector position;
 		Text(SDL_Renderer* renderer, const char* text, const char* font, Uint8 font_size = 24);
 		//Sets the font file given as the Text object's font
 		void set_font(const char* font, Uint8 font_size);

@@ -42,6 +42,10 @@ void ss::Text::set_text(string text) {
 }
 
 void ss::Text::draw() {
+	if (rect.x != position.x or rect.y != position.y) {
+		rect.x = position.x;
+		rect.y = position.y;
+	}
 	SDL_RenderCopy(render, texture, NULL, &rect);
 }
 
