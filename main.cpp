@@ -25,7 +25,7 @@ void show_fps(ss::Text& text, unsigned int fps, int &i) {
 
 int main(int argc, char* args[]) {
 	ss::Snow game("The Snow", ss::Vector(512, 288), SDL_WINDOW_SHOWN, 60);
-	ss::Text fps(game.get_renderer(), "00", "color basic.ttf", 18);
+	ss::Text fps(game.get_renderer(), "00", "basic.ttf", 18);
 	fps.position = ss::Vector(10, 10);
 	float _dt = 0.0f;
 	int i = 0;
