@@ -43,7 +43,8 @@ int main(int argc, char* args[]) {
 	fill_color.b = 100;
 	fill_color.a = 255;
 
-	ss::Button button(game.get_renderer(), fill_color, border_color, text_color, 2, "Button");
+	ss::Button button(game.get_renderer(), fill_color, border_color, text_color, 10, "BUTTON", "basic.ttf", 36);
+	button.set_position(50, 50);
 	fps.position = ss::Vector(10, 10);
 	float _dt = 0.0f;
 	int i = 0;

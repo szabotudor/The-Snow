@@ -44,11 +44,19 @@ ss::Button::Button(SDL_Renderer* renderer, SDL_Color bgd_color, SDL_Color border
 	type = Type::Press;
 }
 
+void ss::Button::set_position(int x, int y) {
+	rect.x = x;
+	rect.y = y;
+	border_rect.x = x - border;
+	border_rect.y = y - border;
+	position = Vector(x, y);
+}
+
 void ss::Button::draw() {
 	SDL_SetRenderDrawColor(render, border_color.r, border_color.g, border_color.b, border_color.a);
-	SDL_RenderDrawRect(render, &border_rect);
+	SDL_RenderFillRect(render, &border_rect);
 	SDL_SetRenderDrawColor(render, fill_color.r, fill_color.g, fill_color.b, fill_color.a);
-	SDL_RenderDrawRect(render, &rect);
+	SDL_RenderFillRect(render, &rect);
 	SDL_SetRenderDrawColor(render, text_color.r, text_color.g, text_color.b, text_color.a);
 	SDL_RenderCopy(render, texture, NULL, &rect);
 }
