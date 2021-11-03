@@ -14,13 +14,17 @@ namespace ss {
 		SDL_Rect rect;
 	public:
 		Vector position;
-		Text(SDL_Renderer* renderer, const char* text, const char* font, Uint8 font_size = 24);
+		Text(SDL_Renderer* renderer, const char* text, const char* font, Uint8 font_size = 18);
 		//Sets the font file given as the Text object's font
 		void set_font(const char* font, Uint8 font_size);
 		//Sets the text to the given string
 		void set_text(const char* text);
 		//Sets the text to the given string
 		void set_text(string text);
+		//Sets the text to the given string, taking into consideration command characters
+		void set_rich_text(const char* text);
+		//Sets the text to the given string, taking into consideration command characters
+		void set_rich_text(string text);
 		//Draws the text on screen
 		void draw();
 		//Returns the text set on the Text object
