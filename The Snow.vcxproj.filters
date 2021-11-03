@@ -14,7 +14,7 @@
     <ClInclude Include="Include\Text.h" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="color basic.ttf" />
+    <Font Include="basic.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />

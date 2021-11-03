@@ -160,7 +160,7 @@
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="color basic.ttf" />
+    <Font Include="basic.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="color basic eula.pdf" />
