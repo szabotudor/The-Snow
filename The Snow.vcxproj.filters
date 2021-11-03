@@ -14,8 +14,7 @@
     <ClInclude Include="Include\Text.h" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="Pixel.ttf" />
-    <Font Include="bulkypix.ttf" />
+    <Font Include="color basic.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />
@@ -35,6 +34,8 @@
     <None Include="SDL2_ttf\lib\x64\libfreetype-6.dll" />
     <None Include="SDL2_ttf\lib\x64\SDL2_ttf.dll" />
     <None Include="SDL2_ttf\lib\x64\zlib1.dll" />
+    <None Include="libfreetype-6.dll" />
+    <None Include="SDL2_ttf.dll" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="SDL2\lib\x64\SDL2.lib" />

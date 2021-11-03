@@ -160,10 +160,10 @@
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="bulkypix.ttf" />
-    <Font Include="Pixel.ttf" />
+    <Font Include="color basic.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="libfreetype-6.dll" />
     <None Include="libjpeg-9.dll" />
     <None Include="libpng16-16.dll" />
     <None Include="libtiff-5.dll" />
@@ -177,6 +177,7 @@
     <None Include="SDL2_image\lib\x64\libwebp-7.dll" />
     <None Include="SDL2_image\lib\x64\SDL2_image.dll" />
     <None Include="SDL2_image\lib\x64\zlib1.dll" />
+    <None Include="SDL2_ttf.dll" />
     <None Include="SDL2_ttf\lib\x64\libfreetype-6.dll" />
     <None Include="SDL2_ttf\lib\x64\SDL2_ttf.dll" />
     <None Include="SDL2_ttf\lib\x64\zlib1.dll" />
