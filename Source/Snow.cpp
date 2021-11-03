@@ -14,6 +14,9 @@ ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsign
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		cout << "Could not initialize SDL video: " << SDL_GetError();
 	}
+	if (TTF_Init() < 0) {
+		cout << "Could not initialize TTF library: " << TTF_GetError();
+	}
 
 	target_fps = framerate;
 	Snow::resolution = resolution;
@@ -41,10 +44,12 @@ void ss::Snow::update() {
 	}
 
 	current_frame_delay = (SDL_GetTicks() - time);
-	//cout << SDL_GetTicks() << " " << time << " " << current_frame_delay << endl;
 	if (current_frame_delay > 0 and current_frame_delay <= frame_delay) {
 		frame_wait_time = frame_delay - current_frame_delay + (int)(fps >= target_fps);
 		SDL_Delay(frame_wait_time);
+	}
+	else if (!frame_delay){
+		frame_wait_time = 0;
 	}
 	time = SDL_GetTicks();
 	if (frame_wait_time + current_frame_delay) {
@@ -107,7 +112,12 @@ bool ss::Snow::running(float &delta_time) {
 
 void ss::Snow::set_target_framerate(unsigned int framerate) {
 	target_fps = framerate;
-	frame_delay = 1000 / framerate;
+	if (framerate) {
+		frame_delay = 1000 / framerate;
+	}
+	else {
+		frame_delay = 0;
+	}
 }
 
 unsigned int ss::Snow::get_target_framerate() {
