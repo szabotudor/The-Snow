@@ -163,6 +163,7 @@
     <Font Include="color basic.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="color basic eula.pdf" />
     <None Include="libfreetype-6.dll" />
     <None Include="libjpeg-9.dll" />
     <None Include="libpng16-16.dll" />
