@@ -74,8 +74,9 @@ int ss::Snow::get_fps() {
 	return fps;
 }
 
-SDL_Renderer* ss::Snow::get_renderer() {
-	return render;
+
+SDL_Window* ss::Snow::get_window() {
+	return window;
 }
 
 bool ss::Snow::is_key_pressed(Uint8 key) {

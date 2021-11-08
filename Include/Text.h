@@ -10,11 +10,12 @@ namespace ss {
 		TTF_Font* font;
 		SDL_Texture* texture;
 		SDL_Surface* surface;
-		SDL_Renderer* render;
+		SDL_Renderer* renderer;
+		SDL_Window* window;
 		SDL_Rect rect;
 	public:
 		Vector position;
-		Text(SDL_Renderer* renderer, const char* text, const char* font, Uint8 font_size = 18);
+		Text(SDL_Window* window, const char* text, const char* font, Uint8 font_size = 18);
 		//Sets the font file given as the Text object's font
 		void set_font(const char* font, Uint8 font_size);
 		//Sets the text to the given string

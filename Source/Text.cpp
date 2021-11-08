@@ -12,18 +12,19 @@ Uint32 bmask = 0x00ff0000;
 Uint32 amask = 0xff000000;
 #endif
 
-ss::Text::Text(SDL_Renderer* renderer, const char* text, const char* font, Uint8 font_size) {
+ss::Text::Text(SDL_Window* window, const char* text, const char* font, Uint8 font_size) {
 	if (font_size == 0) {
 		throw "Font size must be positive int";
 	}
-	render = renderer;
+	renderer = SDL_GetRenderer(window);
+	Text::window = window;
 	Text::font = TTF_OpenFont(font, font_size);
 	color.r = 255;
 	color.g = 255;
 	color.b = 255;
 	color.a = 255;
 	surface = TTF_RenderText_Solid(Text::font, text, color);
-	texture = SDL_CreateTextureFromSurface(render, surface);
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	SDL_FreeSurface(surface);
@@ -35,7 +36,7 @@ void ss::Text::set_font(const char* font, Uint8 font_size) {
 	Text::font = TTF_OpenFont(font, font_size);
 	surface = TTF_RenderText_Solid(Text::font, text.c_str(), color);
 	SDL_DestroyTexture(texture);
-	texture = SDL_CreateTextureFromSurface(render, surface);
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 	Text::font_size = font_size;
 }
@@ -44,7 +45,7 @@ void ss::Text::set_text(const char* text) {
 	Text::text = text;
 	surface = TTF_RenderText_Solid(Text::font, text, color);
 	SDL_DestroyTexture(texture);
-	texture = SDL_CreateTextureFromSurface(render, surface);
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	SDL_FreeSurface(surface);
@@ -84,7 +85,7 @@ void ss::Text::set_rich_text(const char* text) {
 		}
 	}
 	SDL_DestroyTexture(texture);
-	texture = SDL_CreateTextureFromSurface(render, surface);
+	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	SDL_FreeSurface(surface);
@@ -99,7 +100,7 @@ void ss::Text::draw() {
 		rect.x = position.x;
 		rect.y = position.y;
 	}
-	SDL_RenderCopy(render, texture, NULL, &rect);
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
 }
 
 string ss::Text::get_text() {

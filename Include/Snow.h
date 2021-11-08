@@ -45,8 +45,8 @@ namespace ss {
 		long long get_time();
 		//Returns the frames per second
 		int get_fps();
-		//Redurns the SDL renderer
-		SDL_Renderer* get_renderer();
+		//Returns the SDL window (used especially for automatic texture scaling)
+		SDL_Window* get_window();
 		//Returnes true if the SDL_KeyScancode is pressed (eg: SDL_SCANCODE_RETURN)
 		bool is_key_pressed(Uint8 key);
 		//Returnes true if the SDL_KeyScancode is just pressed this frame pressed (eg: SDL_SCANCODE_RETURN)
