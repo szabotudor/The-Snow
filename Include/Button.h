@@ -28,7 +28,6 @@ namespace ss {
 		bool held = false;
 		bool just_pressed = false;
 		bool just_released = false;
-		//Mouse button used to click the button
 
 	private:
 		int border = 0;
