@@ -16,6 +16,7 @@ namespace ss {
 	public:
 		Vector resolution;
 	private:
+		Vector sdl_window_size;
 		SDL_Window* window = NULL;
 		SDL_Surface* surface = NULL;
 		SDL_Renderer* render = NULL;
