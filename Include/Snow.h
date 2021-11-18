@@ -14,9 +14,10 @@ using namespace std;
 namespace ss {
 	class Snow {
 	public:
-		Vector resolution;
+		iVector resolution;
 	private:
-		Vector sdl_window_size;
+		iVector sdl_window_size;
+		SDL_Rect viewport;
 		SDL_Window* window = NULL;
 		SDL_Surface* surface = NULL;
 		SDL_Renderer* render = NULL;
@@ -37,7 +38,7 @@ namespace ss {
 		//Poll game events
 		void poll_events();
 	public:
-		Snow(const char* name, Vector resolution = Vector(512, 288), Uint32 SDL_falgs = SDL_WINDOW_SHOWN, unsigned int framerate = 60);
+		Snow(const char* name, iVector resolution = iVector(512, 288), Uint32 SDL_falgs = SDL_WINDOW_SHOWN, unsigned int framerate = 60);
 		//Function to update the SDL2 components
 		void update();
 		//Function to clear the screen to a color

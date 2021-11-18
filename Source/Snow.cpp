@@ -10,7 +10,7 @@ void ss::Snow::poll_events() {
 	}
 }
 
-ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsigned int framerate) {
+ss::Snow::Snow(const char* name, ss::iVector resolution, Uint32 SDL_flags, unsigned int framerate) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		cout << "Could not initialize SDL video: " << SDL_GetError();
 	}
@@ -63,8 +63,20 @@ void ss::Snow::update() {
 	int x, y;
 	SDL_GetWindowSize(window, &x, &y);
 	if (sdl_window_size.x != x or sdl_window_size.y != y) {
-		SDL_RenderSetScale(render, x / resolution.x, y / resolution.y);
-		sdl_window_size = Vector(x, y);
+		sdl_window_size = iVector(x, y);
+		Vector scale(x / resolution.x, y / resolution.y);
+		//SDL_RenderSetScale(render, scale.y, scale.y);
+		if (scale.x > scale.y) {
+			viewport.x = (x - resolution.x) / 2;
+			//SDL_RenderSetScale(render, scale.y, scale.y);
+			SDL_RenderSetClipRect(render, &viewport);
+		}
+		else {
+			viewport.y = (y - resolution.y) / 2;
+			//SDL_RenderSetScale(render, scale.x, scale.x);
+			SDL_RenderSetClipRect(render, &viewport);
+		}
+		cout << "Error: " << SDL_GetError() << endl;
 	}
 }
 
