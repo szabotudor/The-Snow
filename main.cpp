@@ -24,7 +24,7 @@ void show_fps(ss::Text& text, unsigned int fps, int &i) {
 
 
 int main(int argc, char* args[]) {
-	ss::Snow game("The Snow", ss::Vector(512, 288), SDL_WINDOW_SHOWN, 60);
+	ss::Snow game("The Snow", ss::Vector(512, 288), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
 	ss::Text fps(game.get_window(), "00", "basic.ttf", 18);
 	ss::Text debug(game.get_window(), " ", "basic.ttf", 18);
 	ss::Text inst(game.get_window(), "Press RETURN to change button type\nPress SPACE to lock/unlcok fps", "basic.ttf", 18);
