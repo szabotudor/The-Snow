@@ -88,14 +88,12 @@ float ss::Vector::lenght() {
 	return (float)sqrt((double)this->x * this->x + (double)this->y * this->y);
 }
 
+
 /*
 =======================
 iVector Code
 =======================
 */
-
-
-
 
 ss::iVector::iVector(int x, int y) {
 	iVector::x = x;
