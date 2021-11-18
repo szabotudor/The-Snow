@@ -1,6 +1,11 @@
 #include<Vector.h>
 #include<math.h>
 
+/*
+=======================
+Vector Code
+=======================
+*/
 
 ss::Vector::Vector(float x, float y) {
 	Vector::x = x;
@@ -80,5 +85,85 @@ void ss::Vector::normalize() {
 }
 
 float ss::Vector::lenght() {
+	return (float)sqrt((double)this->x * this->x + (double)this->y * this->y);
+}
+
+/*
+=======================
+iVector Code
+=======================
+*/
+
+
+
+
+ss::iVector::iVector(int x, int y) {
+	iVector::x = x;
+	iVector::y = y;
+}
+
+ss::iVector::iVector(int w) {
+	iVector::x = w;
+	iVector::y = w;
+}
+
+//Classic number operators
+ss::iVector ss::iVector::operator+(int x) {
+	return iVector(this->x + x, this->y + x);
+}
+
+ss::iVector ss::iVector::operator-(int x) {
+	return iVector(this->x - x, this->y - x);
+}
+
+ss::iVector ss::iVector::operator*(int x) {
+	return iVector(this->x * x, this->y * x);
+}
+
+ss::iVector ss::iVector::operator/(int x) {
+	return iVector(this->x / x, this->y / x);
+}
+
+//Auto operators
+ss::iVector ss::iVector::operator+=(int x) {
+	return iVector(this->x + x, this->y + x);
+}
+
+ss::iVector ss::iVector::operator-=(int x) {
+	return iVector(this->x - x, this->y - x);
+}
+
+ss::iVector ss::iVector::operator*=(int x) {
+	return iVector(this->x * x, this->y * x);
+}
+
+ss::iVector ss::iVector::operator/=(int x) {
+	return iVector(this->x / x, this->y / x);
+}
+
+//Full iVector operators
+ss::iVector ss::iVector::operator+(iVector v) {
+	return iVector(this->x + v.x, this->y + v.y);
+}
+
+ss::iVector ss::iVector::operator-(iVector v) {
+	return iVector(this->x - v.x, this->y - v.y);
+}
+
+ss::iVector ss::iVector::operator*(iVector v) {
+	return iVector(this->x * v.x, this->y * v.y);
+}
+
+ss::iVector ss::iVector::operator/(iVector v) {
+	return iVector(this->x / v.x, this->y / v.y);
+}
+
+//Set operator
+ss::iVector ss::iVector::operator=(int x) {
+	return iVector(x, x);
+}
+
+
+float ss::iVector::lenght() {
 	return (float)sqrt((double)this->x * this->x + (double)this->y * this->y);
 }
