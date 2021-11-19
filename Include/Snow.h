@@ -37,6 +37,8 @@ namespace ss {
 
 		//Poll game events
 		void poll_events();
+		//Scale the window and center the renderer
+		void scale_window(int w, int h);
 	public:
 		Snow(const char* name, iVector resolution = iVector(512, 288), Uint32 SDL_falgs = SDL_WINDOW_SHOWN, unsigned int framerate = 60);
 		//Function to update the SDL2 components
