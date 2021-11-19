@@ -39,7 +39,7 @@ namespace ss {
 		TTF_Font* font;
 		SDL_Surface* surface;
 		SDL_Texture* texture;
-		SDL_Renderer* renderer;
+		SDL_Renderer* render;
 		SDL_Window* window;
 		SDL_Rect rect, border_rect;
 
