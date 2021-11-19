@@ -1,5 +1,12 @@
 #include<Snow.h>
 
+#if defined _DEBUG
+bool IS_DEBUG = true;
+#else
+bool IS_DEBUG = false;
+#endif // DEBUG
+
+
 
 void ss::Snow::poll_events() {
 	SDL_PumpEvents();
@@ -7,6 +14,49 @@ void ss::Snow::poll_events() {
 		if (event.type == SDL_QUIT) {
 			quit();
 		}
+	}
+}
+
+void ss::Snow::scale_window(int w, int h) {
+	//If the window is to small, resize it
+	if (w < resolution.x) {
+		w = resolution.x;
+		SDL_SetWindowSize(window, w, h);
+	}
+	if (h < resolution.y) {
+		h = resolution.y;
+		SDL_SetWindowSize(window, w, h);
+	}
+	//Calculate the scales and positions
+	sdl_window_size = iVector(w, h);
+	Vector scale((float)w / (float)resolution.x, (float)h / (float)resolution.y);
+	//Two cases, one to add borders on the top and bottom...
+	if (scale.x > scale.y) {
+		viewport.x = (w - scale.y * resolution.x) / 2;
+		viewport.y = 0;
+		viewport.w = resolution.x * (float)scale.y;
+		viewport.h = h;
+		scale.x = scale.y;
+	}
+	//...and one to add borders on the left and right
+	else {
+		viewport.x = 0;
+		viewport.y = (h - scale.x * resolution.y) / 2;
+		viewport.w = w;
+		viewport.h = resolution.y * (float)scale.x;
+		scale.y = scale.x;
+	}
+	//Set the viewport
+	viewport.x /= scale.x;
+	viewport.y /= scale.y;
+	SDL_RenderSetScale(render, scale.x, scale.y);
+	SDL_RenderSetViewport(render, &viewport);
+	//Prepare the viewport border to be drawn (here for debugging, not used in final game)
+	if (IS_DEBUG) {
+		viewport.x = 0;
+		viewport.y = 0;
+		viewport.w /= scale.x;
+		viewport.h /= scale.y;
 	}
 }
 
@@ -29,14 +79,13 @@ ss::Snow::Snow(const char* name, ss::iVector resolution, Uint32 SDL_flags, unsig
 }
 
 void ss::Snow::update() {
+	//Poll the events and stop if should stop
 	poll_events();
 	if (!_run) {
 		return;
 	}
 
-	SDL_RenderPresent(render);
-
-
+	//Test for keyboard state
 	int numkeys;
 	const Uint8* checkstate = SDL_GetKeyboardState(&numkeys);
 	for (int i = 0; i < numkeys; i++) {
@@ -44,6 +93,7 @@ void ss::Snow::update() {
 		keystate[i] = (bool)checkstate[i];
 	}
 
+	//Calculate frame delta and framerate
 	current_frame_delay = (SDL_GetTicks() - time);
 	if (current_frame_delay > 0 and current_frame_delay <= frame_delay) {
 		frame_wait_time = frame_delay - current_frame_delay + (int)(fps >= target_fps);
@@ -60,24 +110,21 @@ void ss::Snow::update() {
 		fps = 1001;
 	}
 
-	int x, y;
-	SDL_GetWindowSize(window, &x, &y);
-	if (sdl_window_size.x != x or sdl_window_size.y != y) {
-		sdl_window_size = iVector(x, y);
-		Vector scale(x / resolution.x, y / resolution.y);
-		//SDL_RenderSetScale(render, scale.y, scale.y);
-		if (scale.x > scale.y) {
-			viewport.x = (x - resolution.x) / 2;
-			//SDL_RenderSetScale(render, scale.y, scale.y);
-			SDL_RenderSetClipRect(render, &viewport);
-		}
-		else {
-			viewport.y = (y - resolution.y) / 2;
-			//SDL_RenderSetScale(render, scale.x, scale.x);
-			SDL_RenderSetClipRect(render, &viewport);
-		}
-		cout << "Error: " << SDL_GetError() << endl;
+	//Calculate window scale, accordin to resolution
+	int w, h;
+	SDL_GetWindowSize(window, &w, &h);
+
+	//Set window scale and center the viewport
+	if ((sdl_window_size.x != w or sdl_window_size.y != h)) {
+		scale_window(w, h);
+		//scale_window(w, h);
 	}
+	//Draw a border around the renderer's viewport (used only in debug mode)
+	if (IS_DEBUG) {
+		SDL_RenderDrawRect(render, &viewport);
+	}
+	//Present renderer (update the screen)
+	SDL_RenderPresent(render);
 }
 
 void ss::Snow::clear_screen(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
