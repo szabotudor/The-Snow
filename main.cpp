@@ -24,10 +24,10 @@ void show_fps(ss::Text& text, unsigned int fps, int &i) {
 
 
 int main(int argc, char* args[]) {
-	ss::Snow game("The Snow", ss::iVector(512, 288), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
-	ss::Text fps(game.get_window(), "00", "basic.ttf", 18);
-	ss::Text debug(game.get_window(), " ", "basic.ttf", 18);
-	ss::Text inst(game.get_window(), "Press RETURN to change button type\nPress SPACE to lock/unlcok fps", "basic.ttf", 18);
+	ss::Snow game("The Snow", ss::iVector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
+	ss::Text fps(game.get_window(), "00", "basic.ttf", 9);
+	ss::Text debug(game.get_window(), " ", "basic.ttf", 9);
+	ss::Text inst(game.get_window(), "Press RETURN to change button type\nPress SPACE to lock/unlcok fps", "basic.ttf", 9);
 	inst.set_rich_text("PRESS return TO CHANGE BUTTON TYPE\nPRESS space TO LOCK/UNLOCK FPS");
 	inst.position = ss::Vector(10, 220);
 	debug.position = ss::Vector(10, 50);
@@ -37,7 +37,7 @@ int main(int argc, char* args[]) {
 	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
 	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
 
-	ss::Button button(game.get_window(), fill_color, border_color, text_color, 5, "BUTTON", "basic.ttf", 36);
+	ss::Button button(game.get_window(), fill_color, border_color, text_color, 5, "BUTTON", "basic.ttf", 18);
 	button.position = ss::Vector(10, 100);
 	fps.position = ss::Vector(10, 10);
 	float _dt = 0.0f;
