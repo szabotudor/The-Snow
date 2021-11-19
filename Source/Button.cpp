@@ -3,13 +3,13 @@
 ss::Button::Button(SDL_Window* window, const char* text, const char* font, unsigned int font_size) {
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
-	renderer = SDL_GetRenderer(window);
+	render = SDL_GetRenderer(window);
 	text_color.r = 255;
 	text_color.g = 255;
 	text_color.b = 255;
 	text_color.a = 255;
 	surface = TTF_RenderText_Solid(Button::font, text, text_color);
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	texture = SDL_CreateTextureFromSurface(render, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	SDL_FreeSurface(surface);
@@ -23,13 +23,13 @@ ss::Button::Button(SDL_Window* window, const char* text, const char* font, unsig
 ss::Button::Button(SDL_Window* window, SDL_Color bgd_color, SDL_Color border_color, SDL_Color text_color, unsigned int border_thickness, const char* text, const char* font, unsigned int font_size) {
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
-	renderer = SDL_GetRenderer(window);
+	render = SDL_GetRenderer(window);
 	Button::text_color = text_color;
 	Button::fill_color = bgd_color;
 	Button::border_color = border_color;
 	border = border_thickness;
 	surface = TTF_RenderText_Solid(Button::font, text, text_color);
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	texture = SDL_CreateTextureFromSurface(render, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	border_rect.x = -border;
@@ -47,10 +47,10 @@ ss::Button::Button(SDL_Window* window, SDL_Color bgd_color, SDL_Color border_col
 ss::Button::Button(SDL_Window* window, SDL_Color text_color, const char* text, const char* font, unsigned int font_size) {
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
-	renderer = SDL_GetRenderer(window);
+	render = SDL_GetRenderer(window);
 	Button::text_color = text_color;
 	surface = TTF_RenderText_Solid(Button::font, text, text_color);
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	texture = SDL_CreateTextureFromSurface(render, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	SDL_FreeSurface(surface);
@@ -63,7 +63,7 @@ ss::Button::Button(SDL_Window* window, SDL_Color text_color, const char* text, c
 
 void ss::Button::set_text(char* text) {
 	surface = TTF_RenderText_Solid(Button::font, text, text_color);
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
+	texture = SDL_CreateTextureFromSurface(render, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	SDL_FreeSurface(surface);
@@ -80,7 +80,7 @@ void ss::Button::set_font(char* font, unsigned int font_size) {
 
 void ss::Button::set_window(SDL_Window* window) {
 	Button::window = window;
-	renderer = SDL_GetRenderer(window);
+	render = SDL_GetRenderer(window);
 }
 
 void ss::Button::draw() {
@@ -92,14 +92,14 @@ void ss::Button::draw() {
 	}
 	switch (background_type) {
 	case ss::Button::BackgroundType::Rect:
-		SDL_SetRenderDrawColor(renderer, border_color.r, border_color.g, border_color.b, border_color.a);
-		SDL_RenderFillRect(renderer, &border_rect);
-		SDL_SetRenderDrawColor(renderer, fill_color.r, fill_color.g, fill_color.b, fill_color.a);
-		SDL_RenderFillRect(renderer, &rect);
-		SDL_SetRenderDrawColor(renderer, text_color.r, text_color.g, text_color.b, text_color.a);
-		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		SDL_SetRenderDrawColor(render, border_color.r, border_color.g, border_color.b, border_color.a);
+		SDL_RenderFillRect(render, &border_rect);
+		SDL_SetRenderDrawColor(render, fill_color.r, fill_color.g, fill_color.b, fill_color.a);
+		SDL_RenderFillRect(render, &rect);
+		SDL_SetRenderDrawColor(render, text_color.r, text_color.g, text_color.b, text_color.a);
+		SDL_RenderCopy(render, texture, NULL, &rect);
 	case ss::Button::BackgroundType::Empty:
-		SDL_RenderCopy(renderer, texture, NULL, &rect);
+		SDL_RenderCopy(render, texture, NULL, &rect);
 	case ss::Button::BackgroundType::Texture:
 		break;
 	}
@@ -130,8 +130,10 @@ void ss::Button::update() {
 
 bool ss::Button::is_hovered() {
 	int x, y;
+	float rx, ry;
 	SDL_GetMouseState(&x, &y);
-	return x > rect.x and x < rect.x + rect.w and y > rect.y and y < rect.y + rect.h;
+	SDL_RenderGetScale(render, &rx, &ry);
+	return x > rect.x * rx and x < rect.x * rx + rect.w * rx and y > rect.y * ry and y < rect.y*ry + rect.h * ry;
 }
 
 void ss::Button::set_toggle(bool ON) {
