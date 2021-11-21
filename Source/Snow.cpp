@@ -10,11 +10,11 @@ bool IS_DEBUG = false;
 
 void ss::Snow::poll_events() {
 	SDL_PumpEvents();
-	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT) {
-			quit();
-		}
-	}
+	for (num_events = 0; SDL_PollEvent(&events[num_events]) and num_events < 31; num_events++);
+	/* Used for debugging, only in case of nothing else working
+	if (num_events == 31) {
+		cout << "Possible event overflow: " << num_events << " events" << endl;
+	}*/
 }
 
 void ss::Snow::scale_window(int w, int h) {
@@ -146,6 +146,19 @@ SDL_Window* ss::Snow::get_window() {
 	return window;
 }
 
+void ss::Snow::set_fullscreen(bool fs) {
+	if (fs) {
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	}
+	else {
+		SDL_SetWindowFullscreen(window, 0);
+	}
+}
+
+bool ss::Snow::get_fullscreen() {
+	return SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+}
+
 bool ss::Snow::is_key_pressed(Uint8 key) {
 	if (!keystate) {
 		return false;
@@ -176,6 +189,10 @@ bool ss::Snow::is_key_just_released(Uint8 key) {
 bool ss::Snow::running(float &delta_time) {
 	delta_time = current_frame_delay + frame_wait_time;
 	return _run;
+}
+
+int ss::Snow::get_num_events() {
+	return num_events;
 }
 
 void ss::Snow::set_target_framerate(unsigned int framerate) {

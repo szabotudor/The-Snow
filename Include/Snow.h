@@ -15,13 +15,14 @@ namespace ss {
 	class Snow {
 	public:
 		iVector resolution;
+		SDL_Event events[32];
 	private:
 		iVector sdl_window_size;
 		SDL_Rect viewport;
 		SDL_Window* window = NULL;
 		SDL_Surface* surface = NULL;
 		SDL_Renderer* render = NULL;
-		SDL_Event event;
+		int num_events = 0;
 		int frame_delay = 16;
 		int current_frame_delay;
 		unsigned int fps;
@@ -51,6 +52,10 @@ namespace ss {
 		int get_fps();
 		//Returns the SDL window (used especially for automatic texture scaling)
 		SDL_Window* get_window();
+		//Sets fullscreen mode to the given value
+		void set_fullscreen(bool fs);
+		//Returns true if the game window is in fullscreen mode
+		bool get_fullscreen();
 		//Returnes true if the SDL_KeyScancode is pressed (eg: SDL_SCANCODE_RETURN)
 		bool is_key_pressed(Uint8 key);
 		//Returnes true if the SDL_KeyScancode is just pressed this frame pressed (eg: SDL_SCANCODE_RETURN)
@@ -59,6 +64,8 @@ namespace ss {
 		bool is_key_just_released(Uint8 key);
 		//Checks if the engine is still running
 		bool running(float &delta_time);
+		//Returns the number of events in the queue
+		int get_num_events();
 		//Sets the target fps (set to negative for unlimited)
 		void set_target_framerate(unsigned int framerate);
 		//Gets the target fps priorly set
