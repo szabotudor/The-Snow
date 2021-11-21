@@ -23,13 +23,17 @@ ss::Text::Text(SDL_Window* window, const char* text, const char* font, Uint8 fon
 	color.g = 255;
 	color.b = 255;
 	color.a = 255;
+	Text::text = text;
+	Text::font_size = font_size;
+	set_rich_text(text);
+	//Old text init mode
+	/*
 	surface = TTF_RenderText_Solid(Text::font, text, color);
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	rect.w = surface->w;
 	rect.h = surface->h;
 	SDL_FreeSurface(surface);
-	Text::text = text;
-	Text::font_size = font_size;
+	*/
 }
 
 void ss::Text::set_font(const char* font, Uint8 font_size) {
