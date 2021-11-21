@@ -27,23 +27,25 @@ int main(int argc, char* args[]) {
 	ss::Snow game("The Snow", ss::iVector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
 	ss::Text fps(game.get_window(), "00", "basic.ttf", 9);
 	ss::Text debug(game.get_window(), " ", "basic.ttf", 9);
-	ss::Text inst(game.get_window(), "Press RETURN to change button type\nPress SPACE to lock/unlcok fps", "basic.ttf", 9);
-	inst.set_rich_text("PRESS return TO CHANGE BUTTON TYPE\nPRESS space TO LOCK/UNLOCK FPS");
-	inst.position = ss::Vector(10, 220);
-	debug.position = ss::Vector(10, 50);
+	ss::Text inst(game.get_window(), "PRESS crtl + f TO TOGGLE FULLSCREEN\nPRESS return TO CHANGE BUTTON TYPE\nPRESS space TO LOCK/UNLOCK FPS", "basic.ttf", 9);
+	fps.position = ss::Vector(10, 5);
+	debug.position = ss::Vector(10, 25);
+	inst.position = ss::Vector(10, 100);
 	SDL_Color text_color, border_color, fill_color;
 
 	text_color.r = 255; text_color.g = 255; text_color.b = 255; text_color.a = 255;
 	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
 	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
 
-	ss::Button button(game.get_window(), fill_color, border_color, text_color, 5, "BUTTON", "basic.ttf", 18);
-	button.position = ss::Vector(10, 100);
-	fps.position = ss::Vector(10, 10);
+	ss::Button button(game.get_window(), fill_color, border_color, text_color, 3, "BUTTON", "basic.ttf", 18);
+	button.position = ss::Vector(10, 50);
 	float _dt = 0.0f;
 	int i = 0;
 
+	SDL_Event* ev;
+
 	while (game.running(_dt)) {
+		game.update();
 		game.clear_screen();
 
 		show_fps(fps, game.get_fps(), i);
@@ -61,12 +63,20 @@ int main(int argc, char* args[]) {
 			button.set_toggle(!button.get_toggle());
 		}
 
+		for (int i = 0; i < game.get_num_events(); i++) {
+			if (game.events[i].type == SDL_QUIT) {
+				game.quit();
+			}
+			if (game.is_key_pressed(SDL_SCANCODE_LCTRL) and game.is_key_just_pressed(SDL_SCANCODE_F)) {
+				game.set_fullscreen(!game.get_fullscreen());
+			}
+		}
+
 		button.update();
 		debug.set_text("type: " + to_string(button.get_toggle()) + ", hovered: " + to_string(button.hovered) + ", pressed: " + to_string(button.pressed) + '\0');
 		button.draw();
 		debug.draw();
 		inst.draw();
-		game.update();
 		}
 	return 0;
 }
