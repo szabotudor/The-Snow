@@ -3,6 +3,9 @@
 ss::Button::Button(SDL_Window* window, const char* text, const char* font, unsigned int font_size) {
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
+	if (text == "") {
+		text = "BUTTON";
+	}
 	render = SDL_GetRenderer(window);
 	SDL_RenderGetViewport(render, &viewport);
 	text_color.r = 255;
@@ -24,6 +27,9 @@ ss::Button::Button(SDL_Window* window, const char* text, const char* font, unsig
 ss::Button::Button(SDL_Window* window, SDL_Color bgd_color, SDL_Color border_color, SDL_Color text_color, unsigned int border_thickness, const char* text, const char* font, unsigned int font_size) {
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
+	if (text == "") {
+		text = "BUTTON";
+	}
 	render = SDL_GetRenderer(window);
 	SDL_RenderGetViewport(render, &viewport);
 	Button::text_color = text_color;
@@ -49,6 +55,9 @@ ss::Button::Button(SDL_Window* window, SDL_Color bgd_color, SDL_Color border_col
 ss::Button::Button(SDL_Window* window, SDL_Color text_color, const char* text, const char* font, unsigned int font_size) {
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
+	if (text == "") {
+		text = "BUTTON";
+	}
 	render = SDL_GetRenderer(window);
 	SDL_RenderGetViewport(render, &viewport);
 	Button::text_color = text_color;
