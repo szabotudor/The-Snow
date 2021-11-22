@@ -188,9 +188,8 @@ ss::iVector ss::Snow::get_mouse_position() {
 	SDL_GetMouseState(&x, &y);
 	x /= sx;
 	y /= sy;
-	x -= viewport.x * sx;
-	y -= viewport.y * sy;
-	cout << viewport.x << " " << viewport.y << endl;
+	x -= viewport.x;
+	y -= viewport.y;
 	return iVector(x, y);
 }
 
