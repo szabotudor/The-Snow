@@ -52,12 +52,14 @@ void ss::Snow::scale_window(int w, int h) {
 	SDL_RenderSetScale(render, scale.x, scale.y);
 	SDL_RenderSetViewport(render, &viewport);
 	//Prepare the viewport border to be drawn (here for debugging, not used in final game)
+	/*
 	if (IS_DEBUG) {
 		viewport.x = 0;
 		viewport.y = 0;
 		viewport.w /= scale.x;
 		viewport.h /= scale.y;
 	}
+	*/
 }
 
 ss::Snow::Snow(const char* name, ss::iVector resolution, Uint32 SDL_flags, unsigned int framerate) {
@@ -120,9 +122,11 @@ void ss::Snow::update() {
 		//scale_window(w, h);
 	}
 	//Draw a border around the renderer's viewport (used only in debug mode)
+	/*
 	if (IS_DEBUG) {
 		SDL_RenderDrawRect(render, &viewport);
 	}
+	*/
 	//Present renderer (update the screen)
 	SDL_RenderPresent(render);
 }
@@ -175,6 +179,19 @@ bool ss::Snow::is_key_just_pressed(Uint8 key) {
 	else {
 		return (!previous_keystate[key] and keystate[key]);
 	}
+}
+
+ss::iVector ss::Snow::get_mouse_position() {
+	int x, y;
+	float sx, sy;
+	SDL_RenderGetScale(render, &sx, &sy);
+	SDL_GetMouseState(&x, &y);
+	x /= sx;
+	y /= sy;
+	x -= viewport.x * sx;
+	y -= viewport.y * sy;
+	cout << viewport.x << " " << viewport.y << endl;
+	return iVector(x, y);
 }
 
 bool ss::Snow::is_key_just_released(Uint8 key) {

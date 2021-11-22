@@ -50,6 +50,8 @@ namespace ss {
 		long long get_time();
 		//Returns the frames per second
 		int get_fps();
+		//Returns the mouse position
+		iVector get_mouse_position();
 		//Returns the SDL window (used especially for automatic texture scaling)
 		SDL_Window* get_window();
 		//Sets fullscreen mode to the given value
