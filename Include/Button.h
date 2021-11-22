@@ -20,6 +20,7 @@ namespace ss {
 			OFF,
 			ON
 		};
+		SDL_Rect viewport;
 		Uint8 font_size;
 		State state = State::OFF;
 		Vector position;
