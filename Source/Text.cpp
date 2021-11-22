@@ -16,6 +16,9 @@ ss::Text::Text(SDL_Window* window, const char* text, const char* font, Uint8 fon
 	if (font_size == 0) {
 		throw "Font size must be positive int";
 	}
+	if (text == "") {
+		text = "Text";
+	}
 	renderer = SDL_GetRenderer(window);
 	Text::window = window;
 	Text::font = TTF_OpenFont(font, font_size);
