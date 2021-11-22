@@ -4,6 +4,7 @@ ss::Button::Button(SDL_Window* window, const char* text, const char* font, unsig
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
 	render = SDL_GetRenderer(window);
+	SDL_RenderGetViewport(render, &viewport);
 	text_color.r = 255;
 	text_color.g = 255;
 	text_color.b = 255;
@@ -24,6 +25,7 @@ ss::Button::Button(SDL_Window* window, SDL_Color bgd_color, SDL_Color border_col
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
 	render = SDL_GetRenderer(window);
+	SDL_RenderGetViewport(render, &viewport);
 	Button::text_color = text_color;
 	Button::fill_color = bgd_color;
 	Button::border_color = border_color;
@@ -48,6 +50,7 @@ ss::Button::Button(SDL_Window* window, SDL_Color text_color, const char* text, c
 	Button::font = TTF_OpenFont(font, font_size);
 	Button::window = window;
 	render = SDL_GetRenderer(window);
+	SDL_RenderGetViewport(render, &viewport);
 	Button::text_color = text_color;
 	surface = TTF_RenderText_Solid(Button::font, text, text_color);
 	texture = SDL_CreateTextureFromSurface(render, surface);
@@ -106,6 +109,7 @@ void ss::Button::draw() {
 }
 
 void ss::Button::update() {
+	SDL_RenderGetViewport(render, &viewport);
 	hovered = is_hovered();
 	int x, y;
 	Uint32 mouse_state = SDL_GetMouseState(&x, &y);
@@ -133,6 +137,8 @@ bool ss::Button::is_hovered() {
 	float rx, ry;
 	SDL_GetMouseState(&x, &y);
 	SDL_RenderGetScale(render, &rx, &ry);
+	x -= viewport.x * rx;
+	y -= viewport.y * ry;
 	return x > rect.x * rx and x < rect.x * rx + rect.w * rx and y > rect.y * ry and y < rect.y*ry + rect.h * ry;
 }
 
