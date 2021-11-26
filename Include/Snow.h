@@ -15,10 +15,10 @@ using namespace std;
 namespace ss {
 	class Snow {
 	public:
-		iVector resolution;
+		Vector resolution;
 		SDL_Event events[32];
 	private:
-		iVector sdl_window_size;
+		Vector sdl_window_size;
 		SDL_Rect viewport;
 		SDL_Window* window = NULL;
 		SDL_Surface* surface = NULL;
@@ -42,7 +42,7 @@ namespace ss {
 		//Scale the window and center the renderer
 		void scale_window(int w, int h);
 	public:
-		Snow(const char* name, iVector resolution = iVector(512, 288), Uint32 SDL_falgs = SDL_WINDOW_SHOWN, unsigned int framerate = 60);
+		Snow(const char* name, Vector resolution = Vector(512, 288), Uint32 SDL_falgs = SDL_WINDOW_SHOWN, unsigned int framerate = 60);
 		//Function to update the SDL2 components
 		void update();
 		//Function to clear the screen to a color

@@ -28,7 +28,7 @@ void ss::Snow::scale_window(int w, int h) {
 		SDL_SetWindowSize(window, w, h);
 	}
 	//Calculate the scales and positions
-	sdl_window_size = iVector(w, h);
+	sdl_window_size = Vector(w, h);
 	Vector scale((float)w / (float)resolution.x, (float)h / (float)resolution.y);
 	//Two cases, one to add borders on the top and bottom...
 	if (scale.x > scale.y) {
@@ -62,7 +62,7 @@ void ss::Snow::scale_window(int w, int h) {
 	*/
 }
 
-ss::Snow::Snow(const char* name, ss::iVector resolution, Uint32 SDL_flags, unsigned int framerate) {
+ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsigned int framerate) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		cout << "Could not initialize SDL video: " << SDL_GetError();
 	}
