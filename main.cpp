@@ -24,7 +24,7 @@ void show_fps(ss::Text& text, unsigned int fps, int &i) {
 
 
 int main(int argc, char* args[]) {
-	ss::iVector mpos;
+	ss::Vector mpos;
 	ss::Snow game("The Snow", ss::iVector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
 	ss::Text debug(game.get_window(), "", "basic.ttf", 9);

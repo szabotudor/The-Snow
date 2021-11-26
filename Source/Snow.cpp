@@ -181,7 +181,7 @@ bool ss::Snow::is_key_just_pressed(Uint8 key) {
 	}
 }
 
-ss::iVector ss::Snow::get_mouse_position() {
+ss::Vector ss::Snow::get_mouse_position() {
 	int x, y;
 	float sx, sy;
 	SDL_RenderGetScale(render, &sx, &sy);
@@ -190,7 +190,7 @@ ss::iVector ss::Snow::get_mouse_position() {
 	y /= sy;
 	x -= viewport.x;
 	y -= viewport.y;
-	return iVector(x, y);
+	return Vector(x, y);
 }
 
 bool ss::Snow::is_key_just_released(Uint8 key) {
