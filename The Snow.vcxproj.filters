@@ -6,12 +6,14 @@
     <ClCompile Include="Source\Button.cpp" />
     <ClCompile Include="Source\Vector.cpp" />
     <ClCompile Include="Source\Text.cpp" />
+    <ClCompile Include="Source\Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
     <ClInclude Include="Include\Vector.h" />
     <ClInclude Include="Include\Button.h" />
     <ClInclude Include="Include\Text.h" />
+    <ClInclude Include="Include\Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />

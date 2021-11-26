@@ -7,6 +7,7 @@
 #include<SDL_ttf.h>
 #include<Vector.h>
 #include<Button.h>
+#include<Sprite.h>
 #include<Text.h>
 
 using namespace std;
@@ -51,7 +52,7 @@ namespace ss {
 		//Returns the frames per second
 		int get_fps();
 		//Returns the mouse position
-		iVector get_mouse_position();
+		Vector get_mouse_position();
 		//Returns the SDL window (used especially for automatic texture scaling)
 		SDL_Window* get_window();
 		//Sets fullscreen mode to the given value
