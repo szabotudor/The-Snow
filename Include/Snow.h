@@ -61,9 +61,9 @@ namespace ss {
 		bool get_fullscreen();
 		//Returnes true if the SDL_KeyScancode is pressed (eg: SDL_SCANCODE_RETURN)
 		bool is_key_pressed(Uint8 key);
-		//Returnes true if the SDL_KeyScancode is just pressed this frame pressed (eg: SDL_SCANCODE_RETURN)
+		//Returnes true if the SDL_KeyScancode is just pressed this frame (eg: SDL_SCANCODE_RETURN)
 		bool is_key_just_pressed(Uint8 key);
-		//Returnes true if the SDL_KeyScancode is just released this frame pressed (eg: SDL_SCANCODE_RETURN)
+		//Returnes true if the SDL_KeyScancode is just released this frame (eg: SDL_SCANCODE_RETURN)
 		bool is_key_just_released(Uint8 key);
 		//Checks if the engine is still running
 		bool running(float &delta_time);
