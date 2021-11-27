@@ -203,7 +203,7 @@ bool ss::Snow::is_key_just_released(Uint8 key) {
 }
 
 bool ss::Snow::running(float &delta_time) {
-	delta_time = current_frame_delay + frame_wait_time;
+	delta_time = (current_frame_delay + frame_wait_time) / 1000.0f;
 	return _run;
 }
 
