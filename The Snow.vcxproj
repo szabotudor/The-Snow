@@ -202,6 +202,9 @@
     <Text Include="SDL2_ttf\lib\x64\LICENSE.freetype.txt" />
     <Text Include="SDL2_ttf\lib\x64\LICENSE.zlib.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="player.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

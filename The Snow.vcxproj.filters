@@ -56,4 +56,7 @@
     <Text Include="SDL2_ttf\lib\x64\LICENSE.freetype.txt" />
     <Text Include="SDL2_ttf\lib\x64\LICENSE.zlib.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="player.png" />
+  </ItemGroup>
 </Project>
