@@ -35,20 +35,44 @@ ss::Vector ss::Vector::operator/(float x) {
 }
 
 //Auto operators
-ss::Vector ss::Vector::operator+=(float x) {
-	return Vector(this->x + x, this->y + x);
+void ss::Vector::operator+=(float x) {
+	this->x += x;
+	this->y += x;
 }
 
-ss::Vector ss::Vector::operator-=(float x) {
-	return Vector(this->x - x, this->y - x);
+void ss::Vector::operator-=(float x) {
+	this->x -= x;
+	this->y -= x;
 }
 
-ss::Vector ss::Vector::operator*=(float x) {
-	return Vector(this->x * x, this->y * x);
+void ss::Vector::operator*=(float x) {
+	this->x *= x;
+	this->y *= x;
 }
 
-ss::Vector ss::Vector::operator/=(float x) {
-	return Vector(this->x / x, this->y / x);
+void ss::Vector::operator/=(float x) {
+	this->x /= x;
+	this->y /= x;
+}
+
+void ss::Vector::operator+=(Vector v) {
+	this->x += v.x;
+	this->y += v.y;
+}
+
+void ss::Vector::operator-=(Vector v) {
+	this->x -= v.x;
+	this->y -= v.y;
+}
+
+void ss::Vector::operator*=(Vector v) {
+	this->x *= v.x;
+	this->y *= v.y;
+}
+
+void ss::Vector::operator/=(Vector v) {
+	this->x /= v.x;
+	this->y /= v.y;
 }
 
 //Full vector operators
@@ -75,13 +99,24 @@ ss::Vector ss::Vector::operator=(float x) {
 
 ss::Vector ss::Vector::normalized() {
 	float n = this->lenght();
-	return Vector(this->x / n, this->y / n);
+	if (x or y) {
+		return Vector(this->x / n, this->y / n);
+	}
+	else {
+		return Vector(0, 0);
+	}
 }
 
 void ss::Vector::normalize() {
-	float n = this->lenght();
-	x = this->x / n;
-	y = this->y / n;
+	if (x or y) {
+		float n = this->lenght();
+		x = this->x / n;
+		y = this->y / n;
+	}
+	else {
+		x = 0;
+		y = 0;
+	}
 }
 
 float ss::Vector::lenght() {

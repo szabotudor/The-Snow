@@ -13,14 +13,20 @@ namespace ss {
 		Vector operator - (float x);
 		Vector operator * (float x);
 		Vector operator / (float x);
-		Vector operator += (float x);
-		Vector operator -= (float x);
-		Vector operator *= (float x);
-		Vector operator /= (float x);
 		Vector operator + (Vector v);
 		Vector operator - (Vector v);
 		Vector operator * (Vector v);
 		Vector operator / (Vector v);
+
+		void operator += (float x);
+		void operator -= (float x);
+		void operator *= (float x);
+		void operator /= (float x);
+		void operator += (Vector x);
+		void operator -= (Vector x);
+		void operator *= (Vector x);
+		void operator /= (Vector x);
+
 		Vector operator = (float x);
 
 		//Returns the normalized verctor without changing the vector that is being normalized
