@@ -23,6 +23,17 @@ void show_fps(ss::Text& text, unsigned int fps, int &i) {
 }
 
 
+void player_move(ss::Sprite& player, ss::Snow &game, float delta) {
+	ss::Vector velocity;
+	velocity.y = game.is_key_pressed(SDL_SCANCODE_DOWN) - game.is_key_pressed(SDL_SCANCODE_UP);
+	velocity.x = game.is_key_pressed(SDL_SCANCODE_RIGHT) - game.is_key_pressed(SDL_SCANCODE_LEFT);
+	velocity.normalize();
+	velocity *= delta * 75;
+	player.position = player.position + velocity;
+
+}
+
+
 int main(int argc, char* args[]) {
 	ss::Vector mpos;
 	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
@@ -44,6 +55,8 @@ int main(int argc, char* args[]) {
 	button.position = ss::Vector(5, 50);
 	float _dt = 0.0f;
 	int i = 0;
+
+	ss::Sprite player = ss::Sprite(game.get_window(), "player.png");
 
 	SDL_Event* ev;
 
@@ -76,7 +89,7 @@ int main(int argc, char* args[]) {
 		}
 
 		mpos = game.get_mouse_position();
-		mousepos.set_text(to_string(mpos.x) + " " + to_string(mpos.y));
+		mousepos.set_text(to_string((int)mpos.x) + " " + to_string((int)mpos.y));
 
 		button.update();
 		debug.set_text("type: " + to_string(button.get_toggle()) + ", hovered: " + to_string(button.hovered) + ", pressed: " + to_string(button.pressed) + '\0');
@@ -84,6 +97,8 @@ int main(int argc, char* args[]) {
 		debug.draw();
 		inst.draw();
 		mousepos.draw();
+		player_move(player, game, _dt);
+		player.draw();
 		}
 	return 0;
 }
