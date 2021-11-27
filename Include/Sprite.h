@@ -16,5 +16,7 @@ namespace ss {
 		Vector position;
 		Sprite(SDL_Window *window, const char* texture);
 		Sprite(SDL_Window* window, int frames, const char ** textures);
+		//Draws the sprite on the window
+		void draw();
 	};
 }
