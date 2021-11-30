@@ -56,12 +56,24 @@ int main(int argc, char* args[]) {
 	float _dt = 0.0f;
 	int i = 0;
 
-	ss::Sprite player = ss::Sprite(game.get_window(), "player.png");
+	const char* frames[10] = {
+		"Sprites/Player/player_idle0000.png",
+		"Sprites/Player/player_idle0001.png",
+		"Sprites/Player/player_idle0002.png",
+		"Sprites/Player/player_idle0003.png",
+		"Sprites/Player/player_idle0004.png",
+		"Sprites/Player/player_idle0005.png",
+	};
+	
+	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
+	player.play(0, 5, 12);
 
 	SDL_Event* ev;
 
 	while (game.running(_dt)) {
+		cout << _dt << endl;
 		game.update();
+		player_move(player, game, _dt);
 		game.clear_screen();
 
 		show_fps(fps, game.get_fps(), i);
@@ -97,8 +109,7 @@ int main(int argc, char* args[]) {
 		debug.draw();
 		inst.draw();
 		mousepos.draw();
-		player_move(player, game, _dt);
-		player.draw();
+		player.draw(_dt);
 		}
 	return 0;
 }

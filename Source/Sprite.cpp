@@ -2,6 +2,7 @@
 
 ss::Sprite::Sprite(SDL_Window *window, const char* texture) {
 	frames = 0;
+	frame = 0;
 	IMG_Init(IMG_INIT_PNG);
 	surface = IMG_Load(texture);
 	render = SDL_GetRenderer(window);
@@ -15,22 +16,42 @@ ss::Sprite::Sprite(SDL_Window *window, const char* texture) {
 
 ss::Sprite::Sprite(SDL_Window* window, int frames, const char** textures) {
 	Sprite::frames = frames;
+	frame = 0;
 	render = SDL_GetRenderer(window);
 	IMG_Init(IMG_INIT_PNG);
 	Sprite::textures = new SDL_Texture * [frames];
 	for (int i = 0; i < frames; i++) {
 		surface = IMG_Load(textures[i]);
 		Sprite::textures[i] = SDL_CreateTextureFromSurface(render, surface);
+		if (!i) {
+			rect = surface->clip_rect;
+			rect.x = position.x;
+			rect.y = position.y;
+		}
 		SDL_FreeSurface(surface);
 	}
 }
 
-void ss::Sprite::draw() {
+void ss::Sprite::draw(float delta) {
 	if (rect.x != position.x or rect.y != position.y) {
 		rect.x = position.x;
 		rect.y = position.y;
 	}
-	if (!frames) {
-		SDL_RenderCopy(render, textures[0], NULL, &rect);
+	SDL_RenderCopy(render, textures[frame], NULL, &rect);
+
+	if (playing) {
+		time += delta;
+		frame = (int)(time / frame_delay);
+		if (frame > end) {
+			frame = 0;
+			time = 0;
+		}
 	}
+}
+
+void ss::Sprite::play(int start, int end, int fps) {
+	Sprite::start = start;
+	Sprite::end = end;
+	Sprite::frame_delay = 1.0f / fps;
+	playing = true;
 }
