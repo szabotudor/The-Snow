@@ -76,8 +76,6 @@ ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsign
 	window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, resolution.x, resolution.y, SDL_flags);
 	surface = SDL_GetWindowSurface(window);
 	render = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
-
-	frame_delay = 1000 / framerate;
 }
 
 void ss::Snow::update() {
@@ -96,23 +94,19 @@ void ss::Snow::update() {
 	}
 
 	//Calculate frame delta and framerate
-	current_frame_delay = (SDL_GetTicks() - time);
-	if (current_frame_delay > 0 and current_frame_delay <= frame_delay) {
-		frame_wait_time = frame_delay - current_frame_delay + (int)(fps >= target_fps);
-		SDL_Delay(frame_wait_time);
+	NOW = SDL_GetPerformanceCounter();
+	delta_time = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+	if (target_fps) {
+		target_wait_time = 1000.0f / target_fps;
+		if (delta_time < target_wait_time) {
+			SDL_Delay(target_wait_time - delta_time);
+			delta_time = target_wait_time;
+		}
 	}
-	else if (!frame_delay){
-		frame_wait_time = 0;
-	}
-	time = SDL_GetTicks();
-	if (frame_wait_time + current_frame_delay) {
-		fps = 1000 / (frame_wait_time + current_frame_delay);
-	}
-	else {
-		fps = 1001;
-	}
+	LAST = SDL_GetPerformanceCounter();
+	fps = (int)(1000 / delta_time);
 
-	//Calculate window scale, accordin to resolution
+	//Calculate window scale, according to resolution
 	int w, h;
 	SDL_GetWindowSize(window, &w, &h);
 
@@ -121,6 +115,7 @@ void ss::Snow::update() {
 		scale_window(w, h);
 		//scale_window(w, h);
 	}
+
 	//Draw a border around the renderer's viewport (used only in debug mode)
 	/*
 	if (IS_DEBUG) {
@@ -203,26 +198,12 @@ bool ss::Snow::is_key_just_released(Uint8 key) {
 }
 
 bool ss::Snow::running(float &delta_time) {
-	delta_time = (current_frame_delay + frame_wait_time) / 1000.0f;
+	delta_time = Snow::delta_time;
 	return _run;
 }
 
 int ss::Snow::get_num_events() {
 	return num_events;
-}
-
-void ss::Snow::set_target_framerate(unsigned int framerate) {
-	target_fps = framerate;
-	if (framerate) {
-		frame_delay = 1000 / framerate;
-	}
-	else {
-		frame_delay = 0;
-	}
-}
-
-unsigned int ss::Snow::get_target_framerate() {
-	return target_fps;
 }
 
 void ss::Snow::quit() {

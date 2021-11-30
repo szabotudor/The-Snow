@@ -52,6 +52,6 @@ void ss::Sprite::draw(float delta) {
 void ss::Sprite::play(int start, int end, int fps) {
 	Sprite::start = start;
 	Sprite::end = end;
-	Sprite::frame_delay = 1.0f / fps;
+	Sprite::frame_delay = 1000.0f / fps;
 	playing = true;
 }

@@ -17,6 +17,7 @@ namespace ss {
 	public:
 		Vector resolution;
 		SDL_Event events[32];
+		unsigned int target_fps = 60;
 	private:
 		Vector sdl_window_size;
 		SDL_Rect viewport;
@@ -24,12 +25,11 @@ namespace ss {
 		SDL_Surface* surface = NULL;
 		SDL_Renderer* render = NULL;
 		int num_events = 0;
-		int frame_delay = 16;
-		int current_frame_delay;
 		unsigned int fps;
-		unsigned int target_fps = 60;
-		unsigned int frame_wait_time;
 		long long time;
+		Uint64 NOW = 0, LAST = 0;
+		double delta_time;
+		float target_wait_time;
 		bool _run = true;
 		//Uint8* previous_keystate = { 0 };
 		//Uint8* keystate = { 0 };
@@ -69,10 +69,6 @@ namespace ss {
 		bool running(float &delta_time);
 		//Returns the number of events in the queue
 		int get_num_events();
-		//Sets the target fps (set to negative for unlimited)
-		void set_target_framerate(unsigned int framerate);
-		//Gets the target fps priorly set
-		unsigned int get_target_framerate();
 		//Stops all processes and background threads running in the helper library
 		void quit();
 	};
