@@ -4,7 +4,7 @@
 int avg_fps[60];
 
 
-void show_fps(ss::Text& text, unsigned int fps, int &i) {
+void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 	if (i < 60) {
 		avg_fps[i] = fps;
 		i++;
@@ -17,7 +17,7 @@ void show_fps(ss::Text& text, unsigned int fps, int &i) {
 		}
 		sum /= 60;
 
-		text.set_text(to_string(sum));
+		text.set_text(to_string(sum) + " " + to_string(delta));
 	}
 	text.draw();
 }
@@ -28,7 +28,7 @@ void player_move(ss::Sprite& player, ss::Snow &game, float delta) {
 	velocity.y = game.is_key_pressed(SDL_SCANCODE_DOWN) - game.is_key_pressed(SDL_SCANCODE_UP);
 	velocity.x = game.is_key_pressed(SDL_SCANCODE_RIGHT) - game.is_key_pressed(SDL_SCANCODE_LEFT);
 	velocity.normalize();
-	velocity *= delta * 75;
+	velocity *= delta / 10;
 	player.position = player.position + velocity;
 
 }
@@ -56,7 +56,7 @@ int main(int argc, char* args[]) {
 	float _dt = 0.0f;
 	int i = 0;
 
-	const char* frames[10] = {
+	const char* frames[6] = {
 		"Sprites/Player/player_idle0000.png",
 		"Sprites/Player/player_idle0001.png",
 		"Sprites/Player/player_idle0002.png",
@@ -66,24 +66,23 @@ int main(int argc, char* args[]) {
 	};
 	
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
-	player.play(0, 5, 12);
+	player.play(0, 5, 8);
 
 	SDL_Event* ev;
 
 	while (game.running(_dt)) {
-		cout << _dt << endl;
 		game.update();
 		player_move(player, game, _dt);
 		game.clear_screen();
 
-		show_fps(fps, game.get_fps(), i);
+		show_fps(fps, game.get_fps(), i, _dt);
 
 		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
-			if (game.get_target_framerate() == 60) {
-				game.set_target_framerate(0);
+			if (game.target_fps == 60) {
+				game.target_fps = 0;
 			}
-			else if (game.get_target_framerate() == 0) {
-				game.set_target_framerate(60);
+			else if (game.target_fps == 0) {
+				game.target_fps = 60;
 			}
 		}
 
