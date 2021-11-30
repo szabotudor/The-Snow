@@ -76,6 +76,8 @@ ss::Snow::Snow(const char* name, ss::Vector resolution, Uint32 SDL_flags, unsign
 	window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, resolution.x, resolution.y, SDL_flags);
 	surface = SDL_GetWindowSurface(window);
 	render = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
+	numkeys;
+	checkstate = SDL_GetKeyboardState(&numkeys);
 }
 
 void ss::Snow::update() {
@@ -86,10 +88,8 @@ void ss::Snow::update() {
 	}
 
 	//Test for keyboard state
-	int numkeys;
-	const Uint8* checkstate = SDL_GetKeyboardState(&numkeys);
+	copy(begin(keystate), end(keystate), begin(previous_keystate));
 	for (int i = 0; i < numkeys; i++) {
-		previous_keystate[i] = keystate[i];
 		keystate[i] = (bool)checkstate[i];
 	}
 

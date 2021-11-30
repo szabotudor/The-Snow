@@ -31,8 +31,8 @@ namespace ss {
 		double delta_time;
 		float target_wait_time;
 		bool _run = true;
-		//Uint8* previous_keystate = { 0 };
-		//Uint8* keystate = { 0 };
+		int numkeys;
+		const Uint8* checkstate;
 		
 		bool previous_keystate[512];
 		bool keystate[512];
