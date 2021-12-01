@@ -37,6 +37,7 @@ void player_move(ss::Sprite& player, ss::Snow &game, float delta) {
 int main(int argc, char* args[]) {
 	ss::Vector mpos;
 	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
+	SDL_SetWindowOpacity(game.get_window(), 0);
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
 	ss::Text debug(game.get_window(), "", "basic.ttf", 9);
 	ss::Text inst(game.get_window(), "PRESS crtl + f TO TOGGLE FULLSCREEN\nPRESS return TO CHANGE BUTTON TYPE\nPRESS space TO LOCK/UNLOCK FPS", "basic.ttf", 9);
@@ -54,6 +55,8 @@ int main(int argc, char* args[]) {
 	ss::Button button(game.get_window(), fill_color, border_color, text_color, 3, "BUTTON", "basic.ttf", 18);
 	button.position = ss::Vector(5, 50);
 	float _dt = 0.0f;
+	float _rdt = 0.0f;
+	float window_opacity = 0.0f;
 	int i = 0;
 
 	const char* frames[6] = {
@@ -70,12 +73,16 @@ int main(int argc, char* args[]) {
 
 	SDL_Event* ev;
 
-	while (game.running(_dt)) {
+	while (game.running(_dt, _rdt)) {
+		if (window_opacity < 0.999) {
+			SDL_SetWindowOpacity(game.get_window(), window_opacity);
+			window_opacity += 0.01 * (1 - window_opacity);
+		}
 		game.update();
 		player_move(player, game, _dt);
 		game.clear_screen();
 
-		show_fps(fps, game.get_fps(), i, _dt);
+		show_fps(fps, game.get_fps(), i, _rdt);
 
 		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
 			if (game.target_fps == 60) {
