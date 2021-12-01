@@ -28,7 +28,7 @@ namespace ss {
 		unsigned int fps;
 		long long time;
 		Uint64 NOW = 0, LAST = 0;
-		double delta_time;
+		double delta_time, real_delta_time;
 		float target_wait_time;
 		bool _run = true;
 		int numkeys;
@@ -66,7 +66,7 @@ namespace ss {
 		//Returnes true if the SDL_KeyScancode is just released this frame (eg: SDL_SCANCODE_RETURN)
 		bool is_key_just_released(Uint8 key);
 		//Checks if the engine is still running
-		bool running(float &delta_time);
+		bool running(float &delta_time, float& real_delta_time);
 		//Returns the number of events in the queue
 		int get_num_events();
 		//Stops all processes and background threads running in the helper library

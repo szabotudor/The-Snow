@@ -96,12 +96,16 @@ void ss::Snow::update() {
 	//Calculate frame delta and framerate
 	NOW = SDL_GetPerformanceCounter();
 	delta_time = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+	real_delta_time = delta_time;
 	if (target_fps) {
 		target_wait_time = 1000.0f / target_fps;
 		if (delta_time < target_wait_time) {
 			SDL_Delay(target_wait_time - delta_time);
 			delta_time = target_wait_time;
 		}
+	}
+	if (delta_time > 1000 or delta_time < 0) {
+		delta_time = 1;
 	}
 	LAST = SDL_GetPerformanceCounter();
 	fps = (int)(1000 / delta_time);
@@ -197,8 +201,9 @@ bool ss::Snow::is_key_just_released(Uint8 key) {
 	}
 }
 
-bool ss::Snow::running(float &delta_time) {
+bool ss::Snow::running(float &delta_time, float &real_delta_time) {
 	delta_time = Snow::delta_time;
+	real_delta_time = Snow::real_delta_time;
 	return _run;
 }
 
