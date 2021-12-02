@@ -66,7 +66,9 @@ void ss::Text::set_rich_text(const char* text) {
 	Text::text = text;
 	size_t length = strlen(text);
 	string t = "";
-	surface = SDL_CreateRGBSurface(0, 1000, 1000, 32, rmask, gmask, bmask, amask);
+	int w, h;
+	SDL_GetRendererOutputSize(renderer, &w, &h);
+	surface = SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
 	int line = 0;
 	for (int i = 0; i <= length; i++) {
 		if (text[i] == '\n' or i == length) {
