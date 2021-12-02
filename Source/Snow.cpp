@@ -137,7 +137,7 @@ void ss::Snow::clear_screen(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 }
 
 long long ss::Snow::get_time() {
-	return time;
+	return NOW;
 }
 
 int ss::Snow::get_fps() {
