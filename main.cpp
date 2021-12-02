@@ -37,7 +37,6 @@ void player_move(ss::Sprite& player, ss::Snow &game, float delta) {
 int main(int argc, char* args[]) {
 	ss::Vector mpos;
 	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
-	SDL_SetWindowOpacity(game.get_window(), 0);
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
 	ss::Text debug(game.get_window(), "", "basic.ttf", 9);
 	ss::Text inst(game.get_window(), "PRESS crtl + f TO TOGGLE FULLSCREEN\nPRESS return TO CHANGE BUTTON TYPE\nPRESS space TO LOCK/UNLOCK FPS", "basic.ttf", 9);
@@ -74,10 +73,6 @@ int main(int argc, char* args[]) {
 	SDL_Event* ev;
 
 	while (game.running(_dt, _rdt)) {
-		if (window_opacity < 0.999) {
-			SDL_SetWindowOpacity(game.get_window(), window_opacity);
-			window_opacity += 0.01 * (1 - window_opacity);
-		}
 		game.update();
 		player_move(player, game, _dt);
 		game.clear_screen();
