@@ -26,7 +26,6 @@ namespace ss {
 		SDL_Renderer* render = NULL;
 		int num_events = 0;
 		unsigned int fps;
-		long long time;
 		Uint64 NOW = 0, LAST = 0;
 		double delta_time, real_delta_time;
 		float target_wait_time;
