@@ -89,6 +89,12 @@ int main(int argc, char* args[]) {
 		}
 
 		if (game.is_key_just_pressed(SDL_SCANCODE_RETURN)) {
+			if (player.playing) {
+				player.pause();
+			}
+			else {
+				player.resume();
+			}
 			button.set_toggle(!button.get_toggle());
 		}
 
