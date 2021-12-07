@@ -32,6 +32,10 @@ ss::Sprite::Sprite(SDL_Window* window, int frames, const char** textures) {
 	}
 }
 
+void ss::Sprite::load(SDL_Window* window, int frames, const char** textures) {
+
+}
+
 void ss::Sprite::draw(float delta) {
 	if (rect.x != position.x or rect.y != position.y) {
 		rect.x = position.x;
@@ -54,4 +58,18 @@ void ss::Sprite::play(int start, int end, int fps) {
 	Sprite::end = end;
 	Sprite::frame_delay = 1000.0f / fps;
 	playing = true;
+}
+
+void ss::Sprite::resume() {
+	playing = true;
+}
+
+void ss::Sprite::stop() {
+	frame = 0;
+	time = 0;
+	playing = false;
+}
+
+void ss::Sprite::pause() {
+	playing = false;
 }
