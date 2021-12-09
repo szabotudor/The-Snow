@@ -7,6 +7,7 @@
     <ClCompile Include="Source\Vector.cpp" />
     <ClCompile Include="Source\Text.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
+    <ClCompile Include="Source\Particles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
@@ -14,6 +15,7 @@
     <ClInclude Include="Include\Button.h" />
     <ClInclude Include="Include\Text.h" />
     <ClInclude Include="Include\Sprite.h" />
+    <ClInclude Include="Include\Particles.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />

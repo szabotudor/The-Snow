@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Button.cpp" />
+    <ClCompile Include="Source\Particles.cpp" />
     <ClCompile Include="Source\Snow.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
     <ClCompile Include="Source\Text.cpp" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Button.h" />
+    <ClInclude Include="Include\Particles.h" />
     <ClInclude Include="Include\Snow.h" />
     <ClInclude Include="Include\Sprite.h" />
     <ClInclude Include="Include\Text.h" />

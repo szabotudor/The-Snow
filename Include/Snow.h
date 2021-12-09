@@ -7,6 +7,7 @@
 #include<SDL_ttf.h>
 #include<Vector.h>
 #include<Button.h>
+#include<Particles.h>
 #include<Sprite.h>
 #include<Text.h>
 
