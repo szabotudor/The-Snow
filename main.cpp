@@ -79,25 +79,6 @@ int main(int argc, char* args[]) {
 
 		show_fps(fps, game.get_fps(), i, _rdt);
 
-		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
-			if (game.target_fps == 60) {
-				game.target_fps = 0;
-			}
-			else if (game.target_fps == 0) {
-				game.target_fps = 60;
-			}
-		}
-
-		if (game.is_key_just_pressed(SDL_SCANCODE_RETURN)) {
-			if (player.playing) {
-				player.pause();
-			}
-			else {
-				player.resume();
-			}
-			button.set_toggle(!button.get_toggle());
-		}
-
 		for (int i = 0; i < game.get_num_events(); i++) {
 			if (game.events[i].type == SDL_QUIT) {
 				game.quit();
