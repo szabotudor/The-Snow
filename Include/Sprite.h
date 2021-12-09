@@ -26,7 +26,7 @@ namespace ss {
 		void draw(float delta);
 		//Starts playing an animation from the start frame to the end frame at the given fps
 		void play(int start, int end, int fps);
-		//Plays the animation after a pause
+		//Plays the currently loaded animation from the set position
 		void resume();
 		//Stops the animation and resets it
 		void stop();
