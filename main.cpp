@@ -70,6 +70,11 @@ int main(int argc, char* args[]) {
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.play(0, 5, 8);
 
+	ss::ParticleEmitter ptem(ss::Vector(50, 50));
+	ss::Particle pt;
+	pt.ammount = 16;
+	ptem << pt;
+
 	SDL_Event* ev;
 
 	while (game.running(_dt, _rdt)) {
