@@ -7,7 +7,14 @@ using namespace std;
 namespace ss {
 	class ParticleGravity {
 	public:
-		Vector direction = Vector(0, 9.81f);
+		enum class Type {
+			DIRECTION,
+			POINT,
+			LINE
+		};
+		float force = 9.81;
+	private:
+		Vector direction;
 		Vector position;
 	};
 	class Particle {
