@@ -7,28 +7,31 @@ using namespace std;
 namespace ss {
 	class ParticleGravity {
 	public:
-		enum class Type {
+		enum class GravityType {
 			DIRECTION,
-			POINT,
-			LINE
+			POINT
 		};
+		GravityType type = GravityType::DIRECTION;
 		float force = 9.81;
 	private:
 		Vector direction;
 		Vector position;
 	};
+	
 	class Particle {
 	public:
-		SDL_Color color;
+		SDL_Color color = SDL_Color();
 		SDL_Texture* texture;
+		SDL_Rect rect;
 		Vector position;
 		Vector velocity;
-		float angular_velocity = 0.0f;
-		float angle = 0.0f;
+		double angular_velocity = 0.0f;
+		double angle = 0.0f;
 		float lifetime = 0.0f;
 		float lifelimit = 1.0f;
 		int ammount = 16;
 	};
+
 	class ParticleEmitter {
 		SDL_Window* window;
 		SDL_Renderer* render;
@@ -36,8 +39,19 @@ namespace ss {
 		int ammount = 0;
 		int filled = 0;
 	public:
+		enum class EmissionShape {
+			POINT
+		};
+		EmissionShape shape = EmissionShape::POINT;
 		Vector position;
-		ParticleEmitter(Vector position, int emission_ammount = 16);
+		ParticleEmitter(Vector position, int emission_ammount = 16, EmissionShape shape = EmissionShape::POINT);
 		void operator << (Particle particle);
+		void operator << (ParticleGravity gravity);
+		//Applies all velocities to the particles and updates their position
+		void update(float delta);
+		//Draws all particles contained in the emitter to screen
+		void draw();
+		//Clears all particles in the particle emitter
+		void clear();
 	};
 }
