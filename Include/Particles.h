@@ -12,8 +12,7 @@ namespace ss {
 			POINT
 		};
 		GravityType type = GravityType::DIRECTION;
-		float force = 9.81;
-	private:
+		double force = 9.81;
 		Vector direction;
 		Vector position;
 	};
@@ -25,10 +24,11 @@ namespace ss {
 		SDL_Rect rect;
 		Vector position;
 		Vector velocity;
-		double angular_velocity = 0.0f;
-		double angle = 0.0f;
-		float lifetime = 0.0f;
-		float lifelimit = 1.0f;
+		double angular_velocity = 0.0;
+		double angle = 0.0;
+		double lifetime = 0.0;
+		double entry_time = 0.0;
+		double lifelimit = 1.0;
 		int ammount = 16;
 	};
 
@@ -38,13 +38,14 @@ namespace ss {
 		Particle* particles;
 		int ammount = 0;
 		int filled = 0;
+		bool first_cycle = true;
 	public:
 		enum class EmissionShape {
 			POINT
 		};
 		EmissionShape shape = EmissionShape::POINT;
 		Vector position;
-		ParticleEmitter(Vector position, int emission_ammount = 16, EmissionShape shape = EmissionShape::POINT);
+		ParticleEmitter(SDL_Window* window, Vector position, int emission_ammount = 16, EmissionShape shape = EmissionShape::POINT);
 		void operator << (Particle particle);
 		void operator << (ParticleGravity gravity);
 		//Applies all velocities to the particles and updates their position
