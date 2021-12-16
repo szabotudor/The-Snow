@@ -55,7 +55,6 @@ int main(int argc, char* args[]) {
 	button.position = ss::Vector(5, 50);
 	float _dt = 0.0f;
 	float _rdt = 0.0f;
-	float window_opacity = 0.0f;
 	int i = 0;
 
 	const char* frames[6] = {
