@@ -35,31 +35,7 @@ namespace ss {
 		void normalize();
 		//Returns the legnth of the vector
 		float lenght();
-	};
-
-	class iVector {
-	public:
-		int x = 0, y = 0;
-
-		iVector(int x, int y);
-		iVector(int w = 0);
-
-		//Overrides for the vector class operators
-		iVector operator + (int x);
-		iVector operator - (int x);
-		iVector operator * (int x);
-		iVector operator / (int x);
-		iVector operator += (int x);
-		iVector operator -= (int x);
-		iVector operator *= (int x);
-		iVector operator /= (int x);
-		iVector operator + (iVector v);
-		iVector operator - (iVector v);
-		iVector operator * (iVector v);
-		iVector operator / (iVector v);
-		iVector operator = (int x);
-
-		//Returns the legnth of the vector
-		float lenght();
+		//Gets a normalized direction to another vector
+		Vector direction_to(Vector v);
 	};
 }
