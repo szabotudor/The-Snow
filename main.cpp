@@ -37,6 +37,7 @@ void player_move(ss::Sprite& player, ss::Snow &game, float delta) {
 int main(int argc, char* args[]) {
 	ss::Vector mpos;
 	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
+	SDL_Renderer* render = SDL_GetRenderer(game.get_window());
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
 	ss::Text debug(game.get_window(), "", "basic.ttf", 9);
 	ss::Text inst(game.get_window(), "PRESS crtl + f TO TOGGLE FULLSCREEN\nPRESS return TO CHANGE BUTTON TYPE\nPRESS space TO LOCK/UNLOCK FPS", "basic.ttf", 9);
@@ -69,9 +70,18 @@ int main(int argc, char* args[]) {
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.play(0, 5, 8);
 
-	ss::ParticleEmitter ptem(ss::Vector(50, 50));
+	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50, 50));
 	ss::Particle pt;
+	ss::ParticleGravity pg;
+	pg.type = ss::ParticleGravity::GravityType::POINT;
+	pg.direction = ss::Vector(0, 1);
+	pg.force = 0.005;
 	pt.ammount = 16;
+	ptem.position = ss::Vector(50, 50);
+	SDL_Surface* ball = IMG_Load("Sprites/ball.png");
+	SDL_Texture* ballt = SDL_CreateTextureFromSurface(render, ball);
+	SDL_FreeSurface(ball);
+	pt.texture = ballt;
 	ptem << pt;
 
 	SDL_Event* ev;
@@ -102,6 +112,10 @@ int main(int argc, char* args[]) {
 		inst.draw();
 		mousepos.draw();
 		player.draw(_dt);
+
+		ptem << pg;
+		ptem.update(_dt);
+		ptem.draw();
 		}
 	return 0;
 }
