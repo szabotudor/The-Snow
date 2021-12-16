@@ -60,5 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="player.png" />
+    <Image Include="Sprites\ball.png" />
   </ItemGroup>
 </Project>
