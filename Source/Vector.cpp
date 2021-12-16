@@ -124,5 +124,5 @@ float ss::Vector::lenght() {
 }
 
 ss::Vector ss::Vector::direction_to(Vector v) {
-	return Vector(Vector::x - v.x, Vector::y - v.y).normalized();
+	return Vector(v.x - Vector::x, v.y - Vector::y).normalized();
 }
