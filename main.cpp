@@ -70,7 +70,7 @@ int main(int argc, char* args[]) {
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.play(0, 5, 8);
 
-	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50, 50), 1000);
+	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(0, 0), 1000);
 	ss::Particle pt;
 	ss::ParticleGravity pg;
 	ss::ParticleDamper pd;
@@ -81,7 +81,6 @@ int main(int argc, char* args[]) {
 	pg.force = 0.005;
 	pt.ammount = 1000;
 	pt.lifelimit = 5;
-	ptem.position = ss::Vector(50, 50);
 	SDL_Surface* ball = IMG_Load("Sprites/ball.png");
 	SDL_Texture* ballt = SDL_CreateTextureFromSurface(render, ball);
 	SDL_FreeSurface(ball);
@@ -115,15 +114,13 @@ int main(int argc, char* args[]) {
 		debug.draw();
 		inst.draw();
 		mousepos.draw();
-		player.draw(_dt);
 
-		ptem.position.x += _dt * (game.is_key_pressed(SDL_SCANCODE_RIGHT) - game.is_key_pressed(SDL_SCANCODE_LEFT)) / 10;
-		ptem.position.y += _dt * (game.is_key_pressed(SDL_SCANCODE_DOWN) - game.is_key_pressed(SDL_SCANCODE_UP)) / 10;
-
+		ptem.position = player.position;
 		ptem << pg;
 		ptem << pd;
 		ptem.update(_dt);
 		ptem.draw();
+		player.draw(_dt);
 		}
 	return 0;
 }
