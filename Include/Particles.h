@@ -34,8 +34,8 @@ namespace ss {
 
 	class ParticleDamper {
 	public:
-		double linear_damping = 0.02;
-		double angular_damping = 0.02;
+		double linear_damping = 0.015;
+		double angular_damping = 0.015;
 	};
 
 	class ParticleEmitter {
