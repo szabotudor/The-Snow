@@ -44,6 +44,13 @@ void ss::ParticleEmitter::operator<<(ParticleGravity gravity) {
 	}
 }
 
+void ss::ParticleEmitter::operator<<(ParticleDamper damper) {
+	for (int i = 0; i < filled; i++) {
+		particles[i].velocity -= particles[i].velocity * damper.linear_damping;
+		particles[i].angular_velocity -= particles[i].angular_velocity * damper.angular_damping;
+	}
+}
+
 void ss::ParticleEmitter::update(float delta) {
 	for (int i = 0; i < filled; i++) {
 		particles[i].lifetime += delta / 1000;

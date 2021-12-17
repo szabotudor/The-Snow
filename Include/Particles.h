@@ -32,6 +32,12 @@ namespace ss {
 		int ammount = 16;
 	};
 
+	class ParticleDamper {
+	public:
+		double linear_damping = 0.02;
+		double angular_damping = 0.02;
+	};
+
 	class ParticleEmitter {
 		SDL_Window* window;
 		SDL_Renderer* render;
@@ -48,6 +54,7 @@ namespace ss {
 		ParticleEmitter(SDL_Window* window, Vector position, int emission_ammount = 16, EmissionShape shape = EmissionShape::POINT);
 		void operator << (Particle particle);
 		void operator << (ParticleGravity gravity);
+		void operator << (ParticleDamper damper);
 		//Applies all velocities to the particles and updates their position
 		void update(float delta);
 		//Draws all particles contained in the emitter to screen
