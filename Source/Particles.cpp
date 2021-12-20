@@ -1,5 +1,6 @@
 #include<Particles.h>
 
+/*
 ss::ParticleEmitter::ParticleEmitter(SDL_Window* window, Vector position, int emission_ammount, EmissionShape shape) {
 	ParticleEmitter::window = window;
 	ParticleEmitter::render = SDL_GetRenderer(window);
@@ -86,4 +87,11 @@ void ss::ParticleEmitter::clear() {
 	}
 	filled = 0;
 	delete[] particles;
+}
+*/
+
+ss::ParticleEmitter::ParticleEmitter(SDL_Window* window, Vector position, int ammount) {
+	ParticleEmitter::window = window;
+	render = SDL_GetRenderer(window);
+	ParticleEmitter::position = position;
 }

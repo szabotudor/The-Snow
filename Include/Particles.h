@@ -5,6 +5,7 @@
 using namespace std;
 
 namespace ss {
+	/*
 	class ParticleGravity {
 	public:
 		enum class GravityType {
@@ -61,5 +62,41 @@ namespace ss {
 		void draw();
 		//Clears all particles in the particle emitter
 		void clear();
+	};
+	*/
+	class ParticleEmitter {
+		enum class EmissionShape {
+			POINT,
+			CIRCLE,
+			RECT,
+			LINE
+		};
+		enum {
+			PTex,
+			PLifeTime,
+			PLifeLimit,
+			PPos,
+			PVel,
+			PAng,
+			PAngVel
+		};
+		SDL_Window* window;
+		SDL_Renderer* render;
+		int ammount;
+		int** particles;
+		SDL_Texture** p_textures;
+		double* p_lifetime;
+		double* p_lifelimit;
+		Vector* p_position;
+		Vector* p_velocity;
+		double* p_angle;
+		double* p_angular_velocity;
+	public:
+		EmissionShape emitter_shape = EmissionShape::POINT;
+		Vector position;
+		bool use_gravity = false;
+		double g_force = 1;
+		Vector g_direction, g_position;
+		ParticleEmitter(SDL_Window* window, Vector position, int ammount);
 	};
 }
