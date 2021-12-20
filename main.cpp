@@ -70,6 +70,8 @@ int main(int argc, char* args[]) {
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.play(0, 5, 8);
 
+	/*
+	* Old Particle Emitter creation code
 	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(0, 0), 1000);
 	ss::Particle pt;
 	ss::ParticleGravity pg;
@@ -86,6 +88,7 @@ int main(int argc, char* args[]) {
 	SDL_FreeSurface(ball);
 	pt.texture = ballt;
 	ptem << pt;
+	*/
 
 	SDL_Event* ev;
 
@@ -115,12 +118,15 @@ int main(int argc, char* args[]) {
 		inst.draw();
 		mousepos.draw();
 
+		/*
+		* Old Particle emitter code
 		ptem.position = player.position;
 		ptem << pg;
 		ptem << pd;
 		ptem.update(_dt);
 		ptem.draw();
 		player.draw(_dt);
+		*/
 		}
 	return 0;
 }
