@@ -74,7 +74,7 @@ int main(int argc, char* args[]) {
 	SDL_Surface* ball = IMG_Load("Sprites/ball.png");
 	SDL_Texture* ballt = SDL_CreateTextureFromSurface(render, ball);
 	SDL_FreeSurface(ball);
-	ptem.add_particles(1000, ballt, 3);
+	ptem.add_particle_layer(100, ballt, 3);
 	ptem.use_gravity = true;
 	ptem.g_type = ss::ParticleEmitter::GravityType::POINT;
 	ptem.g_position = ss::Vector(50, 50);
