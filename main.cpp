@@ -74,7 +74,11 @@ int main(int argc, char* args[]) {
 	SDL_Surface* ball = IMG_Load("Sprites/ball.png");
 	SDL_Texture* ballt = SDL_CreateTextureFromSurface(render, ball);
 	SDL_FreeSurface(ball);
-	ptem.add_particles(16, ballt, 5);
+	ptem.add_particles(1000, ballt, 3);
+	ptem.use_gravity = true;
+	ptem.g_type = ss::ParticleEmitter::GravityType::POINT;
+	ptem.g_position = ss::Vector(50, 50);
+	ptem.g_force = 5;
 
 	SDL_Event* ev;
 
@@ -104,6 +108,8 @@ int main(int argc, char* args[]) {
 		inst.draw();
 		mousepos.draw();
 
+		ptem.position = player.position;
+		ptem.update(_dt);
 		ptem.draw();
 		player.draw(_dt);
 		}
