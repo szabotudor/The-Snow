@@ -6,6 +6,18 @@ using namespace std;
 
 namespace ss {
 	class ParticleEmitter {
+	public:
+		enum class EmissionShape {
+			POINT,
+			CIRCLE,
+			RECT,
+			LINE
+		};
+		enum class GravityType {
+			DIRECTION,
+			POINT
+		};
+	private:
 		SDL_Window* window;
 		SDL_Renderer* render;
 		int ammount = 0;
@@ -21,16 +33,6 @@ namespace ss {
 		double* p_angle;
 		double* p_angular_velocity;
 	public:
-		enum class EmissionShape {
-			POINT,
-			CIRCLE,
-			RECT,
-			LINE
-		};
-		enum class GravityType {
-			DIRECTION,
-			POINT
-		};
 		EmissionShape emitter_shape = EmissionShape::POINT;
 		Vector position;
 		bool use_gravity = false;
@@ -43,7 +45,7 @@ namespace ss {
 		//Adds a specified ammount of the given particle
 		void add_particles(int ammount, SDL_Texture* texture, double lifelimit);
 		//Updates position of al particles
-		void update();
+		void update(double delta);
 		//Draws all particles in the emitter on the screen
 		void draw();
 	};

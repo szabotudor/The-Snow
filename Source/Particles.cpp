@@ -101,7 +101,7 @@ void ss::ParticleEmitter::add_particles(int ammount, SDL_Texture* texture, doubl
 
 	for (int i = ParticleEmitter::ammount; i < ParticleEmitter::ammount + ammount; i++) {
 		p_arg[i] = types;
-		p_lifetime[i] = 0;
+		p_lifetime[i] = -lifelimit + lifelimit / ammount * (i + 1);
 		p_angle[i] = 0;
 		p_angular_velocity[i] = 0;
 		p_position[i] = position;
@@ -110,6 +110,42 @@ void ss::ParticleEmitter::add_particles(int ammount, SDL_Texture* texture, doubl
 
 	ParticleEmitter::ammount += ammount;
 	types++;
+}
+
+void ss::ParticleEmitter::update(double delta) {
+	delta /= 1000;
+	for (int i = 0; i < ammount; i++) {
+		p_lifetime[i] += delta;
+		if (p_lifetime[i] >= 0) {
+			if (p_lifetime[i] > p_lifelimit[p_arg[i]]) {
+				p_lifetime[i] -= p_lifelimit[p_arg[i]];
+				p_position[i] = position;
+				p_velocity[i] = Vector();
+				p_angle[i] = 0;
+				p_angular_velocity[i] = 0;
+			}
+			if (use_gravity) {
+				switch (g_type) {
+				case ss::ParticleEmitter::GravityType::DIRECTION:
+					p_velocity[i] += g_direction * g_force;
+					break;
+				case ss::ParticleEmitter::GravityType::POINT:
+					p_velocity[i] += p_position[i].direction_to(g_position) * g_force;
+					break;
+				default:
+					break;
+				}
+			}
+			if (p_lifetime[i] > delta) {
+				p_position[i] += p_velocity[i] * delta;
+				p_angle[i] += p_angular_velocity[i] * delta;
+			}
+			else {
+				p_position[i] += p_velocity[i] * p_lifetime[i];
+				p_angle[i] += p_angular_velocity[i] * p_lifetime[i];
+			}
+		}
+	}
 }
 
 void ss::ParticleEmitter::draw() {
