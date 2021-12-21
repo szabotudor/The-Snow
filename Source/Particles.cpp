@@ -1,97 +1,125 @@
 #include<Particles.h>
 
-/*
-ss::ParticleEmitter::ParticleEmitter(SDL_Window* window, Vector position, int emission_ammount, EmissionShape shape) {
-	ParticleEmitter::window = window;
-	ParticleEmitter::render = SDL_GetRenderer(window);
-	ParticleEmitter::position = position;
-	ParticleEmitter::shape = shape;
-	particles = new Particle[emission_ammount];
-	ammount = emission_ammount;
-}
 
-void ss::ParticleEmitter::operator<<(Particle particle) {
-	if (filled + particle.ammount > ammount) {
-		throw invalid_argument("Ammount of particles given is higher than the ammount of free particle spots");
-	}
-	for (int i = filled; i < particle.ammount; i++) {
-		particles[i] = particle;
-		particles[i].rect;
-		int w, h;
-		SDL_QueryTexture(particles[i].texture, NULL, NULL, &w, &h);
-		particles[i].rect.w = w;
-		particles[i].rect.h = h;
-		particles[i].entry_time = (double)(i - filled) / particles[i].ammount * particles[i].lifelimit;
-		particles[i].lifetime = particles[i].lifelimit - particles[i].entry_time;
-		particles[i].position = position;
-	}
-	filled += particle.ammount;
-}
-
-void ss::ParticleEmitter::operator<<(ParticleGravity gravity) {
-	switch (gravity.type) {
-	case ParticleGravity::GravityType::DIRECTION:
-		for (int i = 0; i < filled; i++) {
-			particles[i].velocity += gravity.direction * gravity.force;
-		}
-		break;
-	case ParticleGravity::GravityType::POINT:
-		for (int i = 0; i < filled; i++) {
-			particles[i].velocity += particles[i].position.direction_to(gravity.position) * gravity.force;
-		}
-		break;
-	default:
-		break;
-	}
-}
-
-void ss::ParticleEmitter::operator<<(ParticleDamper damper) {
-	for (int i = 0; i < filled; i++) {
-		particles[i].velocity -= particles[i].velocity * damper.linear_damping;
-		particles[i].angular_velocity -= particles[i].angular_velocity * damper.angular_damping;
-	}
-}
-
-void ss::ParticleEmitter::update(float delta) {
-	for (int i = 0; i < filled; i++) {
-		particles[i].lifetime += delta / 1000;
-		if (particles[i].lifetime > particles[i].lifelimit) {
-			particles[i].position = position;
-			particles[i].velocity = Vector();
-			particles[i].angular_velocity = 0.0f;
-			particles[i].angle = 0.0f;
-			particles[i].lifetime = 0.0f;
-			first_cycle = false;
-		}
-		if (!first_cycle or (first_cycle and particles[i].lifetime > particles[i].entry_time)) {
-			particles[i].position += particles[i].velocity * delta;
-			particles[i].angle += particles[i].angular_velocity * delta;
-			particles[i].rect.x = particles[i].position.x;
-			particles[i].rect.y = particles[i].position.y;
-		}
-	}
-}
-
-void ss::ParticleEmitter::draw() {
-	for (int i = 0; i < filled; i++) {
-		if (!first_cycle or (first_cycle and particles[i].lifetime > particles[i].entry_time)) {
-			SDL_Rect rect = particles[i].rect;
-			SDL_RenderCopyEx(render, particles[i].texture, NULL, &rect, particles[i].angle, NULL, SDL_FLIP_NONE);
-		}
-	}
-}
-
-void ss::ParticleEmitter::clear() {
-	for (int i = 0; i < filled; i++) {
-		SDL_DestroyTexture(particles[i].texture);
-	}
-	filled = 0;
-	delete[] particles;
-}
-*/
-
-ss::ParticleEmitter::ParticleEmitter(SDL_Window* window, Vector position, int ammount) {
+ss::ParticleEmitter::ParticleEmitter(SDL_Window* window, Vector position) {
 	ParticleEmitter::window = window;
 	render = SDL_GetRenderer(window);
 	ParticleEmitter::position = position;
+}
+
+void resize(int start_size, int end_size, ss::Vector*& arr) {
+	if (start_size == 0) {
+		delete[] arr;
+		arr = new ss::Vector [end_size];
+	}
+	else {
+		ss::Vector* n_arr = new ss::Vector[end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		ss::Vector* temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
+
+void resize(int start_size, int end_size, double*& arr) {
+	if (start_size == 0) {
+		delete[] arr;
+		arr = new double [end_size];
+	}
+	else {
+		double* n_arr = new double[end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		double* temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
+
+void resize(int start_size, int end_size, SDL_Texture**& arr) {
+	if (start_size == 0) {
+		delete[] arr;
+		arr = new SDL_Texture* [end_size];
+	}
+	else {
+		SDL_Texture** n_arr = new SDL_Texture * [end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		SDL_Texture** temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
+
+void resize(int start_size, int end_size, int*& arr) {
+	if (start_size == 0) {
+		delete[] arr;
+		arr = new int [end_size];
+	}
+	else {
+		int* n_arr = new int [end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		int* temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
+
+void resize(int start_size, int end_size, int**& arr) {
+	if (start_size == 0) {
+		delete[] arr;
+		arr = new int* [end_size];
+	}
+	else {
+		int** n_arr = new int* [end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		int** temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
+
+void ss::ParticleEmitter::add_particles(int ammount, SDL_Texture* texture, double lifelimit) {
+	resize(types, types + 1, p_textures);
+	resize(types, types + 1, p_lifelimit);
+	resize(ParticleEmitter::ammount, ParticleEmitter::ammount + ammount, p_arg);
+	resize(ParticleEmitter::ammount, ParticleEmitter::ammount + ammount, p_lifetime);
+	resize(ParticleEmitter::ammount, ParticleEmitter::ammount + ammount, p_angle);
+	resize(ParticleEmitter::ammount, ParticleEmitter::ammount + ammount, p_angular_velocity);
+	resize(ParticleEmitter::ammount, ParticleEmitter::ammount + ammount, p_position);
+	resize(ParticleEmitter::ammount, ParticleEmitter::ammount + ammount, p_velocity);
+	p_textures[types] = texture;
+	p_lifelimit[types] = lifelimit;
+
+	for (int i = ParticleEmitter::ammount; i < ParticleEmitter::ammount + ammount; i++) {
+		p_arg[i] = types;
+		p_lifetime[i] = 0;
+		p_angle[i] = 0;
+		p_angular_velocity[i] = 0;
+		p_position[i] = position;
+		p_velocity[i] = 0;
+	}
+
+	ParticleEmitter::ammount += ammount;
+	types++;
+}
+
+void ss::ParticleEmitter::draw() {
+	SDL_Rect rect;
+	for (int i = 0; i < ammount; i++) {
+		if (p_lifetime[i] >= 0) {
+			rect.x = p_position[i].x;
+			rect.y = p_position[i].y;
+			SDL_QueryTexture(p_textures[p_arg[i]], NULL, NULL, &rect.w, &rect.h);
+			SDL_RenderCopyEx(render, p_textures[p_arg[i]], NULL, &rect, p_angle[i], NULL, SDL_FLIP_NONE);
+		}
+	}
 }
