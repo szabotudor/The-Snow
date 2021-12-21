@@ -6,15 +6,6 @@ using namespace std;
 
 namespace ss {
 	class ParticleEmitter {
-		enum {
-			PTex,
-			PLifeTime,
-			PLifeLimit,
-			PPos,
-			PVel,
-			PAng,
-			PAngVel
-		};
 		SDL_Window* window;
 		SDL_Renderer* render;
 		int ammount = 0;
