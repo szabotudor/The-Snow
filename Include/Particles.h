@@ -18,6 +18,8 @@ namespace ss {
 			POINT
 		};
 		class ParticleType {
+			SDL_Texture* texture;
+			double lifelimit = 1.0;
 			GravityType g_type = GravityType::DIRECTION;
 			double g_force = 1;
 			Vector g_direction = Vector(0, 1), g_position = Vector();
