@@ -6,6 +6,7 @@
 #include<SDL_image.h>
 #include<SDL_ttf.h>
 #include<Vector.h>
+#include<RandomNumberGenerator.h>
 #include<Button.h>
 #include<Particles.h>
 #include<Sprite.h>
