@@ -8,6 +8,7 @@
     <ClCompile Include="Source\Text.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
     <ClCompile Include="Source\Particles.cpp" />
+    <ClCompile Include="Source\RandomNumberGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
@@ -16,6 +17,7 @@
     <ClInclude Include="Include\Text.h" />
     <ClInclude Include="Include\Sprite.h" />
     <ClInclude Include="Include\Particles.h" />
+    <ClInclude Include="Include\RandomNumberGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />
