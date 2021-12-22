@@ -20,7 +20,7 @@ namespace ss {
 		class ParticleType {
 			GravityType g_type = GravityType::DIRECTION;
 			double g_force = 1;
-			Vector g_direction = Vetor(0, 1), g_position = Vector();
+			Vector g_direction = Vector(0, 1), g_position = Vector();
 		};
 	private:
 		ParticleEmitter* sec_emitter;
