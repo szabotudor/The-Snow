@@ -154,6 +154,7 @@
     <ClCompile Include="Source\Snow.cpp" />
     <ClCompile Include="Source\Sprite.cpp" />
     <ClCompile Include="Source\Text.cpp" />
+    <ClCompile Include="Source\Utility.cpp" />
     <ClCompile Include="Source\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +164,7 @@
     <ClInclude Include="Include\Snow.h" />
     <ClInclude Include="Include\Sprite.h" />
     <ClInclude Include="Include\Text.h" />
+    <ClInclude Include="Include\Utility.h" />
     <ClInclude Include="Include\Vector.h" />
   </ItemGroup>
   <ItemGroup>
