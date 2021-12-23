@@ -37,5 +37,7 @@ namespace ss {
 		float lenght();
 		//Gets a normalized direction to another vector
 		Vector direction_to(Vector v);
+		//Gets the distance to another vector
+		double distance_to(Vector v);
 	};
 }
