@@ -75,7 +75,6 @@ void ss::ParticleEmitter::update(double delta) {
 			else {
 				p_position[i] += p_velocity[i] * p_lifetime[i];
 				p_angle[i] += p_angular_velocity[i] * p_lifetime[i];
-				cout << delta << endl;
 			}
 		}
 		else {
