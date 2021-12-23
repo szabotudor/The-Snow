@@ -35,25 +35,16 @@ void player_move(ss::Sprite& player, ss::Snow &game, float delta) {
 
 
 int main(int argc, char* args[]) {
-	ss::Vector mpos;
-	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 60);
+	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 	SDL_Renderer* render = SDL_GetRenderer(game.get_window());
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
-	ss::Text debug(game.get_window(), "", "basic.ttf", 9);
-	ss::Text inst(game.get_window(), "PRESS crtl + f TO TOGGLE FULLSCREEN\nPRESS return TO CHANGE BUTTON TYPE\nPRESS space TO LOCK/UNLOCK FPS", "basic.ttf", 9);
-	ss::Text mousepos(game.get_window(), "", "basic.ttf", 9);
-	mousepos.position = ss::Vector(100, 55);
 	fps.position = ss::Vector(5, 5);
-	debug.position = ss::Vector(5, 25);
-	inst.position = ss::Vector(5, 100);
 	SDL_Color text_color, border_color, fill_color;
 
 	text_color.r = 255; text_color.g = 255; text_color.b = 255; text_color.a = 255;
 	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
 	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
 
-	ss::Button button(game.get_window(), fill_color, border_color, text_color, 3, "BUTTON", "basic.ttf", 18);
-	button.position = ss::Vector(5, 50);
 	float _dt = 0.0f;
 	float _rdt = 0.0f;
 	int i = 0;
@@ -74,11 +65,21 @@ int main(int argc, char* args[]) {
 	SDL_Surface* ball = IMG_Load("Sprites/ball.png");
 	SDL_Texture* ballt = SDL_CreateTextureFromSurface(render, ball);
 	SDL_FreeSurface(ball);
-	ptem.add_particle_layer(100, ballt, 3);
-	ptem.use_gravity = true;
-	ptem.g_type = ss::ParticleEmitter::GravityType::POINT;
-	ptem.g_position = ss::Vector(50, 50);
-	ptem.g_force = 5;
+	ptem.add_particle_layer(24000, ballt, 3);
+	ptem.particle_layer[0].use_gravity = true;
+	ptem.particle_layer[0].g_type = ss::ParticleEmitter::GravityType::POINT;
+	ptem.particle_layer[0].g_position = ss::Vector(50, 50);
+	ptem.particle_layer[0].g_force = 5;
+
+	/*
+	SDL_Surface* sun = IMG_Load("sun.png");
+	SDL_Texture* sunt = SDL_CreateTextureFromSurface(render, sun);
+	SDL_FreeSurface(sun);
+	ptem.add_particle_layer(16, sunt, 3);
+	ptem.particle_layer[1].g_type = ss::ParticleEmitter::GravityType::DIRECTION;
+	ptem.particle_layer[1].g_force = 5;
+	ptem.particle_layer[1].use_gravity = true;
+	*/
 
 	SDL_Event* ev;
 
@@ -86,8 +87,6 @@ int main(int argc, char* args[]) {
 		game.update();
 		player_move(player, game, _dt);
 		game.clear_screen();
-
-		show_fps(fps, game.get_fps(), i, _rdt);
 
 		for (int i = 0; i < game.get_num_events(); i++) {
 			if (game.events[i].type == SDL_QUIT) {
@@ -98,20 +97,21 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		mpos = game.get_mouse_position();
-		mousepos.set_text(to_string((int)mpos.x) + " " + to_string((int)mpos.y));
-
-		button.update();
-		debug.set_text("type: " + to_string(button.get_toggle()) + ", hovered: " + to_string(button.hovered) + ", pressed: " + to_string(button.pressed) + '\0');
-		button.draw();
-		debug.draw();
-		inst.draw();
-		mousepos.draw();
+		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
+			if (game.target_fps == 144) {
+				game.target_fps = 60;
+			}
+			else {
+				game.target_fps = 144;
+			}
+		}
 
 		ptem.position = player.position;
 		ptem.update(_dt);
 		ptem.draw();
 		player.draw(_dt);
-		}
+
+		show_fps(fps, game.get_fps(), i, _rdt);
+	}
 	return 0;
 }
