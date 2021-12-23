@@ -63,7 +63,7 @@
     <Text Include="SDL2_ttf\lib\x64\LICENSE.zlib.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="player.png" />
+    <Image Include="sun.png" />
     <Image Include="Sprites\ball.png" />
   </ItemGroup>
 </Project>
