@@ -79,3 +79,19 @@ void ss::resize(int start_size, int end_size, int**& arr) {
 		delete[] temp;
 	}
 }
+
+void ss::resize(int start_size, int end_size, ParticleEmitter::ParticleType*& arr) {
+	if (start_size == 0) {
+		delete[] arr;
+		arr = new  ParticleEmitter::ParticleType[end_size];
+	}
+	else {
+		ParticleEmitter::ParticleType* n_arr = new  ParticleEmitter::ParticleType[end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		ParticleEmitter::ParticleType* temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
