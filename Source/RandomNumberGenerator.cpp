@@ -6,11 +6,14 @@ ss::RandomNumberGenerator::RandomNumberGenerator(long long seed) {
 }
 
 long long ss::RandomNumberGenerator::rand() {
+	ammount++;
 	seed = (seed * k1 + k2) % k3;
 	if (seed == init) {
-		k1++;
+		//k1++;
 		k2++;
 		init = rand();
+		cout << k2 << " " << ammount << endl;
+		ammount = 0;
 	}
 	return seed;
 }

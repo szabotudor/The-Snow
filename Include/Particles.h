@@ -1,5 +1,6 @@
 #pragma once
 #include<SDL.h>
+#include<RandomNumberGenerator.h>
 #include<Vector.h>
 #include<iostream>
 using namespace std;
@@ -21,12 +22,19 @@ namespace ss {
 		public:
 			SDL_Texture* texture;
 			double lifelimit = 1.0;
+			double velocity_damping = 0.0125;
+
 			GravityType g_type = GravityType::DIRECTION;
 			double g_force = 1;
-			Vector g_direction = Vector(0, 1), g_position = Vector();
+			Vector g_direction = Vector(0, 1);
+			Vector g_position = Vector();
 			bool use_gravity = false;
+
+			Vector initial_velocity_min = Vector(0, 0);
+			Vector initial_velocity_max = Vector(0, 0);
 		};
 	private:
+		RandomNumberGenerator rng = RandomNumberGenerator(98132479);
 		ParticleEmitter* sec_emitter;
 		bool use_sec_emitter = false;
 		SDL_Window* window;
@@ -40,15 +48,15 @@ namespace ss {
 		double* p_angle;
 		double* p_angular_velocity;
 		int* p_layer;
-
-		int frameid = 0;
+		int* p_order;
+		bool* p_drawn;
 	public:
-		unsigned frameskip = 1;
+		bool sort_by_lifetime = false;
 		ParticleType* particle_layer;
 		EmissionShape emitter_shape = EmissionShape::POINT;
 		Vector position;
 
-		ParticleEmitter(SDL_Window* window, Vector position);
+		ParticleEmitter(SDL_Window* window, Vector position, bool sort_by_lifetie = false);
 		//Adds a specified ammount of the given particle into the next free layer
 		void add_particle_layer(int ammount, SDL_Texture* texture, double lifelimit);
 		//Adds a seccondary emitter (actiong as a seccond layer of particles)
