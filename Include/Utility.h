@@ -11,4 +11,5 @@ namespace ss {
 	void resize(int start_size, int end_size, int*& arr);
 	void resize(int start_size, int end_size, int**& arr);
 	void resize(int start_size, int end_size, ParticleEmitter::ParticleType*& arr);
+	void resize(int start_size, int end_size, bool*& arr);
 }
