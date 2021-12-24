@@ -6,7 +6,7 @@ using namespace std;
 
 namespace ss {
 	class RandomNumberGenerator {
-		long long k1 = 191882, k2 = 2, k3 = 257;
+		long long k1 = 159979, k2 = 153611, k3 = 148021;
 		int init = -1;
 	public:
 		long long seed = 0;
