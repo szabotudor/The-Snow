@@ -63,14 +63,44 @@ int main(int argc, char* args[]) {
 	player.play(0, 5, 8);
 
 	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
-	SDL_Surface* ball = IMG_Load("Sprites/ball.png");
-	SDL_Texture* ballt = SDL_CreateTextureFromSurface(render, ball);
-	SDL_FreeSurface(ball);
-	ptem.add_particle_layer(2000, ballt, 3);
+	SDL_Surface* fire1 = SDL_CreateRGBSurface(NULL, 4, 4, 32, 0, 0, 0, 0);
+	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 10, 10));
+	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
+	SDL_FreeSurface(fire1);
+	ptem.add_particle_layer(300, fire1_t, 0.5);
+
+	SDL_Surface* fire2 = SDL_CreateRGBSurface(NULL, 3, 3, 32, 0, 0, 0, 0);
+	SDL_FillRect(fire2, NULL, SDL_MapRGB(fire2->format, 255, 120, 10));
+	SDL_Texture* fire2_t = SDL_CreateTextureFromSurface(render, fire2);
+	SDL_FreeSurface(fire2);
+	ptem.add_particle_layer(100, fire2_t, 0.4);
+
+	SDL_Surface* fire3 = SDL_CreateRGBSurface(NULL, 2, 2, 32, 0, 0, 0, 0);
+	SDL_FillRect(fire3, NULL, SDL_MapRGB(fire3->format, 255, 200, 20));
+	SDL_Texture* fire3_t = SDL_CreateTextureFromSurface(render, fire3);
+	SDL_FreeSurface(fire3);
+	ptem.add_particle_layer(40, fire3_t, 0.3);
+
 	ptem.particle_layer[0].use_gravity = true;
-	ptem.particle_layer[0].initial_velocity_min = ss::Vector(-100, -200);
-	ptem.particle_layer[0].initial_velocity_max = ss::Vector(100, -200);
-	ptem.particle_layer[0].g_force = 500;
+	ptem.particle_layer[0].g_direction = ss::Vector(0, -1);
+	ptem.particle_layer[0].initial_velocity_min = ss::Vector(-20, -40);
+	ptem.particle_layer[0].initial_velocity_max = ss::Vector(20, 12);
+	ptem.particle_layer[0].g_force = 70;
+	ptem.particle_layer[0].velocity_damping = 0.1;
+
+	ptem.particle_layer[1].use_gravity = true;
+	ptem.particle_layer[1].g_direction = ss::Vector(0, -1);
+	ptem.particle_layer[1].initial_velocity_min = ss::Vector(-12, -20);
+	ptem.particle_layer[1].initial_velocity_max = ss::Vector(12, 12);
+	ptem.particle_layer[1].g_force = 70;
+	ptem.particle_layer[1].velocity_damping = 0.1;
+
+	ptem.particle_layer[2].use_gravity = true;
+	ptem.particle_layer[2].g_direction = ss::Vector(0, -1);
+	ptem.particle_layer[2].initial_velocity_min = ss::Vector(-5, -10);
+	ptem.particle_layer[2].initial_velocity_max = ss::Vector(5, 11);
+	ptem.particle_layer[2].g_force = 70;
+	ptem.particle_layer[2].velocity_damping = 0.1;
 
 	SDL_Event* ev;
 
@@ -97,10 +127,10 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		ptem.position = player.position;
+		ptem.position = player.position + 6;
 		ptem.update(_dt);
 		ptem.draw();
-		player.draw(_dt);
+		//player.draw(_dt);
 
 		show_fps(fps, game.get_fps(), i, _rdt);
 	}
