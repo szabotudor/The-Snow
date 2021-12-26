@@ -23,6 +23,7 @@ namespace ss {
 			SDL_Texture* texture;
 			double lifelimit = 1.0;
 			double velocity_damping = 0.0125;
+			double angular_velocity_damping = 0.0125;
 
 			GravityType g_type = GravityType::DIRECTION;
 			double g_force = 1;
@@ -32,6 +33,9 @@ namespace ss {
 
 			Vector initial_velocity_min = Vector(0, 0);
 			Vector initial_velocity_max = Vector(0, 0);
+
+			double initial_angular_velocity_min = 0.0;
+			double initial_angular_velocity_max = 0.0;
 		};
 	private:
 		RandomNumberGenerator rng = RandomNumberGenerator(98132479);

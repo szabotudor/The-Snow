@@ -60,8 +60,8 @@ void ss::ParticleEmitter::update(double delta) {
 				p_lifetime[i] -= particle_layer[ly].lifelimit;
 				p_position[i] = position;
 				p_velocity[i] = rng.randv_range(particle_layer[ly].initial_velocity_min, particle_layer[ly].initial_velocity_max);
+				p_angular_velocity[i] = rng.randd_range(particle_layer[ly].initial_angular_velocity_min, particle_layer[ly].initial_angular_velocity_max);
 				p_angle[i] = 0;
-				p_angular_velocity[i] = 0;
 			}
 			if (particle_layer[ly].use_gravity) {
 				switch (particle_layer[ly].g_type) {
@@ -76,6 +76,7 @@ void ss::ParticleEmitter::update(double delta) {
 				}
 			}
 			p_velocity[i] -= p_velocity[i] * particle_layer[ly].velocity_damping * delta;
+			p_angular_velocity[i] -= p_angular_velocity[i] * particle_layer[ly].angular_velocity_damping * delta;
 			if (p_lifetime[i] > delta) {
 				p_position[i] += p_velocity[i] * delta;
 				p_angle[i] += p_angular_velocity[i] * delta;
