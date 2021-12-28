@@ -13,7 +13,10 @@ namespace ss {
 	void resize(int start_size, int end_size, ParticleEmitter::ParticleType*& arr);
 	void resize(int start_size, int end_size, bool*& arr);
 	void resize(int start_size, int end_size, SDL_Event*& arr);
+	void resize(int start_size, int end_size, SDL_Color*& arr);
 
 	Vector lerp(Vector start, Vector end, double weight);
 	double lerp(double start, double end, double weight);
+
+	double clamp(double min, double max, double val);
 }

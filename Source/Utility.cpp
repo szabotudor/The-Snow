@@ -22,7 +22,6 @@ void ss::resize(int start_size, int end_size, ss::Vector*& arr) {
 
 void ss::resize(int start_size, int end_size, double*& arr) {
 	if (start_size == 0) {
-		delete[] arr;
 		arr = new double[end_size];
 	}
 	else {
@@ -132,6 +131,21 @@ void ss::resize(int start_size, int end_size, SDL_Event*& arr) {
 	}
 }
 
+void ss::resize(int start_size, int end_size, SDL_Color*& arr) {
+	if (start_size == 0) {
+		arr = new SDL_Color[end_size];
+	}
+	else {
+		SDL_Color* n_arr = new SDL_Color[end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		SDL_Color* temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
+
 //===============
 //	Lerp code
 //===============
@@ -145,4 +159,14 @@ ss::Vector ss::lerp(Vector start, Vector end, double weight) {
 double ss::lerp(double start, double end, double weight) {
 	start += (end - start) * weight;
 	return start;
+}
+
+double ss::clamp(double min, double max, double val) {
+	if (val > max) {
+		val = max;
+	}
+	else if (val < min) {
+		val = min;
+	}
+	return val;
 }
