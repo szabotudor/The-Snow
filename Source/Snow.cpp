@@ -11,6 +11,16 @@ bool IS_DEBUG = false;
 void ss::Snow::poll_events() {
 	SDL_PumpEvents();
 	for (num_events = 0; SDL_PollEvent(&events[num_events]) and num_events < 31; num_events++);
+	for (int i = 0; i < 32; i++) {
+		if (events[i].type == SDL_MOUSEBUTTONDOWN) {
+			previous_mousestate[events[i].button.button] = mousestate[events[i].button.button];
+			mousestate[events[i].button.button] = true;
+		}
+		else if (events[i].type == SDL_MOUSEBUTTONUP) {
+			previous_mousestate[events[i].button.button] = mousestate[events[i].button.button];
+			mousestate[events[i].button.button] = false;
+		}
+	}
 	/* Used for debugging, only in case of nothing else working
 	if (num_events == 31) {
 		cout << "Possible event overflow: " << num_events << " events" << endl;
@@ -94,7 +104,7 @@ void ss::Snow::update() {
 
 	//Calculate frame delta and framerate
 	NOW = SDL_GetPerformanceCounter();
-	delta_time = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
+	delta_time = (double)((NOW - LAST) * 1000 / performace_frequency);
 	real_delta_time = delta_time;
 	if (target_fps) {
 		target_wait_time = 1000.0f / target_fps;
@@ -191,8 +201,8 @@ ss::Vector ss::Snow::get_mouse_position() {
 	return Vector(x, y);
 }
 
-bool ss::Snow::is_button_pressed() {
-	return false;
+bool ss::Snow::is_button_pressed(Uint8 button) {
+	return mousestate[button];
 }
 
 bool ss::Snow::is_key_just_released(Uint8 key) {

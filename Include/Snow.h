@@ -22,6 +22,8 @@ namespace ss {
 		SDL_Event events[32];
 		unsigned int target_fps = 60;
 	private:
+		double performace_frequency = (double)SDL_GetPerformanceFrequency();
+		int max_events = 32;
 		Vector sdl_window_size;
 		SDL_Rect viewport;
 		SDL_Window* window = NULL;
@@ -36,8 +38,11 @@ namespace ss {
 		int numkeys;
 		const Uint8* checkstate;
 		
-		bool previous_keystate[512];
-		bool keystate[512];
+		bool previous_keystate[512] = {0};
+		bool keystate[512] = {0};
+
+		bool previous_mousestate[6] = {0};
+		bool mousestate[6] = {0};
 
 		//Poll game events
 		void poll_events();
@@ -56,7 +61,7 @@ namespace ss {
 		//Returns the mouse position
 		Vector get_mouse_position();
 		//Returns true if the given mouse button has been pressed
-		bool is_button_pressed();
+		bool is_button_pressed(Uint8 button);
 		//Returns the SDL window (used especially for automatic texture scaling)
 		SDL_Window* get_window();
 		//Sets fullscreen mode to the given value
