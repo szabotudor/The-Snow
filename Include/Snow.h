@@ -1,6 +1,7 @@
 #pragma once
 #include<chrono>
 #include<iostream>
+#include<math.h>
 #include<string>
 #include<SDL.h>
 #include<SDL_image.h>
@@ -41,8 +42,9 @@ namespace ss {
 		bool previous_keystate[512] = {0};
 		bool keystate[512] = {0};
 
-		bool previous_mousestate[6] = {0};
-		bool mousestate[6] = {0};
+		Uint32 previous_mousestate;
+		Uint32 mousestate;
+		int mpos_x, mpos_y;
 
 		//Poll game events
 		void poll_events();
@@ -64,6 +66,8 @@ namespace ss {
 		bool is_button_pressed(Uint8 button);
 		//Returns the SDL window (used especially for automatic texture scaling)
 		SDL_Window* get_window();
+		//Sets the window size to the given parameters (or resets the size if w and h are null)
+		void resize_window(int w, int h);
 		//Sets fullscreen mode to the given value
 		void set_fullscreen(bool fs);
 		//Returns true if the game window is in fullscreen mode

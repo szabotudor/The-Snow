@@ -11,16 +11,6 @@ bool IS_DEBUG = false;
 void ss::Snow::poll_events() {
 	SDL_PumpEvents();
 	for (num_events = 0; SDL_PollEvent(&events[num_events]) and num_events < 31; num_events++);
-	for (int i = 0; i < 32; i++) {
-		if (events[i].type == SDL_MOUSEBUTTONDOWN) {
-			previous_mousestate[events[i].button.button] = mousestate[events[i].button.button];
-			mousestate[events[i].button.button] = true;
-		}
-		else if (events[i].type == SDL_MOUSEBUTTONUP) {
-			previous_mousestate[events[i].button.button] = mousestate[events[i].button.button];
-			mousestate[events[i].button.button] = false;
-		}
-	}
 	/* Used for debugging, only in case of nothing else working
 	if (num_events == 31) {
 		cout << "Possible event overflow: " << num_events << " events" << endl;
@@ -96,6 +86,9 @@ void ss::Snow::update() {
 		return;
 	}
 
+	previous_mousestate = mousestate;
+	mousestate = SDL_GetMouseState(&mpos_x, &mpos_y);
+
 	//Test for keyboard state
 	copy(begin(keystate), end(keystate), begin(previous_keystate));
 	for (int i = 0; i < numkeys; i++) {
@@ -158,6 +151,11 @@ SDL_Window* ss::Snow::get_window() {
 	return window;
 }
 
+void ss::Snow::resize_window(int w, int h) {
+	SDL_SetWindowSize(window, w, h);
+	scale_window(w, h);
+}
+
 void ss::Snow::set_fullscreen(bool fs) {
 	if (fs) {
 		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -202,7 +200,7 @@ ss::Vector ss::Snow::get_mouse_position() {
 }
 
 bool ss::Snow::is_button_pressed(Uint8 button) {
-	return mousestate[button];
+	return SDL_BUTTON(button) & mousestate;
 }
 
 bool ss::Snow::is_key_just_released(Uint8 key) {
