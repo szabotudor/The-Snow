@@ -41,13 +41,11 @@ void ss::Sprite::draw(float delta) {
 		rect.x = position.x;
 		rect.y = position.y;
 	}
-	frame = clamp(0, frames, frame);
-	SDL_RenderCopyEx(render, textures[frame], NULL, &rect, 0, NULL, flip);
 
 	if (playing) {
 		time += delta / 1000;
 		if (reverse) {
-			frame = (int)lerp(start, end, 1 - time / anim_time);
+			frame = (int)lerp(start, end, 1 - time / anim_time) + 1;
 			if (frame < start) {
 				if (repeat) {
 					frame = end;
@@ -76,6 +74,7 @@ void ss::Sprite::draw(float delta) {
 		}
 	}
 	frame = clamp(0, frames, frame);
+	SDL_RenderCopyEx(render, textures[frame], NULL, &rect, 0, NULL, flip);
 }
 
 void ss::Sprite::play(int start, int end, int fps, bool repeat) {
