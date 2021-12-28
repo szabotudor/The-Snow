@@ -60,7 +60,20 @@ void ss::ParticleEmitter::update(double delta) {
 				double randl = rng.randd(particle_layer[ly].lifetime_random);
 				if (p_lifetime[i] > particle_layer[ly].lifelimit - randl) {
 					p_lifetime[i] -= particle_layer[ly].lifelimit - randl;
-					p_position[i] = position;
+					switch (emission_shape) {
+					case ss::ParticleEmitter::EmissionShape::POINT:
+						p_position[i] = position;
+						break;
+					case ss::ParticleEmitter::EmissionShape::CIRCLE:
+						p_position[i] = rng.randdir() * rng.randd(emission_radius) + position;
+						break;
+					case ss::ParticleEmitter::EmissionShape::RECT:
+						break;
+					case ss::ParticleEmitter::EmissionShape::LINE:
+						break;
+					default:
+						break;
+					}
 					p_velocity[i] = (particle_layer[ly].initial_direction * (1 - particle_layer[ly].initial_direction_randomness) +
 						rng.randdir() * particle_layer[ly].initial_direction_randomness) *
 						rng.randd_range(particle_layer[ly].initial_velocity_min, particle_layer[ly].initial_velocity_max) +
@@ -114,6 +127,7 @@ void ss::ParticleEmitter::update(double delta) {
 
 void ss::ParticleEmitter::draw() {
 	SDL_Rect rect;
+	int w, h;
 	SDL_Color color;
 	int prev_ly = -1;
 	int i, i_end;
@@ -131,8 +145,15 @@ void ss::ParticleEmitter::draw() {
 			if (p_position[j].distance_to(p_position[j + 1]) > 0.5) {
 				int ly = p_layer[j];
 				if (ly != prev_ly) {
-					SDL_QueryTexture(particle_layer[ly].texture, NULL, NULL, &rect.w, &rect.h);
+					SDL_QueryTexture(particle_layer[ly].texture, NULL, NULL, &w, &h);
 					prev_ly = ly;
+				}
+				rect.w = w;
+				rect.h = h;
+				if (particle_layer[ly].get_scales_in_scale_curve()) {
+					double scale = particle_layer[ly].get_scale_at_timestamp(p_lifetime[j]);
+					rect.w *= scale;
+					rect.h *= scale;
 				}
 				rect.x = p_position[j].x;
 				rect.y = p_position[j].y;
@@ -168,9 +189,8 @@ SDL_Color ss::ParticleEmitter::ParticleType::get_color_at_timestamp(double time)
 	color.b = 255;
 	color.a = 255;
 	for (int i = 0; i < colors - 1; i++) {
-		if (time > gradient_times[i]) {
-			time -= gradient_times[i];
-			double dt = time / (gradient_times[i + 1] - gradient_times[i]);
+		if (time > gradient_times[i] and time < gradient_times[i + 1]) {
+			double dt = (time - gradient_times[i]) / (gradient_times[i + 1] - gradient_times[i]);
 			r = lerp(gradient[i].r, gradient[i + 1].r, dt);
 			g = lerp(gradient[i].g, gradient[i + 1].g, dt);
 			b = lerp(gradient[i].b, gradient[i + 1].b, dt);
@@ -182,7 +202,7 @@ SDL_Color ss::ParticleEmitter::ParticleType::get_color_at_timestamp(double time)
 			return color;
 		}
 	}
-	return color;
+	return gradient[colors - 1];
 }
 
 int ss::ParticleEmitter::ParticleType::get_colors_in_gradient() {
@@ -205,4 +225,31 @@ void ss::ParticleEmitter::ParticleType::add_color_to_gradient(int r, int g, int 
 	color.g = g;
 	color.b = b;
 	add_color_to_gradient(color, timestamp);
+}
+
+void ss::ParticleEmitter::ParticleType::add_scale_to_scale_curve(double scale, double timestamp) {
+	resize(scales, scales + 1, scale_curve);
+	resize(scales, scales + 1, scale_times);
+
+	scale_curve[scales] = scale;
+	scale_times[scales] = timestamp;
+	if (scale > max_scale) {
+		max_scale = scale;
+	}
+
+	scales++;
+}
+
+double ss::ParticleEmitter::ParticleType::get_scale_at_timestamp(double time) {
+	for (int i = 0; i < scales - 1; i++) {
+		if (time >= scale_times[i] and time < scale_times[i + 1]) {
+			double dt = (time - scale_times[i]) / (scale_times[i + 1] - scale_times[i]);
+			return clamp(0, max_scale, lerp(scale_curve[i], scale_curve[i + 1], dt));
+		}
+	}
+	return scale_curve[scales - 1];
+}
+
+int ss::ParticleEmitter::ParticleType::get_scales_in_scale_curve() {
+	return scales;
 }

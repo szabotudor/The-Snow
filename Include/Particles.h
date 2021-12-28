@@ -22,6 +22,11 @@ namespace ss {
 			SDL_Color* gradient;
 			double* gradient_times;
 			int colors = 0;
+
+			double* scale_curve;
+			double* scale_times;
+			int scales = 0;
+			double max_scale;
 		public:
 			SDL_Texture* texture;
 			double lifelimit = 1.0;
@@ -52,6 +57,13 @@ namespace ss {
 			SDL_Color get_color_at_timestamp(double time);
 			//Returns the ammount of colors added to the gradient
 			int get_colors_in_gradient();
+
+			//Adds a new scale to the scale curve list
+			void add_scale_to_scale_curve(double scale, double timestamp);
+			//Returns the scale at a certain timestamp
+			double get_scale_at_timestamp(double time);
+			//Returns the number of scales in the scale curve
+			int get_scales_in_scale_curve();
 		};
 	private:
 		RandomNumberGenerator rng = RandomNumberGenerator(98132479);
@@ -74,7 +86,8 @@ namespace ss {
 		bool sort_by_lifetime = false;
 		bool reverse_draw_order = false;
 		ParticleType* particle_layer;
-		EmissionShape emitter_shape = EmissionShape::POINT;
+		EmissionShape emission_shape = EmissionShape::POINT;
+		double emission_radius = 1;
 		Vector position;
 
 		ParticleEmitter(SDL_Window* window, Vector position, bool sort_by_lifetie = false);
