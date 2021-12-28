@@ -45,3 +45,7 @@ ss::Vector ss::RandomNumberGenerator::randv(Vector k) {
 ss::Vector ss::RandomNumberGenerator::randv_range(Vector min, Vector max) {
 	return Vector((float)rand() / k3 * (max - min).x + min.x, (float)rand() / k3 * (max - min).y + min.y);
 }
+
+ss::Vector ss::RandomNumberGenerator::randdir() {
+	return randv_range(-1, 1).normalized();
+}

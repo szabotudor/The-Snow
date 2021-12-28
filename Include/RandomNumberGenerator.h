@@ -29,5 +29,7 @@ namespace ss {
 		Vector randv(Vector k = 1);
 		//Returns a random Vector between a given range
 		Vector randv_range(Vector min, Vector max);
+		//Returns a random direction vector that has been normalized
+		Vector randdir();
 	};
 }
