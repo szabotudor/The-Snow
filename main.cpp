@@ -2,6 +2,7 @@
 
 
 int avg_fps[60];
+ss::Vector velocity;
 
 
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
@@ -23,19 +24,38 @@ void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 }
 
 
-void player_move(ss::Sprite& player, ss::Snow &game, float delta) {
-	ss::Vector velocity;
-	velocity.y = game.is_key_pressed(SDL_SCANCODE_DOWN) - game.is_key_pressed(SDL_SCANCODE_UP);
-	velocity.x = game.is_key_pressed(SDL_SCANCODE_RIGHT) - game.is_key_pressed(SDL_SCANCODE_LEFT);
-	velocity.normalize();
-	velocity *= delta / 10;
+void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
+	ss::Vector direction;
+
+	//Calculate the velocity with which the player should pe moving, and move him with that velocity
+	direction.y = game.is_key_pressed(SDL_SCANCODE_DOWN) - game.is_key_pressed(SDL_SCANCODE_UP);
+	direction.x = game.is_key_pressed(SDL_SCANCODE_RIGHT) - game.is_key_pressed(SDL_SCANCODE_LEFT);
+	direction.normalize();
+	direction *= delta / 10;
+	velocity = ss::lerp(velocity, direction, delta / 125);
 	player.position = player.position + velocity;
 
+	//Stop player from going outside the screen
+	ss::Vector size = player.get_size();
+	if (player.position.x > game.resolution.x - size.x) {
+		player.position.x = game.resolution.x - size.x;
+	}
+	else if (player.position.x < size.x) {
+		player.position.x = size.x;
+	}
+	if (player.position.y > game.resolution.y - size.y / 2) {
+		player.position.y = game.resolution.y - size.y / 2;
+	}
+	else if (player.position.y < size.y) {
+		player.position.y = size.y;
+	}
+
+	fire.position = player.position;
 }
 
 
 int main(int argc, char* args[]) {
-	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
+	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_FULLSCREEN_DESKTOP, 144);
 	SDL_Renderer* render = SDL_GetRenderer(game.get_window());
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
 	fps.position = ss::Vector(5, 5);
@@ -106,7 +126,7 @@ int main(int argc, char* args[]) {
 
 	while (game.running(_dt, _rdt)) {
 		game.update();
-		player_move(player, game, _dt);
+		player_move(player, ptem, game, _dt);
 		game.clear_screen();
 
 		for (int i = 0; i < game.get_num_events(); i++) {
@@ -118,16 +138,6 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
-			if (game.target_fps == 144) {
-				game.target_fps = 60;
-			}
-			else {
-				game.target_fps = 144;
-			}
-		}
-
-		ptem.position = player.position + 6;
 		ptem.update(_dt);
 		ptem.draw();
 		//player.draw(_dt);
