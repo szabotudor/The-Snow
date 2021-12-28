@@ -73,3 +73,9 @@ void ss::Sprite::stop() {
 void ss::Sprite::pause() {
 	playing = false;
 }
+
+ss::Vector ss::Sprite::get_size() {
+	int w, h;
+	SDL_QueryTexture(textures[frame], NULL, NULL, &w, &h);
+	return Vector(w, h);
+}

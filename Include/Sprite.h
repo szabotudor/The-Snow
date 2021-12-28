@@ -32,5 +32,7 @@ namespace ss {
 		void stop();
 		//Pauses the animation to be resumed by play
 		void pause();
+		//Returns the size of the sprite's texture in pixels
+		Vector get_size();
 	};
 }
