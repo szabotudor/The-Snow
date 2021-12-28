@@ -19,4 +19,7 @@ namespace ss {
 	double lerp(double start, double end, double weight);
 
 	double clamp(double min, double max, double val);
+
+	double natural(double val);
+	int natural(int val);
 }

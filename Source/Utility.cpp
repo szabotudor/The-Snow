@@ -157,7 +157,12 @@ ss::Vector ss::lerp(Vector start, Vector end, double weight) {
 }
 
 double ss::lerp(double start, double end, double weight) {
-	start += (end - start) * weight;
+	if (end > start) {
+		start += (end - start) * weight;
+	}
+	else {
+		start -= (end - start) * weight;
+	}
 	return start;
 }
 
@@ -169,4 +174,22 @@ double ss::clamp(double min, double max, double val) {
 		val = min;
 	}
 	return val;
+}
+
+double ss::natural(double val) {
+	if (val >= 0) {
+		return val;
+	}
+	else {
+		return -val;
+	}
+}
+
+int ss::natural(int val) {
+	if (val >= 0) {
+		return val;
+	}
+	else {
+		return -val;
+	}
 }
