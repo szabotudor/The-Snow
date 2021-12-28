@@ -1,4 +1,5 @@
 #pragma once
+#include<chrono>
 #include<iostream>
 #include<Vector.h>
 using namespace std;
@@ -11,6 +12,8 @@ namespace ss {
 	public:
 		long long seed = 0;
 		RandomNumberGenerator(long long seed = 0);
+		//Sets the seed to the system clock to randomize the generator
+		void randomize();
 		//Returns the first itteration of the rng generator (can be used to generate other types of random numbers)
 		long long rand();
 		//Returns a random float between 0 and 1 (or a between 0 and another number, if given)

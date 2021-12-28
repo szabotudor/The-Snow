@@ -5,6 +5,11 @@ ss::RandomNumberGenerator::RandomNumberGenerator(long long seed) {
 	init = rand();
 }
 
+void ss::RandomNumberGenerator::randomize() {
+	const auto p1 = chrono::system_clock::now();
+	seed = p1.time_since_epoch().count();
+}
+
 long long ss::RandomNumberGenerator::rand() {
 	seed = (seed * k1 + k2) % k3;
 	if (seed == init) {
@@ -31,11 +36,11 @@ double ss::RandomNumberGenerator::randd_range(double min, double max) {
 }
 
 int ss::RandomNumberGenerator::randi(int k) {
-	return (int)((float)rand() / k3 * k + 0.5);
+	return (int)((float)rand() / k3 * (k + 1));
 }
 
 int ss::RandomNumberGenerator::randi_range(int min, int max) {
-	return (int)((float)rand() / k3 * (max - min) + min + 0.5);
+	return (int)((float)rand() / k3 * (max - min + 1) + min);
 }
 
 ss::Vector ss::RandomNumberGenerator::randv(Vector k) {
