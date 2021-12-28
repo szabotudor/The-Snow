@@ -116,6 +116,22 @@ void ss::resize(int start_size, int end_size, bool*& arr) {
 	}
 }
 
+void ss::resize(int start_size, int end_size, SDL_Event*& arr) {
+	if (start_size == 0) {
+		delete[] arr;
+		arr = new SDL_Event[end_size];
+	}
+	else {
+		SDL_Event* n_arr = new SDL_Event[end_size];
+		for (int i = 0; i < start_size; i++) {
+			n_arr[i] = arr[i];
+		}
+		SDL_Event* temp = arr;
+		arr = n_arr;
+		delete[] temp;
+	}
+}
+
 //===============
 //	Lerp code
 //===============
