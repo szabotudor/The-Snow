@@ -19,9 +19,13 @@ namespace ss {
 			POINT
 		};
 		class ParticleType {
+			SDL_Color* gradient;
+			double* gradient_times;
+			int colors = 0;
 		public:
 			SDL_Texture* texture;
 			double lifelimit = 1.0;
+			double lifetime_random = 0;
 			double velocity_damping = 0.0125;
 			double angular_velocity_damping = 0.0125;
 
@@ -31,11 +35,23 @@ namespace ss {
 			Vector g_position = Vector();
 			bool use_gravity = false;
 
-			Vector initial_velocity_min = Vector(0, 0);
-			Vector initial_velocity_max = Vector(0, 0);
+			double initial_velocity_min = 0;
+			double initial_velocity_max = 0;
+			double initial_direction_randomness = 0.0;
+			Vector initial_direction = Vector(0, 0);
+			Vector initial_velocity = 0;
 
 			double initial_angular_velocity_min = 0.0;
 			double initial_angular_velocity_max = 0.0;
+
+			//Adds a new color to the color gradient list
+			void add_color_to_gradient(SDL_Color color, double timestamp);
+			//Adds a new color to the color gradient list
+			void add_color_to_gradient(int r, int g, int b, double timestamp);
+			//Returns the color with which the particle will be drawn at a certain timestamp
+			SDL_Color get_color_at_timestamp(double time);
+			//Returns the ammount of colors added to the gradient
+			int get_colors_in_gradient();
 		};
 	private:
 		RandomNumberGenerator rng = RandomNumberGenerator(98132479);
@@ -56,6 +72,7 @@ namespace ss {
 		bool* p_drawn;
 	public:
 		bool sort_by_lifetime = false;
+		bool reverse_draw_order = false;
 		ParticleType* particle_layer;
 		EmissionShape emitter_shape = EmissionShape::POINT;
 		Vector position;

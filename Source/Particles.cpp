@@ -56,12 +56,18 @@ void ss::ParticleEmitter::update(double delta) {
 		if (p_lifetime[i] >= 0) {
 			int ly = p_layer[i];
 
-			if (p_lifetime[i] > particle_layer[ly].lifelimit) {
-				p_lifetime[i] -= particle_layer[ly].lifelimit;
-				p_position[i] = position;
-				p_velocity[i] = rng.randv_range(particle_layer[ly].initial_velocity_min, particle_layer[ly].initial_velocity_max);
-				p_angular_velocity[i] = rng.randd_range(particle_layer[ly].initial_angular_velocity_min, particle_layer[ly].initial_angular_velocity_max);
-				p_angle[i] = 0;
+			if (p_lifetime[i] > particle_layer[ly].lifelimit - particle_layer[ly].lifetime_random) {
+				double randl = rng.randd(particle_layer[ly].lifetime_random);
+				if (p_lifetime[i] > particle_layer[ly].lifelimit - randl) {
+					p_lifetime[i] -= particle_layer[ly].lifelimit - randl;
+					p_position[i] = position;
+					p_velocity[i] = (particle_layer[ly].initial_direction * (1 - particle_layer[ly].initial_direction_randomness) +
+						rng.randdir() * particle_layer[ly].initial_direction_randomness) *
+						rng.randd_range(particle_layer[ly].initial_velocity_min, particle_layer[ly].initial_velocity_max) +
+						particle_layer[ly].initial_velocity;
+					p_angular_velocity[i] = rng.randd_range(particle_layer[ly].initial_angular_velocity_min, particle_layer[ly].initial_angular_velocity_max);
+					p_angle[i] = 0;
+				}
 			}
 			if (particle_layer[ly].use_gravity) {
 				switch (particle_layer[ly].g_type) {
@@ -108,8 +114,18 @@ void ss::ParticleEmitter::update(double delta) {
 
 void ss::ParticleEmitter::draw() {
 	SDL_Rect rect;
+	SDL_Color color;
 	int prev_ly = -1;
-	for (int i = 0; i < ammount; i++) {
+	int i, i_end;
+	if (reverse_draw_order) {
+		i = ammount - 1;
+		i_end = -1;
+	}
+	else {
+		i = 0;
+		i_end = ammount;
+	}
+	while (i != i_end) {
 		int j = p_order[i];
 		if (p_lifetime[j] >= 0) {
 			if (p_position[j].distance_to(p_position[j + 1]) > 0.5) {
@@ -120,10 +136,21 @@ void ss::ParticleEmitter::draw() {
 				}
 				rect.x = p_position[j].x;
 				rect.y = p_position[j].y;
+				if (particle_layer[ly].get_colors_in_gradient() > 0) {
+					color = particle_layer[ly].get_color_at_timestamp(p_lifetime[j]);
+					SDL_SetTextureColorMod(particle_layer[ly].texture, color.r, color.g, color.b);
+				}
 				SDL_RenderCopyEx(render, particle_layer[ly].texture, NULL, &rect, p_angle[j], NULL, SDL_FLIP_NONE);
 			}
 		}
+		if (reverse_draw_order) {
+			i--;
+		}
+		else {
+			i++;
+		}
 	}
+	SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
 	if (use_sec_emitter) {
 		sec_emitter->draw();
 	}
@@ -131,4 +158,51 @@ void ss::ParticleEmitter::draw() {
 
 int ss::ParticleEmitter::get_num_of_layers() {
 	return layer;
+}
+
+SDL_Color ss::ParticleEmitter::ParticleType::get_color_at_timestamp(double time) {
+	float r = 255, g = 255, b = 255;
+	SDL_Color color{};
+	color.r = 255;
+	color.g = 255;
+	color.b = 255;
+	color.a = 255;
+	for (int i = 0; i < colors - 1; i++) {
+		if (time > gradient_times[i]) {
+			time -= gradient_times[i];
+			double dt = time / (gradient_times[i + 1] - gradient_times[i]);
+			r = lerp(gradient[i].r, gradient[i + 1].r, dt);
+			g = lerp(gradient[i].g, gradient[i + 1].g, dt);
+			b = lerp(gradient[i].b, gradient[i + 1].b, dt);
+			
+			color.r = clamp(0, 255, r);
+			color.g = clamp(0, 255, g);
+			color.b = clamp(0, 255, b);
+
+			return color;
+		}
+	}
+	return color;
+}
+
+int ss::ParticleEmitter::ParticleType::get_colors_in_gradient() {
+	return colors;
+}
+
+void ss::ParticleEmitter::ParticleType::add_color_to_gradient(SDL_Color color, double timestamp) {
+	resize(colors, colors + 1, gradient);
+	resize(colors, colors + 1, gradient_times);
+
+	gradient[colors] = color;
+	gradient_times[colors] = timestamp;
+
+	colors++;
+}
+
+void ss::ParticleEmitter::ParticleType::add_color_to_gradient(int r, int g, int b, double timestamp) {
+	SDL_Color color;
+	color.r = r;
+	color.g = g;
+	color.b = b;
+	add_color_to_gradient(color, timestamp);
 }
