@@ -1,8 +1,16 @@
 #include<Snow.h>
 
 
+enum class PlayerMoveType {
+	IDLE,
+	MOVING,
+	SHOOTING
+};
+PlayerMoveType player_move_type = PlayerMoveType::IDLE;
+ss::RandomNumberGenerator rng;
 int avg_fps[60];
 ss::Vector velocity;
+double blink_timer = 1;
 
 
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
@@ -30,8 +38,17 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 	//Calculate the velocity with which the player should pe moving, and move him with that velocity
 	direction.y = game.is_key_pressed(SDL_SCANCODE_S) - game.is_key_pressed(SDL_SCANCODE_W);
 	direction.x = game.is_key_pressed(SDL_SCANCODE_D) - game.is_key_pressed(SDL_SCANCODE_A);
-	direction.normalize();
-	direction *= delta / 10;
+	if (direction.lenght() > 0) {
+		direction.normalize();
+		direction *= delta / 10;
+		player_move_type = PlayerMoveType::MOVING;
+	}
+	else {
+		if (player_move_type != PlayerMoveType::IDLE) {
+			player.frame = 0;
+		}
+		player_move_type = PlayerMoveType::IDLE;
+	}
 	velocity = ss::lerp(velocity, direction, delta / 125);
 	player.position += velocity;
 
@@ -55,6 +72,7 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 	}
 
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
+		player_move_type = PlayerMoveType::SHOOTING;
 		fire.particle_layer[0].initial_direction = fire.position.direction_to(game.get_mouse_position()) * 20;
 		fire.particle_layer[0].initial_velocity = velocity * delta * 20;
 		fire.particle_layer[0].initial_velocity_min = 30;
@@ -65,11 +83,67 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 		fire.particle_layer[0].initial_velocity = ss::Vector(0);
 	}
 
+	switch (player_move_type) {
+	case PlayerMoveType::IDLE:
+		blink_timer -= delta / 1000;
+		if (blink_timer < 0) {
+			blink_timer = rng.randd_range(3, 4);
+			if (player.frame == 0) {
+				player.play(0, 4, 12, false);
+				if (rng.randi(1)) {
+					player.flip = SDL_FLIP_HORIZONTAL;
+				}
+				else {
+					player.flip = SDL_FLIP_NONE;
+				}
+			}
+			else if (player.frame == 4) {
+				player.play(4, 0, 12, false);
+			}
+		}
+		break;
+	case PlayerMoveType::MOVING:
+		player.frame = 4;
+		if (direction.x > 0) {
+			player.flip = SDL_FLIP_NONE;
+		}
+		else if (direction.x < 0) {
+			player.flip = SDL_FLIP_HORIZONTAL;
+		}
+		else {
+			player.frame = 0;
+		}
+		break;
+	case PlayerMoveType::SHOOTING:
+		if (ss::natural(fire.particle_layer[0].initial_direction.x) > ss::natural(fire.particle_layer[0].initial_direction.y)) {
+			player.frame = 4;
+			if (fire.particle_layer[0].initial_direction.x > 0) {
+				player.flip = SDL_FLIP_NONE;
+			}
+			else if (fire.particle_layer[0].initial_direction.x < 0) {
+				player.flip = SDL_FLIP_HORIZONTAL;
+			}
+		}
+		else {
+			player.frame = 5;
+			if (fire.particle_layer[0].initial_direction.y > 0) {
+				player.flip = SDL_FLIP_VERTICAL;
+			}
+			else if (fire.particle_layer[0].initial_direction.y < 0) {
+				player.flip = SDL_FLIP_NONE;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
 	fire.position = player.position + player.get_size() / 2;
 }
 
 
 int main(int argc, char* args[]) {
+	rng.randomize();
 	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 	game.resize_window(512, 288);
 	SDL_Renderer* render = SDL_GetRenderer(game.get_window());
@@ -85,15 +159,16 @@ int main(int argc, char* args[]) {
 	float _rdt = 0.0f;
 	int i = 0;
 
-	const char* frames[5] = {
+	const char* frames[6] = {
 		"Sprites/Player/player_idle0000.png",
 		"Sprites/Player/player_idle0001.png",
 		"Sprites/Player/player_idle0002.png",
 		"Sprites/Player/player_idle0003.png",
-		"Sprites/Player/player_idle0004.png"
+		"Sprites/Player/player_idle0004.png",
+		"Sprites/Player/player_idle0005.png"
 	};
 	
-	ss::Sprite player = ss::Sprite(game.get_window(), 5, frames);
+	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.position = ss::Vector(100, 100);
 
 	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
@@ -103,7 +178,7 @@ int main(int argc, char* args[]) {
 	SDL_FreeSurface(fire1);
 	ptem.add_particle_layer(750, fire1_t, 0.8);
 	//ptem.sort_by_lifetime = true;
-	ptem.reverse_draw_order = true;
+	//ptem.reverse_draw_order = true;
 
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
 	ptem.particle_layer[0].add_color_to_gradient(255, 120, 10, 0.2);
