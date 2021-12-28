@@ -65,7 +65,7 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 		fire.particle_layer[0].initial_velocity = ss::Vector(0);
 	}
 
-	fire.position = player.position;
+	fire.position = player.position + player.get_size() / 2;
 }
 
 
@@ -85,45 +85,36 @@ int main(int argc, char* args[]) {
 	float _rdt = 0.0f;
 	int i = 0;
 
-	const char* frames[6] = {
+	const char* frames[5] = {
 		"Sprites/Player/player_idle0000.png",
 		"Sprites/Player/player_idle0001.png",
 		"Sprites/Player/player_idle0002.png",
 		"Sprites/Player/player_idle0003.png",
-		"Sprites/Player/player_idle0004.png",
-		"Sprites/Player/player_idle0005.png",
+		"Sprites/Player/player_idle0004.png"
 	};
 	
-	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
+	ss::Sprite player = ss::Sprite(game.get_window(), 5, frames);
 	player.position = ss::Vector(100, 100);
-	player.play(0, 5, 8);
 
 	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
 	SDL_Surface* fire1 = SDL_CreateRGBSurface(NULL, 2, 2, 32, 0, 0, 0, 0);
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
 	SDL_FreeSurface(fire1);
-	ptem.add_particle_layer(500, fire1_t, 0.8);
-	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
-	ptem.particle_layer[0].add_color_to_gradient(255, 120, 10, 0.2);
-	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.35);
-	ptem.particle_layer[0].add_color_to_gradient(200, 0, 0, 0.45);
-	ptem.sort_by_lifetime = true;
+	ptem.add_particle_layer(750, fire1_t, 0.8);
+	//ptem.sort_by_lifetime = true;
 	ptem.reverse_draw_order = true;
 
-	/*
-	SDL_Surface* fire2 = SDL_CreateRGBSurface(NULL, 3, 3, 32, 0, 0, 0, 0);
-	SDL_FillRect(fire2, NULL, SDL_MapRGB(fire2->format, 255, 120, 10));
-	SDL_Texture* fire2_t = SDL_CreateTextureFromSurface(render, fire2);
-	SDL_FreeSurface(fire2);
-	ptem.add_particle_layer(75, fire2_t, 0.4);
+	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
+	ptem.particle_layer[0].add_color_to_gradient(255, 120, 10, 0.2);
+	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.3);
+	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.5);
+	ptem.particle_layer[0].add_color_to_gradient(255, 255, 0, 0.6);
 
-	SDL_Surface* fire3 = SDL_CreateRGBSurface(NULL, 2, 2, 32, 0, 0, 0, 0);
-	SDL_FillRect(fire3, NULL, SDL_MapRGB(fire3->format, 255, 200, 20));
-	SDL_Texture* fire3_t = SDL_CreateTextureFromSurface(render, fire3);
-	SDL_FreeSurface(fire3);
-	ptem.add_particle_layer(30, fire3_t, 0.3);
-	*/
+	ptem.particle_layer[0].add_scale_to_scale_curve(1, 0);
+	ptem.particle_layer[0].add_scale_to_scale_curve(1, 0.15);
+	ptem.particle_layer[0].add_scale_to_scale_curve(2, 0.3);
+	ptem.particle_layer[0].add_scale_to_scale_curve(0.5, 0.5);
 
 	ptem.particle_layer[0].use_gravity = true;
 	ptem.particle_layer[0].g_direction = ss::Vector(0, -1);
@@ -134,24 +125,8 @@ int main(int argc, char* args[]) {
 	ptem.particle_layer[0].g_force = 80;
 	ptem.particle_layer[0].velocity_damping = 0.1;
 	ptem.particle_layer[0].lifetime_random = 0.3;
-
-	/*
-	ptem.particle_layer[1].use_gravity = true;
-	ptem.particle_layer[1].g_direction = ss::Vector(0, -1);
-	ptem.particle_layer[1].initial_direction_randomness = 0.7;
-	ptem.particle_layer[1].initial_velocity_min = 2;
-	ptem.particle_layer[1].initial_velocity_max = 20;
-	ptem.particle_layer[1].g_force = 70;
-	ptem.particle_layer[1].velocity_damping = 0.1;
-
-	ptem.particle_layer[2].use_gravity = true;
-	ptem.particle_layer[2].g_direction = ss::Vector(0, -1);
-	ptem.particle_layer[2].initial_direction_randomness = 0.7;
-	ptem.particle_layer[2].initial_velocity_min = 1;
-	ptem.particle_layer[2].initial_velocity_max = 10;
-	ptem.particle_layer[2].g_force = 70;
-	ptem.particle_layer[2].velocity_damping = 0.1;
-	*/
+	ptem.emission_shape = ss::ParticleEmitter::EmissionShape::CIRCLE;
+	ptem.emission_radius = 5;
 
 	SDL_Event* ev;
 
@@ -169,9 +144,13 @@ int main(int argc, char* args[]) {
 			}
 		}
 
+		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
+			ptem.reverse_draw_order = !ptem.reverse_draw_order;
+		}
+
 		ptem.update(_dt);
 		ptem.draw();
-		//player.draw(_dt);
+		player.draw(_dt);
 
 		show_fps(fps, game.get_fps(), i, _rdt);
 	}
