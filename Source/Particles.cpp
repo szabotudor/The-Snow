@@ -108,14 +108,18 @@ void ss::ParticleEmitter::update(double delta) {
 
 void ss::ParticleEmitter::draw() {
 	SDL_Rect rect;
+	int prev_ly = -1;
 	for (int i = 0; i < ammount; i++) {
 		int j = p_order[i];
 		if (p_lifetime[j] >= 0) {
 			if (p_position[j].distance_to(p_position[j + 1]) > 0.5) {
 				int ly = p_layer[j];
+				if (ly != prev_ly) {
+					SDL_QueryTexture(particle_layer[ly].texture, NULL, NULL, &rect.w, &rect.h);
+					prev_ly = ly;
+				}
 				rect.x = p_position[j].x;
 				rect.y = p_position[j].y;
-				SDL_QueryTexture(particle_layer[ly].texture, NULL, NULL, &rect.w, &rect.h);
 				SDL_RenderCopyEx(render, particle_layer[ly].texture, NULL, &rect, p_angle[j], NULL, SDL_FLIP_NONE);
 			}
 		}
