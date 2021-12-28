@@ -1,5 +1,9 @@
 #include<Utility.h>
 
+//================
+//	Resize code
+//================
+
 void ss::resize(int start_size, int end_size, ss::Vector*& arr) {
 	if (start_size == 0) {
 		delete[] arr;
@@ -110,4 +114,19 @@ void ss::resize(int start_size, int end_size, bool*& arr) {
 		arr = n_arr;
 		delete[] temp;
 	}
+}
+
+//===============
+//	Lerp code
+//===============
+
+ss::Vector ss::lerp(Vector start, Vector end, double weight) {
+	start.x += (end.x - start.x) * weight;
+	start.y += (end.y - start.y) * weight;
+	return start;
+}
+
+double ss::lerp(double start, double end, double weight) {
+	start += (end - start) * weight;
+	return start;
 }

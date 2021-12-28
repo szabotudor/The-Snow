@@ -12,4 +12,7 @@ namespace ss {
 	void resize(int start_size, int end_size, int**& arr);
 	void resize(int start_size, int end_size, ParticleEmitter::ParticleType*& arr);
 	void resize(int start_size, int end_size, bool*& arr);
+
+	Vector lerp(Vector start, Vector end, double weight);
+	double lerp(double start, double end, double weight);
 }
