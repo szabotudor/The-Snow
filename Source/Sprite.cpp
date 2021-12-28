@@ -41,22 +41,58 @@ void ss::Sprite::draw(float delta) {
 		rect.x = position.x;
 		rect.y = position.y;
 	}
-	SDL_RenderCopy(render, textures[frame], NULL, &rect);
+	frame = clamp(0, frames, frame);
+	SDL_RenderCopyEx(render, textures[frame], NULL, &rect, 0, NULL, flip);
 
 	if (playing) {
-		time += delta;
-		frame = (int)(time / frame_delay);
-		if (frame > end) {
-			frame = 0;
-			time = 0;
+		time += delta / 1000;
+		if (reverse) {
+			frame = (int)lerp(start, end, 1 - time / anim_time);
+			if (frame < start) {
+				if (repeat) {
+					frame = end;
+					time = 0;
+				}
+				else {
+					playing = false;
+					frame = start;
+					time = 0;
+				}
+			}
+		}
+		else {
+			frame = (int)lerp(start, end, time / anim_time);
+			if (frame > end) {
+				if (repeat) {
+					frame = start;
+					time = 0;
+				}
+				else {
+					playing = false;
+					frame = end;
+					time = 0;
+				}
+			}
 		}
 	}
+	frame = clamp(0, frames, frame);
 }
 
-void ss::Sprite::play(int start, int end, int fps) {
+void ss::Sprite::play(int start, int end, int fps, bool repeat) {
+	if (end < start) {
+		reverse = true;
+		int aux = start;
+		start = end;
+		end = aux;
+	}
+	else {
+		reverse = false;
+	}
 	Sprite::start = start;
 	Sprite::end = end;
-	Sprite::frame_delay = 1000.0f / fps;
+	Sprite::repeat = repeat;
+	anim_time = (double)(end - start) / fps;
+	frame = start;
 	playing = true;
 }
 
