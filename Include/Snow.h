@@ -5,6 +5,7 @@
 #include<SDL.h>
 #include<SDL_image.h>
 #include<SDL_ttf.h>
+#include<Utility.h>
 #include<Vector.h>
 #include<RandomNumberGenerator.h>
 #include<Button.h>
@@ -54,17 +55,19 @@ namespace ss {
 		int get_fps();
 		//Returns the mouse position
 		Vector get_mouse_position();
+		//Returns true if the given mouse button has been pressed
+		bool is_button_pressed();
 		//Returns the SDL window (used especially for automatic texture scaling)
 		SDL_Window* get_window();
 		//Sets fullscreen mode to the given value
 		void set_fullscreen(bool fs);
 		//Returns true if the game window is in fullscreen mode
 		bool get_fullscreen();
-		//Returnes true if the SDL_KeyScancode is pressed (eg: SDL_SCANCODE_RETURN)
+		//Returns true if the SDL_KeyScancode is pressed (eg: SDL_SCANCODE_RETURN)
 		bool is_key_pressed(Uint8 key);
-		//Returnes true if the SDL_KeyScancode is just pressed this frame (eg: SDL_SCANCODE_RETURN)
+		//Returns true if the SDL_KeyScancode is just pressed this frame (eg: SDL_SCANCODE_RETURN)
 		bool is_key_just_pressed(Uint8 key);
-		//Returnes true if the SDL_KeyScancode is just released this frame (eg: SDL_SCANCODE_RETURN)
+		//Returns true if the SDL_KeyScancode is just released this frame (eg: SDL_SCANCODE_RETURN)
 		bool is_key_just_released(Uint8 key);
 		//Checks if the engine is still running
 		bool running(float &delta_time, float& real_delta_time);
