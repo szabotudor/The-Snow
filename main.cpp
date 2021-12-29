@@ -71,9 +71,10 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 		velocity.y = 0;
 	}
 
+	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
 		player_move_type = PlayerMoveType::SHOOTING;
-		fire.particle_layer[0].initial_direction = fire.position.direction_to(game.get_mouse_position()) * 20;
+		fire.particle_layer[0].initial_direction = fire.position.direction_to(game.get_mouse_position()) * 30;
 		fire.particle_layer[0].initial_velocity = velocity * delta * 20;
 		fire.particle_layer[0].initial_velocity_min = 30;
 	}
@@ -83,6 +84,7 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 		fire.particle_layer[0].initial_velocity = ss::Vector(0);
 	}
 
+	//Player Animations
 	switch (player_move_type) {
 	case PlayerMoveType::IDLE:
 		blink_timer -= delta / 1000;
@@ -176,14 +178,12 @@ int main(int argc, char* args[]) {
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
 	SDL_FreeSurface(fire1);
-	ptem.add_particle_layer(750, fire1_t, 0.8);
-	//ptem.sort_by_lifetime = true;
-	//ptem.reverse_draw_order = true;
+	ptem.add_particle_layer(500, fire1_t, 0.8);
 
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
 	ptem.particle_layer[0].add_color_to_gradient(255, 120, 10, 0.2);
 	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.3);
-	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.5);
+	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.45);
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 0, 0.6);
 
 	ptem.particle_layer[0].add_scale_to_scale_curve(1, 0);
@@ -217,10 +217,6 @@ int main(int argc, char* args[]) {
 			if (game.is_key_pressed(SDL_SCANCODE_LCTRL) and game.is_key_just_pressed(SDL_SCANCODE_F)) {
 				game.set_fullscreen(!game.get_fullscreen());
 			}
-		}
-
-		if (game.is_key_just_pressed(SDL_SCANCODE_SPACE)) {
-			ptem.reverse_draw_order = !ptem.reverse_draw_order;
 		}
 
 		ptem.update(_dt);
