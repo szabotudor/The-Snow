@@ -178,7 +178,7 @@ int main(int argc, char* args[]) {
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
 	SDL_FreeSurface(fire1);
-	ptem.add_particle_layer(500, fire1_t, 0.8);
+	ptem.add_particle_layer(300, fire1_t, 0.8);
 
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
 	ptem.particle_layer[0].add_color_to_gradient(255, 120, 10, 0.2);
@@ -205,6 +205,11 @@ int main(int argc, char* args[]) {
 
 	SDL_Event* ev;
 
+#if defined _DEBUG
+	player_cs.enable_draw(game.get_window());
+	bool draw_debug = true;
+#endif
+
 	while (game.running(_dt, _rdt)) {
 		game.update();
 		player_move(player, ptem, game, _dt);
@@ -223,7 +228,15 @@ int main(int argc, char* args[]) {
 		ptem.draw();
 		player.draw(_dt);
 
-		show_fps(fps, game.get_fps(), i, _rdt);
+#if defined _DEBUG
+		if (draw_debug) {
+			show_fps(fps, game.get_fps(), i, _rdt);
+			player_cs.draw();
+		}
+		if (game.is_key_just_pressed(SDL_SCANCODE_F3)) {
+			draw_debug = !draw_debug;
+		}
+#endif
 	}
 	return 0;
 }
