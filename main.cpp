@@ -6,11 +6,15 @@ enum class PlayerMoveType {
 	MOVING,
 	SHOOTING
 };
-PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::RandomNumberGenerator rng;
 int avg_fps[60];
+
 ss::Vector velocity;
 double blink_timer = 1;
+PlayerMoveType player_move_type = PlayerMoveType::IDLE;
+ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
+
+ss::CollisionShape window_cs;
 
 
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
@@ -51,25 +55,11 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 	}
 	velocity = ss::lerp(velocity, direction, delta / 125);
 	player.position += velocity;
+	player_cs.position = player.position + 2;
 
-	//Stop player from going outside the screen
-	ss::Vector size = player.get_size();
-	if (player.position.x > game.resolution.x - size.x) {
-		player.position.x = game.resolution.x - size.x;
-		velocity.x = 0;
-	}
-	else if (player.position.x < size.x) {
-		player.position.x = size.x;
-		velocity.x = 0;
-	}
-	if (player.position.y > game.resolution.y - size.y / 2) {
-		player.position.y = game.resolution.y - size.y / 2;
-		velocity.y = 0;
-	}
-	else if (player.position.y < size.y) {
-		player.position.y = size.y;
-		velocity.y = 0;
-	}
+	//Stop player from going outside the window
+	window_cs.push_in(player_cs);
+	player.position = player_cs.position - 2;
 
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
@@ -155,6 +145,7 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 int main(int argc, char* args[]) {
 	rng.randomize();
 	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
+	window_cs.size = game.resolution;
 	game.resize_window(512, 288);
 	SDL_Renderer* render = SDL_GetRenderer(game.get_window());
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
@@ -180,6 +171,7 @@ int main(int argc, char* args[]) {
 	
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.position = ss::Vector(100, 100);
+	player_cs.size = player.get_size() - 4;
 
 	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
 	SDL_Surface* fire1 = SDL_CreateRGBSurface(NULL, 2, 2, 32, 0, 0, 0, 0);
