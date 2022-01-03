@@ -48,6 +48,20 @@ void ss::ParticleEmitter::remove_seccondary_emitter() {
 }
 
 void ss::ParticleEmitter::update(double delta) {
+	if (!init) {
+		init = true;
+		double max_lt = 0;
+		for (int i = 0; i < layer; i++) {
+			if (particle_layer[i].lifelimit > max_lt) {
+				max_lt = particle_layer[i].lifelimit;
+			}
+		}
+
+		double dt = 0.06666;
+		for (double i = 0; i < max_lt; i += dt) {
+			update(dt * 1000);
+		}
+	}
 	delta /= 1000;
 	for (int i = 0; i < ammount; i++) {
 		p_lifetime[i] += delta;

@@ -82,6 +82,8 @@ namespace ss {
 		int* p_layer;
 		int* p_order;
 		bool* p_drawn;
+
+		bool init = false;
 	public:
 		bool sort_by_lifetime = false;
 		bool reverse_draw_order = false;
