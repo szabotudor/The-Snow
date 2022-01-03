@@ -8,6 +8,7 @@
 #include<SDL_ttf.h>
 #include<Utility.h>
 #include<Vector.h>
+#include<Collision.h>
 #include<RandomNumberGenerator.h>
 #include<Button.h>
 #include<Particles.h>
