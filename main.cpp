@@ -89,7 +89,7 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 	case PlayerMoveType::IDLE:
 		blink_timer -= delta / 1000;
 		if (blink_timer < 0) {
-			blink_timer = rng.randd_range(3, 4);
+			blink_timer = rng.randd_range(2.5, 8);
 			if (player.frame == 0) {
 				player.play(0, 4, 12, false);
 				if (rng.randi(1)) {
@@ -105,15 +105,23 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 		}
 		break;
 	case PlayerMoveType::MOVING:
-		player.frame = 4;
-		if (direction.x > 0) {
-			player.flip = SDL_FLIP_NONE;
-		}
-		else if (direction.x < 0) {
-			player.flip = SDL_FLIP_HORIZONTAL;
+		if (ss::natural(direction.x) >= ss::natural(direction.y)) {
+			player.frame = 4;
+			if (direction.x > 0) {
+				player.flip = SDL_FLIP_NONE;
+			}
+			else if (direction.x < 0) {
+				player.flip = SDL_FLIP_HORIZONTAL;
+			}
 		}
 		else {
-			player.frame = 0;
+			player.frame = 5;
+			if (direction.y > 0) {
+				player.flip = SDL_FLIP_VERTICAL;
+			}
+			else if (direction.y < 0) {
+				player.flip = SDL_FLIP_NONE;
+			}
 		}
 		break;
 	case PlayerMoveType::SHOOTING:
