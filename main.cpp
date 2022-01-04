@@ -14,7 +14,6 @@ double blink_timer = 1;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
 ss::CollisionShape window_cs;
-ss::CollisionShape fire_cs(ss::Vector(16, 20));
 
 
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
@@ -148,7 +147,7 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
 	SDL_FreeSurface(fire1);
-	ptem.add_particle_layer(300, fire1_t, 0.8);
+	ptem.add_particle_layer(350, fire1_t, 0.8);
 
 	//Creating the color gradient to make it look like a fire
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
@@ -213,9 +212,11 @@ int main(int argc, char* args[]) {
 	init_part(ptem, game.get_renderer());
 
 	//Creating the ground
+	ss::Vector ground_size(256, 144);
 	Uint32* ground_p = new Uint32[256 * 144];
+	bool* ground_b = new bool[256 * 144];
+	memset(ground_b, 1, sizeof(bool) * 256 * 144);
 	Uint32 w_fmt = SDL_GetWindowPixelFormat(game.get_window());
-	cout << SDL_GetPixelFormatName(w_fmt);
 	SDL_PixelFormat* fmt = SDL_AllocFormat(w_fmt);
 	for (int i = 0; i < 256; i++) {
 		for (int j = 0; j < 144; j++) {
@@ -229,8 +230,6 @@ int main(int argc, char* args[]) {
 
 	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
-	fire_cs.enable_draw(game.get_window());
-	fire_cs.draw_color = border_color;
 	bool draw_debug = true;
 #endif
 
@@ -244,8 +243,22 @@ int main(int argc, char* args[]) {
 	while (game.running(_dt, _rdt)) {
 		game.update();
 		game.clear_screen();
+		SDL_UpdateTexture(ground, NULL, ground_p, (int)ground_size.x * sizeof(Uint32));
 		SDL_RenderCopy(game.get_renderer(), ground, NULL, &window_rect);
 		player_move(player, ptem, game, _dt);
+
+		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
+			ss::Vector p_pos = ptem.get_particle_position(i);
+			if (p_pos.x >= 0 and p_pos.x < (int)ground_size.x and p_pos.y >= 0 and p_pos.y < (int)ground_size.y) {
+				if (ground_b[(int)p_pos.x + (int)p_pos.y * (int)ground_size.x]) {
+					int r = rng.randi_range(0, 40);
+					int g = rng.randi_range(210, 230);
+					int b = rng.randi_range(0, 40);
+					ground_p[(int)p_pos.x + (int)p_pos.y * (int)ground_size.x] = SDL_MapRGB(fmt, r, g, b);
+					ground_b[(int)p_pos.x + (int)p_pos.y * (int)ground_size.x] = false;
+				}
+			}
+		}
 
 		for (int i = 0; i < game.get_num_events(); i++) {
 			if (game.events[i].type == SDL_QUIT) {
@@ -264,7 +277,6 @@ int main(int argc, char* args[]) {
 #if defined _DEBUG
 		if (draw_debug) {
 			show_fps(fps, game.get_fps(), i, _rdt);
-			fire_cs.draw();
 		}
 		if (game.is_key_just_pressed(SDL_SCANCODE_F3)) {
 			draw_debug = !draw_debug;
