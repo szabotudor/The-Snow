@@ -151,6 +151,10 @@ SDL_Window* ss::Snow::get_window() {
 	return window;
 }
 
+SDL_Renderer* ss::Snow::get_renderer() {
+	return render;
+}
+
 void ss::Snow::resize_window(int w, int h) {
 	SDL_SetWindowSize(window, w, h);
 	scale_window(w, h);

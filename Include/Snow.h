@@ -67,6 +67,8 @@ namespace ss {
 		bool is_button_pressed(Uint8 button);
 		//Returns the SDL window (used especially for automatic texture scaling)
 		SDL_Window* get_window();
+		//Returns the SDL renderer (used when drawing or creating textures manually)
+		SDL_Renderer* get_renderer();
 		//Sets the window size to the given parameters (or resets the size if w and h are null)
 		void resize_window(int w, int h);
 		//Sets fullscreen mode to the given value
