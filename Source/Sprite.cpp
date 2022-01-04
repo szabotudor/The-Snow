@@ -33,7 +33,23 @@ ss::Sprite::Sprite(SDL_Window* window, int frames, const char** textures) {
 }
 
 void ss::Sprite::load(SDL_Window* window, int frames, const char** textures) {
-
+	for (int i = 0; i < frames; i++) {
+		SDL_DestroyTexture(Sprite::textures[i]);
+	}
+	stop();
+	frames = 0;
+	IMG_Init(IMG_INIT_PNG);
+	Sprite::textures = new SDL_Texture * [frames];
+	for (int i = 0; i < frames; i++) {
+		surface = IMG_Load(textures[i]);
+		Sprite::textures[i] = SDL_CreateTextureFromSurface(render, surface);
+		if (!i) {
+			rect = surface->clip_rect;
+			rect.x = position.x;
+			rect.y = position.y;
+		}
+		SDL_FreeSurface(surface);
+	}
 }
 
 void ss::Sprite::draw(float delta) {
