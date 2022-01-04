@@ -195,6 +195,17 @@ int ss::ParticleEmitter::get_num_of_layers() {
 	return layer;
 }
 
+int ss::ParticleEmitter::get_num_of_particles() {
+	return ammount;
+}
+
+ss::Vector ss::ParticleEmitter::get_particle_position(int i) {
+	if (i >= ammount) {
+		return -1;
+	}
+	return p_position[i];
+}
+
 SDL_Color ss::ParticleEmitter::ParticleType::get_color_at_timestamp(double time) {
 	float r = 255, g = 255, b = 255;
 	SDL_Color color{};

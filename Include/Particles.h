@@ -105,5 +105,9 @@ namespace ss {
 		void draw();
 		//Returns the number of particle layers in the emitter
 		int get_num_of_layers();
+		//Returns the total number of particles
+		int get_num_of_particles();
+		//Returns the global position of a particle
+		Vector get_particle_position(int i);
 	};
 }
