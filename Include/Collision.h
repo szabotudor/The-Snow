@@ -11,6 +11,7 @@ namespace ss {
 	public:
 		Vector position;
 		Vector size;
+		SDL_Color draw_color;
 		CollisionShape(Vector size = Vector(1), Vector position = Vector(0), SDL_Window* window = nullptr);
 		//Returns true if this is overlapping with the given CollisionShape
 		bool is_colliding_with(CollisionShape cs, bool inverse_collision = false);

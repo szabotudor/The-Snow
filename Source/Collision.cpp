@@ -70,7 +70,9 @@ void ss::CollisionShape::draw() {
 	rect.y = position.y;
 	rect.w = size.x;
 	rect.h = size.y;
+	SDL_SetRenderDrawColor(render, draw_color.r, draw_color.g, draw_color.b, draw_color.a);
 	SDL_RenderDrawRect(render, &rect);
+	SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
 }
 
 double ss::CollisionShape::get_area() {
