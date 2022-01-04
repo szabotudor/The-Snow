@@ -13,8 +13,8 @@ ss::Vector velocity;
 double blink_timer = 1;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
-
 ss::CollisionShape window_cs;
+ss::CollisionShape fire_cs(ss::Vector(16, 20));
 
 
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
@@ -205,24 +205,47 @@ int main(int argc, char* args[]) {
 		"Sprites/Player/player_idle0005.png"
 	};
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
-	player.position = ss::Vector(100, 100);
+	player.position = game.resolution / 2 - player.get_size() / 2;
 	player_cs.size = player.get_size() - 4;
 
 	//Creating a particle emitter for the fire
 	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
 	init_part(ptem, game.get_renderer());
 
+	//Creating the ground
+	Uint32* ground_p = new Uint32[256 * 144];
+	Uint32 w_fmt = SDL_GetWindowPixelFormat(game.get_window());
+	cout << SDL_GetPixelFormatName(w_fmt);
+	SDL_PixelFormat* fmt = SDL_AllocFormat(w_fmt);
+	for (int i = 0; i < 256; i++) {
+		for (int j = 0; j < 144; j++) {
+			int r = rng.randi_range(210, 230);
+			int g = rng.randi_range(r, 230);
+			ground_p[i + j * 256] = SDL_MapRGB(fmt, r, g, 240);
+		}
+	}
+	SDL_Texture* ground = SDL_CreateTexture(game.get_renderer(), w_fmt, SDL_TEXTUREACCESS_STATIC, 256, 144);
+	SDL_UpdateTexture(ground, NULL, ground_p, 256 * sizeof(Uint32));
+
 	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
-	player_cs.enable_draw(game.get_window());
+	fire_cs.enable_draw(game.get_window());
+	fire_cs.draw_color = border_color;
 	bool draw_debug = true;
 #endif
+
+	SDL_Rect window_rect;
+	window_rect.x = 0;
+	window_rect.y = 0;
+	window_rect.w = window_cs.size.x;
+	window_rect.h = window_cs.size.y;
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
 		game.update();
-		player_move(player, ptem, game, _dt);
 		game.clear_screen();
+		SDL_RenderCopy(game.get_renderer(), ground, NULL, &window_rect);
+		player_move(player, ptem, game, _dt);
 
 		for (int i = 0; i < game.get_num_events(); i++) {
 			if (game.events[i].type == SDL_QUIT) {
@@ -241,7 +264,7 @@ int main(int argc, char* args[]) {
 #if defined _DEBUG
 		if (draw_debug) {
 			show_fps(fps, game.get_fps(), i, _rdt);
-			player_cs.draw();
+			fire_cs.draw();
 		}
 		if (game.is_key_just_pressed(SDL_SCANCODE_F3)) {
 			draw_debug = !draw_debug;
