@@ -208,25 +208,22 @@ int main(int argc, char* args[]) {
 	player_cs.size = player.get_size() - 4;
 
 	//Creating a particle emitter for the fire
-	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
+	ss::ParticleEmitter ptem(game.get_window(), player.position);
 	init_part(ptem, game.get_renderer());
 
 	//Creating the ground
 	ss::Vector ground_size(256, 144);
-	Uint32* ground_p = new Uint32[256 * 144];
+	ss::Texture gnd_tex(game.get_window(), ground_size);
 	bool* ground_b = new bool[256 * 144];
 	memset(ground_b, 1, sizeof(bool) * 256 * 144);
-	Uint32 w_fmt = SDL_GetWindowPixelFormat(game.get_window());
-	SDL_PixelFormat* fmt = SDL_AllocFormat(w_fmt);
 	for (int i = 0; i < 256; i++) {
 		for (int j = 0; j < 144; j++) {
 			int r = rng.randi_range(210, 230);
 			int g = rng.randi_range(r, 230);
-			ground_p[i + j * 256] = SDL_MapRGB(fmt, r, g, 240);
+			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 240);
 		}
 	}
-	SDL_Texture* ground = SDL_CreateTexture(game.get_renderer(), w_fmt, SDL_TEXTUREACCESS_STATIC, 256, 144);
-	SDL_UpdateTexture(ground, NULL, ground_p, 256 * sizeof(Uint32));
+	gnd_tex.update();
 
 	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
@@ -243,8 +240,8 @@ int main(int argc, char* args[]) {
 	while (game.running(_dt, _rdt)) {
 		game.update();
 		game.clear_screen();
-		SDL_UpdateTexture(ground, NULL, ground_p, (int)ground_size.x * sizeof(Uint32));
-		SDL_RenderCopy(game.get_renderer(), ground, NULL, &window_rect);
+		gnd_tex.update();
+		gnd_tex.draw();
 		player_move(player, ptem, game, _dt);
 
 		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
@@ -256,7 +253,7 @@ int main(int argc, char* args[]) {
 							int r = rng.randi_range(0, 40);
 							int g = rng.randi_range(210, 230);
 							int b = rng.randi_range(0, 40);
-							ground_p[x + y * (int)ground_size.x] = SDL_MapRGB(fmt, r, g, b);
+							gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
 							ground_b[x + y * (int)ground_size.x] = false;
 						}
 					}
