@@ -11,6 +11,7 @@
     <ClCompile Include="Source\RandomNumberGenerator.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
+    <ClCompile Include="Source\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
@@ -22,6 +23,7 @@
     <ClInclude Include="Include\RandomNumberGenerator.h" />
     <ClInclude Include="Include\Utility.h" />
     <ClInclude Include="Include\Collision.h" />
+    <ClInclude Include="Include\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />
