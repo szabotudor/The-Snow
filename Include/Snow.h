@@ -12,6 +12,7 @@
 #include<RandomNumberGenerator.h>
 #include<Button.h>
 #include<Particles.h>
+#include<Texture.h>
 #include<Sprite.h>
 #include<Text.h>
 
