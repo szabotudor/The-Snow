@@ -249,13 +249,17 @@ int main(int argc, char* args[]) {
 
 		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
 			ss::Vector p_pos = ptem.get_particle_position(i);
-			if (p_pos.x >= 0 and p_pos.x < (int)ground_size.x and p_pos.y >= 0 and p_pos.y < (int)ground_size.y) {
-				if (ground_b[(int)p_pos.x + (int)p_pos.y * (int)ground_size.x]) {
-					int r = rng.randi_range(0, 40);
-					int g = rng.randi_range(210, 230);
-					int b = rng.randi_range(0, 40);
-					ground_p[(int)p_pos.x + (int)p_pos.y * (int)ground_size.x] = SDL_MapRGB(fmt, r, g, b);
-					ground_b[(int)p_pos.x + (int)p_pos.y * (int)ground_size.x] = false;
+			for (int x = p_pos.x - 1; x < p_pos.x + 1; x++) {
+				for (int y = p_pos.y - 1; y < p_pos.y + 1; y++) {
+					if (x >= 0 and x < (int)ground_size.x and y >= 0 and y < (int)ground_size.y) {
+						if (ground_b[x + y * (int)ground_size.x]) {
+							int r = rng.randi_range(0, 40);
+							int g = rng.randi_range(210, 230);
+							int b = rng.randi_range(0, 40);
+							ground_p[x + y * (int)ground_size.x] = SDL_MapRGB(fmt, r, g, b);
+							ground_b[x + y * (int)ground_size.x] = false;
+						}
+					}
 				}
 			}
 		}
