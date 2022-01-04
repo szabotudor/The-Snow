@@ -142,39 +142,8 @@ void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, 
 }
 
 
-int main(int argc, char* args[]) {
-	rng.randomize();
-	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
-	window_cs.size = game.resolution;
-	game.resize_window(512, 288);
-	SDL_Renderer* render = SDL_GetRenderer(game.get_window());
-	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
-	fps.position = ss::Vector(5, 5);
-	SDL_Color text_color, border_color, fill_color;
-
-	text_color.r = 255; text_color.g = 255; text_color.b = 255; text_color.a = 255;
-	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
-	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
-
-	float _dt = 0.0f;
-	float _rdt = 0.0f;
-	int i = 0;
-
-	//Creating the player sprite
-	const char* frames[6] = {
-		"Sprites/Player/player_idle0000.png",
-		"Sprites/Player/player_idle0001.png",
-		"Sprites/Player/player_idle0002.png",
-		"Sprites/Player/player_idle0003.png",
-		"Sprites/Player/player_idle0004.png",
-		"Sprites/Player/player_idle0005.png"
-	};
-	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
-	player.position = ss::Vector(100, 100);
-	player_cs.size = player.get_size() - 4;
-
+void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 	//Creating the particle emitter and adding a particle to it
-	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
 	SDL_Surface* fire1 = SDL_CreateRGBSurface(NULL, 2, 2, 32, 0, 0, 0, 0);
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
@@ -206,6 +175,42 @@ int main(int argc, char* args[]) {
 	ptem.particle_layer[0].lifetime_random = 0.3;
 	ptem.emission_shape = ss::ParticleEmitter::EmissionShape::CIRCLE;
 	ptem.emission_radius = 5;
+}
+
+
+int main(int argc, char* args[]) {
+	rng.randomize();
+	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
+	window_cs.size = game.resolution;
+	game.resize_window(512, 288);
+	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
+	fps.position = ss::Vector(5, 5);
+	SDL_Color text_color, border_color, fill_color;
+
+	text_color.r = 255; text_color.g = 255; text_color.b = 255; text_color.a = 255;
+	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
+	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
+
+	float _dt = 0.0f;
+	float _rdt = 0.0f;
+	int i = 0;
+
+	//Creating the player sprite
+	const char* frames[6] = {
+		"Sprites/Player/player_idle0000.png",
+		"Sprites/Player/player_idle0001.png",
+		"Sprites/Player/player_idle0002.png",
+		"Sprites/Player/player_idle0003.png",
+		"Sprites/Player/player_idle0004.png",
+		"Sprites/Player/player_idle0005.png"
+	};
+	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
+	player.position = ss::Vector(100, 100);
+	player_cs.size = player.get_size() - 4;
+
+	//Creating a particle emitter for the fire
+	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
+	init_part(ptem, game.get_renderer());
 
 	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
@@ -232,6 +237,7 @@ int main(int argc, char* args[]) {
 		ptem.draw();
 		player.draw(_dt);
 
+		//Draws the CollisionShapes and other debug info to the screen
 #if defined _DEBUG
 		if (draw_debug) {
 			show_fps(fps, game.get_fps(), i, _rdt);
