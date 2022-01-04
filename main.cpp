@@ -160,6 +160,7 @@ int main(int argc, char* args[]) {
 	float _rdt = 0.0f;
 	int i = 0;
 
+	//Creating the player sprite
 	const char* frames[6] = {
 		"Sprites/Player/player_idle0000.png",
 		"Sprites/Player/player_idle0001.png",
@@ -168,11 +169,11 @@ int main(int argc, char* args[]) {
 		"Sprites/Player/player_idle0004.png",
 		"Sprites/Player/player_idle0005.png"
 	};
-	
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.position = ss::Vector(100, 100);
 	player_cs.size = player.get_size() - 4;
 
+	//Creating the particle emitter and adding a particle to it
 	ss::ParticleEmitter ptem(game.get_window(), ss::Vector(50));
 	SDL_Surface* fire1 = SDL_CreateRGBSurface(NULL, 2, 2, 32, 0, 0, 0, 0);
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
@@ -180,17 +181,20 @@ int main(int argc, char* args[]) {
 	SDL_FreeSurface(fire1);
 	ptem.add_particle_layer(300, fire1_t, 0.8);
 
+	//Creating the color gradient to make it look like a fire
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
 	ptem.particle_layer[0].add_color_to_gradient(255, 120, 10, 0.2);
 	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.3);
 	ptem.particle_layer[0].add_color_to_gradient(255, 0, 0, 0.45);
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 0, 0.6);
 
+	//Creating a scale curve, to make the fire look more dense in the middle
 	ptem.particle_layer[0].add_scale_to_scale_curve(1, 0);
 	ptem.particle_layer[0].add_scale_to_scale_curve(1, 0.15);
 	ptem.particle_layer[0].add_scale_to_scale_curve(2, 0.3);
 	ptem.particle_layer[0].add_scale_to_scale_curve(0.5, 0.5);
 
+	//Settings that make the particles behave like a fire
 	ptem.particle_layer[0].use_gravity = true;
 	ptem.particle_layer[0].g_direction = ss::Vector(0, -1);
 	ptem.particle_layer[0].initial_direction_randomness = 0.85;
@@ -203,13 +207,13 @@ int main(int argc, char* args[]) {
 	ptem.emission_shape = ss::ParticleEmitter::EmissionShape::CIRCLE;
 	ptem.emission_radius = 5;
 
-	SDL_Event* ev;
-
+	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
 	player_cs.enable_draw(game.get_window());
 	bool draw_debug = true;
 #endif
 
+	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
 		game.update();
 		player_move(player, ptem, game, _dt);
