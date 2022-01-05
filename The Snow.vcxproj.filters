@@ -12,6 +12,7 @@
     <ClCompile Include="Source\Utility.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\Texture.cpp" />
+    <ClCompile Include="Extern\Enemy\Enemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Snow.h" />
@@ -24,6 +25,7 @@
     <ClInclude Include="Include\Utility.h" />
     <ClInclude Include="Include\Collision.h" />
     <ClInclude Include="Include\Texture.h" />
+    <ClInclude Include="Extern\Enemy\Enemy.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />

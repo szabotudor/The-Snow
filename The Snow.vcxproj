@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Extern\Enemy\Enemy.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Button.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="Source\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Extern\Enemy\Enemy.h" />
     <ClInclude Include="Include\Button.h" />
     <ClInclude Include="Include\Collision.h" />
     <ClInclude Include="Include\Particles.h" />
