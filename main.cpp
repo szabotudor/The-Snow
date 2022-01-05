@@ -1,4 +1,8 @@
 #include<Snow.h>
+#include"Extern/Enemy/Enemy.h"
+
+
+ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 
 
 enum class PlayerMoveType {
@@ -35,7 +39,7 @@ void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 }
 
 
-void player_move(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
+void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
 	ss::Vector direction;
 
 	//Calculate the velocity with which the player should pe moving, and move him with that velocity
@@ -179,20 +183,15 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 
 int main(int argc, char* args[]) {
 	rng.randomize();
-	ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 	window_cs.size = game.resolution;
 	game.resize_window(512, 288);
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
 	fps.position = ss::Vector(5, 5);
-	SDL_Color text_color, border_color, fill_color;
+	SDL_Color text_color = SDL_Color(), border_color = SDL_Color(), fill_color = SDL_Color();
 
 	text_color.r = 255; text_color.g = 255; text_color.b = 255; text_color.a = 255;
 	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
 	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
-
-	float _dt = 0.0f;
-	float _rdt = 0.0f;
-	int i = 0;
 
 	//Creating the player sprite
 	const char* frames[6] = {
@@ -206,6 +205,9 @@ int main(int argc, char* args[]) {
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.position = game.resolution / 2 - player.get_size() / 2;
 	player_cs.size = player.get_size() - 4;
+
+	//Creating the snowman/ememy sprite
+	
 
 	//Creating a particle emitter for the fire
 	ss::ParticleEmitter ptem(game.get_window(), player.position);
@@ -230,11 +232,14 @@ int main(int argc, char* args[]) {
 	bool draw_debug = true;
 #endif
 
-	SDL_Rect window_rect;
+	SDL_Rect window_rect = SDL_Rect();
 	window_rect.x = 0;
 	window_rect.y = 0;
 	window_rect.w = window_cs.size.x;
 	window_rect.h = window_cs.size.y;
+	float _dt = 0.0f;
+	float _rdt = 0.0f;
+	int i = 0;
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
@@ -242,7 +247,7 @@ int main(int argc, char* args[]) {
 		game.clear_screen();
 		gnd_tex.update();
 		gnd_tex.draw();
-		player_move(player, ptem, game, _dt);
+		player_process(player, ptem, game, _dt);
 
 		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
 			ss::Vector p_pos = ptem.get_particle_position(i);
