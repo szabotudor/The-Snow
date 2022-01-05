@@ -8,6 +8,9 @@ ss::CollisionShape::CollisionShape(Vector size, Vector position, SDL_Window* win
 		render = SDL_GetRenderer(window);
 		draw_enabled = true;
 	}
+	draw_color.r = 120;
+	draw_color.g = 120;
+	draw_color.b = 255;
 }
 
 bool ss::CollisionShape::is_colliding_with(CollisionShape cs, bool inverse_collision) {
