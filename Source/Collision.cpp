@@ -24,6 +24,11 @@ bool ss::CollisionShape::is_colliding_with(CollisionShape cs, bool inverse_colli
 	}
 }
 
+bool ss::CollisionShape::is_colliding_with(Vector v) {
+	return v.x > position.x and v.x < position.x + size.x and
+		v.y > position.y and v.y < position.y + size.y;
+}
+
 void ss::CollisionShape::push_out(CollisionShape& cs) {
 	if (is_colliding_with(cs)) {
 		Vector cs_center = cs.get_center();
@@ -44,6 +49,24 @@ void ss::CollisionShape::push_out(CollisionShape& cs) {
 	}
 }
 
+void ss::CollisionShape::push_out(Vector& v) {
+	if (is_colliding_with(v)) {
+		Vector center = get_center();
+		if (v.x < center.x) {
+			v.x = position.x;
+		}
+		else {
+			v.x = position.x + size.x;
+		}
+		if (v.y < center.y) {
+			v.y = position.y;
+		}
+		else {
+			v.y = position.y + size.y;
+		}
+	}
+}
+
 void ss::CollisionShape::push_in(CollisionShape& cs) {
 	if (is_colliding_with(cs, true)) {
 		if (cs.position.x < position.x) {
@@ -58,6 +81,23 @@ void ss::CollisionShape::push_in(CollisionShape& cs) {
 		}
 		else if (cs.position.y + cs.size.y > position.y + size.y) {
 			cs.position.y = position.y + size.y - cs.size.y;
+		}
+	}
+}
+
+void ss::CollisionShape::push_in(Vector& v) {
+	if (!is_colliding_with(v)) {
+		if (v.x < position.x) {
+			v.x = position.x;
+		}
+		else if (v.x > position.x + size.x) {
+			v.x = position.x + size.x;
+		}
+		if (v.y < position.y) {
+			v.y = position.y;
+		}
+		else if (v.y > position.y + size.y) {
+			v.y = position.y + size.y;
 		}
 	}
 }
