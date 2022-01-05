@@ -109,5 +109,7 @@ namespace ss {
 		int get_num_of_particles();
 		//Returns the global position of a particle
 		Vector get_particle_position(int i);
+		//Sets the position of the given particle
+		void set_particle_position(int i, Vector pos);
 	};
 }

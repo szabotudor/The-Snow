@@ -206,6 +206,13 @@ ss::Vector ss::ParticleEmitter::get_particle_position(int i) {
 	return p_position[i];
 }
 
+void ss::ParticleEmitter::set_particle_position(int i, Vector pos) {
+	if (i >= ammount) {
+		return;
+	}
+	p_position[i] = pos;
+}
+
 SDL_Color ss::ParticleEmitter::ParticleType::get_color_at_timestamp(double time) {
 	float r = 255, g = 255, b = 255;
 	SDL_Color color{};
