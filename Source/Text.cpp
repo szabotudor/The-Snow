@@ -60,9 +60,11 @@ void ss::Text::set_text(const char* text) {
 
 void ss::Text::set_text(string text) {
 	set_text(text.c_str());
+	line_num = 1;
 }
 
 void ss::Text::set_rich_text(const char* text) {
+	line_num = 0;
 	Text::text = text;
 	size_t length = strlen(text);
 	string t = "";
@@ -71,7 +73,8 @@ void ss::Text::set_rich_text(const char* text) {
 	surface = SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
 	int line = 0;
 	for (int i = 0; i <= length; i++) {
-		if (text[i] == '\n' or i == length) {
+		if (text[i] == '\n' or (i == length and text[i - 1] != '\n')) {
+			line_num++;
 			SDL_Surface* t_surface = TTF_RenderText_Solid(Text::font, t.c_str(), color);
 			SDL_Rect t_rect;
 			t_rect.y = (Text::font_size + 2) * line + 1;
@@ -109,9 +112,18 @@ void ss::Text::draw() {
 		rect.x = position.x;
 		rect.y = position.y;
 	}
+	if (color.r != prev_color_mod.r or color.g != prev_color_mod.g or color.b != prev_color_mod.b or color.a != prev_color_mod.a) {
+		SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+		SDL_SetTextureAlphaMod(texture, color.a);
+		prev_color_mod = color;
+	}
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
 }
 
 string ss::Text::get_text() {
 	return Text::text;
+}
+
+int ss::Text::get_num_of_lines() {
+	return line_num;
 }
