@@ -175,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />
+    <Font Include="Pixel.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="color basic eula.pdf" />

@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />
+    <Font Include="Pixel.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2\lib\x64\SDL2.dll" />
