@@ -4,6 +4,10 @@
 
 ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 
+#if defined _DEBUG
+ss::Text console(game.get_window(), " ", "Pixel.ttf", 7);
+#endif
+
 
 enum class PlayerMoveType {
 	IDLE,
@@ -18,6 +22,9 @@ double blink_timer = 1;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
 ss::CollisionShape window_cs;
+
+int enemies = 0;
+Enemy* enemy = new Enemy[64];
 
 
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
@@ -206,9 +213,6 @@ int main(int argc, char* args[]) {
 	player.position = game.resolution / 2 - player.get_size() / 2;
 	player_cs.size = player.get_size() - 4;
 
-	//Creating the snowman/ememy sprite
-	
-
 	//Creating a particle emitter for the fire
 	ss::ParticleEmitter ptem(game.get_window(), player.position);
 	init_part(ptem, game.get_renderer());
@@ -216,13 +220,14 @@ int main(int argc, char* args[]) {
 	//Creating the ground
 	ss::Vector ground_size(256, 144);
 	ss::Texture gnd_tex(game.get_window(), ground_size);
-	bool* ground_b = new bool[256 * 144];
-	memset(ground_b, 1, sizeof(bool) * 256 * 144);
+	bool** ground_b = new bool*[256];
 	for (int i = 0; i < 256; i++) {
+		ground_b[i] = new bool[144];
 		for (int j = 0; j < 144; j++) {
 			int r = rng.randi_range(210, 230);
 			int g = rng.randi_range(r, 230);
 			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 240);
+			ground_b[i][j] = true;
 		}
 	}
 	gnd_tex.update();
@@ -230,6 +235,12 @@ int main(int argc, char* args[]) {
 	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
 	bool draw_debug = true;
+	string console_text = " ";
+	console.position.y = 64;
+	console.color.r = 0;
+	console.color.g = 100;
+	console.color.b = 100;
+	console.color.a = 160;
 #endif
 
 	SDL_Rect window_rect = SDL_Rect();
@@ -241,6 +252,8 @@ int main(int argc, char* args[]) {
 	float _rdt = 0.0f;
 	int i = 0;
 
+	double spawn_timer = 2;
+
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
 		game.update();
@@ -249,19 +262,67 @@ int main(int argc, char* args[]) {
 		gnd_tex.draw();
 		player_process(player, ptem, game, _dt);
 
+		//Spawn an enemy at a random interval
+		if (enemies < 64) {
+#if defined _DEBUG
+			if (spawn_timer < 0 or game.is_key_just_pressed(SDL_SCANCODE_F1)) {
+#else
+			if (spawn_timer < 0) {
+#endif
+				spawn_timer = rng.randd_range(2, 4);
+				enemy[enemies] = Enemy(player.position + rng.randdir() * rng.randd_range(50, 100));
+				window_cs.push_in(enemy[enemies].collision);
+#if defined _DEBUG
+				enemy[enemies].collision.enable_draw(game.get_window());
+				console_text += "Enemy " + to_string(enemies) + " spawned\n";
+#endif
+				enemies++;
+			}
+			else {
+				//spawn_timer -= _dt / 1000;
+			}
+		}
+
+		//Process enemies
+		for (int i = 0; i < enemies; i++) {
+			enemy[i].process(_dt);
+			if (enemy[i].is_dead()) {
+#if defined _DEBUG
+				console_text += "Enemy " + to_string(i) + " killed\n";
+#endif
+				for (int j = i; j < enemies - 1; j++) {
+					enemy[j] = enemy[j + 1];
+				}
+				enemies--;
+			}
+		}
+
+		//Verify colision of fire particles with snow on the ground and with snowmen
 		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
 			ss::Vector p_pos = ptem.get_particle_position(i);
+			//Set color of pixels on ground to green
 			for (int x = p_pos.x - 1; x < p_pos.x + 1; x++) {
 				for (int y = p_pos.y - 1; y < p_pos.y + 1; y++) {
-					if (x >= 0 and x < (int)ground_size.x and y >= 0 and y < (int)ground_size.y) {
-						if (ground_b[x + y * (int)ground_size.x]) {
+					if (x >= 0 and x < ground_size.x and y >= 0 and y < ground_size.y) {
+						if (ground_b[x][y]) {
 							int r = rng.randi_range(0, 40);
 							int g = rng.randi_range(210, 230);
 							int b = rng.randi_range(0, 40);
 							gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
-							ground_b[x + y * (int)ground_size.x] = false;
+							ground_b[x][y] = false;
 						}
 					}
+				}
+			}
+			//Verify collision between fire particles and snowmen
+			for (int j = 0; j < enemies; j++) {
+				if (enemy[j].collision.is_colliding_with(p_pos)) {
+#if defined _DEBUG
+					if (!enemy[j].is_invulnerable()) {
+						console_text += "Enemy " + to_string(j) + " damaged (" + to_string(enemy[j].get_hp()) + " hp)\n";
+					}
+#endif
+					enemy[j].damage();
 				}
 			}
 		}
@@ -282,6 +343,23 @@ int main(int argc, char* args[]) {
 		//Draws the CollisionShapes and other debug info to the screen
 #if defined _DEBUG
 		if (draw_debug) {
+			for (int i = 0; i < enemies; i++) {
+				enemy[i].collision.draw();
+			}
+			if (console_text != console.get_text()) {
+				if (console_text[0] == ' ') {
+					if (strlen(console_text.c_str()) > 1) {
+						console_text = console_text.substr(1);
+					}
+				}
+				if (console.get_num_of_lines() > 7) {
+					int j = 0;
+					for (j; console_text[j] != '\n'; j++);
+					console_text = console_text.substr(j + 1);
+				}
+				console.set_rich_text(console_text);
+			}
+			console.draw();
 			show_fps(fps, game.get_fps(), i, _rdt);
 		}
 		if (game.is_key_just_pressed(SDL_SCANCODE_F3)) {
