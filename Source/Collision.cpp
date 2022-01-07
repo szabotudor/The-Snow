@@ -15,7 +15,7 @@ ss::CollisionShape::CollisionShape(Vector size, Vector position, SDL_Window* win
 
 bool ss::CollisionShape::is_colliding_with(CollisionShape cs, bool inverse_collision) {
 	if (!inverse_collision) {
-		return (position.x + size.x > cs.position.x and position.y + size.y > cs.position.y) or
+		return (position.x + size.x > cs.position.x and position.y + size.y > cs.position.y) and
 			(position.x < cs.position.x + cs.size.x and position.y < cs.position.y + cs.size.y);
 	}
 	else {
@@ -25,26 +25,33 @@ bool ss::CollisionShape::is_colliding_with(CollisionShape cs, bool inverse_colli
 }
 
 bool ss::CollisionShape::is_colliding_with(Vector v) {
-	return v.x > position.x and v.x < position.x + size.x and
-		v.y > position.y and v.y < position.y + size.y;
+	return v.x > position.x and v.x < position.x + size.x and v.y > position.y and v.y < position.y + size.y;
 }
 
 void ss::CollisionShape::push_out(CollisionShape& cs) {
 	if (is_colliding_with(cs)) {
 		Vector cs_center = cs.get_center();
 		Vector center = get_center();
+		Vector depth;
 		if (cs_center.x <= center.x) {
-			cs.position.x = position.x - cs.size.x;
+			depth.x = cs.position.x + cs.size.x - position.x;
 		}
 		else {
-			cs.position.x = position.x + size.x;
+			depth.x = -(position.x + size.x - cs.position.x);
 		}
 
 		if (cs_center.y <= center.y) {
-			cs.position.y = position.y - cs.size.y;
+			depth.y = cs.position.y + cs.size.x - position.y;
 		}
 		else {
-			cs.position.y = position.y + size.y;
+			depth.y = -(position.y + size.x - cs.position.y);
+		}
+
+		if (natural(depth.x) > natural(depth.y)) {
+			cs.position.y -= depth.y;
+		}
+		else {
+			cs.position.x -= depth.x;
 		}
 	}
 }
