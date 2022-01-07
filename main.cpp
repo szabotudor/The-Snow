@@ -7,6 +7,26 @@ ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RE
 #if defined _DEBUG
 string console_text = " ";
 ss::Text console(game.get_window(), " ", "Pixel.ttf", 7);
+long long frame, last_console_update_frame;
+
+void print_to_console(string text) {
+	console_text += text + '\n';
+
+	if (console_text[0] == ' ') {
+		if (strlen(console_text.c_str()) > 1) {
+			console_text = console_text.substr(1);
+		}
+	}
+	if (console.get_num_of_lines() > 7) {
+		int j = 0;
+		for (j; console_text[j] != '\n'; j++);
+		console_text = console_text.substr(j + 1);
+	}
+	if (frame != last_console_update_frame) {
+		last_console_update_frame = frame;
+		console.set_rich_text(console_text);
+	}
+}
 #endif
 
 
@@ -248,6 +268,7 @@ int main(int argc, char* args[]) {
 	console.color.b = 100;
 	console.color.a = 160;
 	player_cs.enable_draw(game.get_window());
+	print_to_console("Start game...\n");
 #endif
 
 	SDL_Rect window_rect = SDL_Rect();
@@ -281,8 +302,11 @@ int main(int argc, char* args[]) {
 				window_cs.push_in(enemy[enemies].collision);
 #if defined _DEBUG
 				enemy[enemies].collision.enable_draw(game.get_window());
-				console_text += "Enemy " + to_string(enemies) + " spawned\n";
+				print_to_console("Enemy " + to_string(enemies) + " spawned");
 #endif
+				for (int i = 0; i < enemies; i++) {
+					enemy[i].collision.push_out(enemy[enemies].collision);
+				}
 				enemies++;
 			}
 			else {
@@ -291,11 +315,10 @@ int main(int argc, char* args[]) {
 		}
 
 		//Process enemies
-		for (int i = 0; i < enemies; i++) {
 			enemy[i].process(_dt);
 			if (enemy[i].is_dead()) {
 #if defined _DEBUG
-				console_text += "Enemy " + to_string(i) + " killed\n";
+				print_to_console("Enemy " + to_string(i) + " killed");
 #endif
 				for (int j = i; j < enemies - 1; j++) {
 					enemy[j] = enemy[j + 1];
@@ -326,7 +349,7 @@ int main(int argc, char* args[]) {
 				if (enemy[j].collision.is_colliding_with(p_pos)) {
 #if defined _DEBUG
 					if (!enemy[j].is_invulnerable()) {
-						console_text += "Enemy " + to_string(j) + " damaged (" + to_string(enemy[j].get_hp()) + " hp)\n";
+						print_to_console("Enemy " + to_string(j) + " damaged (" + to_string(enemy[j].get_hp()) + " hp)");
 					}
 #endif
 					enemy[j].damage();
@@ -349,23 +372,11 @@ int main(int argc, char* args[]) {
 
 		//Draws the CollisionShapes and other debug info to the screen
 #if defined _DEBUG
+		frame++;
 		if (draw_debug) {
 			player_cs.draw();
 			for (int i = 0; i < enemies; i++) {
 				enemy[i].collision.draw();
-			}
-			if (console_text != console.get_text()) {
-				if (console_text[0] == ' ') {
-					if (strlen(console_text.c_str()) > 1) {
-						console_text = console_text.substr(1);
-					}
-				}
-				if (console.get_num_of_lines() > 7) {
-					int j = 0;
-					for (j; console_text[j] != '\n'; j++);
-					console_text = console_text.substr(j + 1);
-				}
-				console.set_rich_text(console_text);
 			}
 			console.draw();
 			show_fps(fps, game.get_fps(), i, _rdt);
