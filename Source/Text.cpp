@@ -72,28 +72,33 @@ void ss::Text::set_rich_text(const char* text) {
 	SDL_GetRendererOutputSize(renderer, &w, &h);
 	surface = SDL_CreateRGBSurface(0, w, h, 32, rmask, gmask, bmask, amask);
 	int line = 0;
+	int nrt = 0;
 	for (int i = 0; i <= length; i++) {
 		if (text[i] == '\n' or (i == length and text[i - 1] != '\n')) {
 			line_num++;
-			SDL_Surface* t_surface = TTF_RenderText_Solid(Text::font, t.c_str(), color);
-			SDL_Rect t_rect;
-			t_rect.y = (Text::font_size + 2) * line + 1;
-			t_rect.x = 1;
-			t_rect.w = t_surface->w;
-			t_rect.h = t_surface->h;
-			SDL_BlitSurface(t_surface, NULL, surface, &t_rect);
-			if (surface->w < t_rect.w) {
-				surface->w = t_rect.w;
+			if (nrt != 0) {
+				nrt = 0;
+				SDL_Surface* t_surface = TTF_RenderText_Solid(Text::font, t.c_str(), color);
+				SDL_Rect t_rect;
+				t_rect.y = (Text::font_size + 2) * line + 1;
+				t_rect.x = 1;
+				t_rect.w = t_surface->w;
+				t_rect.h = t_surface->h;
+				SDL_BlitSurface(t_surface, NULL, surface, &t_rect);
+				if (surface->w < t_rect.w) {
+					surface->w = t_rect.w;
+				}
+				if (surface->h < t_rect.y + t_rect.h) {
+					surface->h = t_rect.h;
+				}
+				SDL_FreeSurface(t_surface);
+				t = "";
 			}
-			if (surface->h < t_rect.y + t_rect.h) {
-				surface->h = t_rect.h;
-			}
-			SDL_FreeSurface(t_surface);
 			line++;
-			t = "";
 		}
 		if (text[i] != '\n') {
 			t += text[i];
+			nrt++;
 		}
 	}
 	SDL_DestroyTexture(texture);
