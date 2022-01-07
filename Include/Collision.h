@@ -1,6 +1,10 @@
 #pragma once
+#include<Utility.h>
+#include<iostream>
 #include<Vector.h>
 #include<SDL.h>
+
+using namespace std;
 
 namespace ss {
 	class CollisionShape {
