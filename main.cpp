@@ -8,16 +8,24 @@ ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RE
 string console_text = " ";
 ss::Text console(game.get_window(), " ", "Pixel.ttf", 7);
 long long frame, last_console_update_frame;
+int console_lines;
 
 void print_to_console(string text) {
+	int text_len = strlen(text.c_str());
+	for (int i = 0; i < text_len; i++) {
+		if (text[i] == '\n') {
+			console_lines++;
+		}
+	}
 	console_text += text + '\n';
+	console_lines++;
 
 	if (console_text[0] == ' ') {
 		if (strlen(console_text.c_str()) > 1) {
 			console_text = console_text.substr(1);
 		}
 	}
-	if (console.get_num_of_lines() > 7) {
+	if (console_lines > 7) {
 		int j = 0;
 		for (j; console_text[j] != '\n'; j++);
 		console_text = console_text.substr(j + 1);
@@ -312,9 +320,24 @@ int main(int argc, char* args[]) {
 			else {
 				//spawn_timer -= _dt / 1000;
 			}
+#if defined _DEBUG
+			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL) and game.is_key_just_pressed(SDL_SCANCODE_F1)) {
+				for (enemies; enemies < 64; enemies++) {
+					enemy[enemies] = Enemy(player.position + rng.randdir() * rng.randd_range(50, 100));
+					window_cs.push_in(enemy[enemies].collision);
+					enemy[enemies].collision.enable_draw(game.get_window());
+					print_to_console("Enemy " + to_string(enemies) + " spawned");
+					for (int i = 0; i < enemies; i++) {
+						enemy[i].collision.push_out(enemy[enemies].collision);
+					}
+				}
+				enemies--;
+			}
+#endif
 		}
 
 		//Process enemies
+		for (int i = 0; i < enemies; i++) {
 			enemy[i].process(_dt);
 			if (enemy[i].is_dead()) {
 #if defined _DEBUG
