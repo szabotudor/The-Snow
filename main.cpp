@@ -5,6 +5,7 @@
 ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 
 #if defined _DEBUG
+string console_text = " ";
 ss::Text console(game.get_window(), " ", "Pixel.ttf", 7);
 #endif
 
@@ -69,6 +70,12 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 
 	//Stop player from going outside the window
 	window_cs.push_in(player_cs);
+	player.position = player_cs.position - 2;
+
+	//Calculate collision between player and enemies
+	for (int i = 0; i < enemies; i++) {
+		enemy[i].collision.push_out(player_cs);
+	}
 	player.position = player_cs.position - 2;
 
 	//Shooting
@@ -235,12 +242,12 @@ int main(int argc, char* args[]) {
 	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
 	bool draw_debug = true;
-	string console_text = " ";
 	console.position.y = 64;
 	console.color.r = 0;
 	console.color.g = 100;
 	console.color.b = 100;
 	console.color.a = 160;
+	player_cs.enable_draw(game.get_window());
 #endif
 
 	SDL_Rect window_rect = SDL_Rect();
@@ -343,6 +350,7 @@ int main(int argc, char* args[]) {
 		//Draws the CollisionShapes and other debug info to the screen
 #if defined _DEBUG
 		if (draw_debug) {
+			player_cs.draw();
 			for (int i = 0; i < enemies; i++) {
 				enemy[i].collision.draw();
 			}
