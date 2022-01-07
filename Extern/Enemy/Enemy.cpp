@@ -8,6 +8,7 @@ Enemy::Enemy(ss::Vector position) {
 
 void Enemy::process(double delta) {
 	delta /= 1000;
+	position = collision.position;
 	if (invulnerability > 0) {
 		invulnerability -= delta;
 #if defined _DEBUG
