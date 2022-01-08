@@ -50,12 +50,14 @@ void ss::Text::set_font(const char* font, Uint8 font_size) {
 
 void ss::Text::set_text(const char* text) {
 	Text::text = text;
-	surface = TTF_RenderText_Solid(Text::font, text, color);
-	SDL_DestroyTexture(texture);
-	texture = SDL_CreateTextureFromSurface(renderer, surface);
-	rect.w = surface->w;
-	rect.h = surface->h;
-	SDL_FreeSurface(surface);
+	if (text != "\0") {
+		surface = TTF_RenderText_Solid(Text::font, text, color);
+		SDL_DestroyTexture(texture);
+		texture = SDL_CreateTextureFromSurface(renderer, surface);
+		rect.w = surface->w;
+		rect.h = surface->h;
+		SDL_FreeSurface(surface);
+	}
 }
 
 void ss::Text::set_text(string text) {
