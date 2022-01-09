@@ -2,7 +2,7 @@
 #include"Extern/Enemy/Enemy.h"
 
 
-ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
+ss::Snow game("The Snow", ss::Vector(256, 144), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 
 #if defined _DEBUG
 string console_text = " ";
@@ -25,7 +25,7 @@ void print_to_console(string text) {
 			console_text = console_text.substr(1);
 		}
 	}
-	if (console_lines > 12) {
+	if (console_lines > 7) {
 		int j = 0;
 		for (j; console_text[j] != '\n'; j++);
 		console_text = console_text.substr(j + 1);
@@ -109,8 +109,8 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
 		player_move_type = PlayerMoveType::SHOOTING;
-		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, fire.position.direction_to(game.get_mouse_position()) * 30, delta / 100).normalized() * 30;
-		fire.particle_layer[0].initial_velocity = velocity * 120 / (delta / 10);
+		fire.particle_layer[0].initial_direction = fire.position.direction_to(game.get_mouse_position()) * 30;
+		fire.particle_layer[0].initial_velocity = velocity * delta * 20;
 		fire.particle_layer[0].initial_velocity_min = 30;
 	}
 	else {
@@ -226,7 +226,7 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 int main(int argc, char* args[]) {
 	rng.randomize();
 	window_cs.size = game.resolution;
-	game.resize_window(640, 360);
+	game.resize_window(512, 288);
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
 	fps.position = ss::Vector(5, 5);
 	SDL_Color text_color = SDL_Color(), border_color = SDL_Color(), fill_color = SDL_Color();
@@ -253,12 +253,12 @@ int main(int argc, char* args[]) {
 	init_part(ptem, game.get_renderer());
 
 	//Creating the ground
-	ss::Vector ground_size(game.resolution);
+	ss::Vector ground_size(256, 144);
 	ss::Texture gnd_tex(game.get_window(), ground_size);
-	bool** ground_b = new bool*[(int)ground_size.x];
-	for (int i = 0; i < ground_size.x; i++) {
-		ground_b[i] = new bool[(int)ground_size.y];
-		for (int j = 0; j < ground_size.y; j++) {
+	bool** ground_b = new bool*[256];
+	for (int i = 0; i < 256; i++) {
+		ground_b[i] = new bool[144];
+		for (int j = 0; j < 144; j++) {
 			int r = rng.randi_range(210, 230);
 			int g = rng.randi_range(r, 230);
 			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 240);
@@ -321,19 +321,17 @@ int main(int argc, char* args[]) {
 				//spawn_timer -= _dt / 1000;
 			}
 #if defined _DEBUG
-			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL)) {
-				if (game.is_key_just_pressed(SDL_SCANCODE_F1)) {
-					for (enemies; enemies < 64; enemies++) {
-						enemy[enemies] = Enemy(player.position + rng.randdir() * rng.randd_range(50, 100));
-						window_cs.push_in(enemy[enemies].collision);
-						enemy[enemies].collision.enable_draw(game.get_window());
-						print_to_console("Enemy " + to_string(enemies) + " spawned");
-						for (int i = 0; i < enemies; i++) {
-							enemy[i].collision.push_out(enemy[enemies].collision);
-						}
+			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL) and game.is_key_just_pressed(SDL_SCANCODE_F1)) {
+				for (enemies; enemies < 64; enemies++) {
+					enemy[enemies] = Enemy(player.position + rng.randdir() * rng.randd_range(50, 100));
+					window_cs.push_in(enemy[enemies].collision);
+					enemy[enemies].collision.enable_draw(game.get_window());
+					print_to_console("Enemy " + to_string(enemies) + " spawned");
+					for (int i = 0; i < enemies; i++) {
+						enemy[i].collision.push_out(enemy[enemies].collision);
 					}
-					enemies--;
 				}
+				enemies--;
 			}
 #endif
 		}
@@ -408,15 +406,6 @@ int main(int argc, char* args[]) {
 		}
 		if (game.is_key_just_pressed(SDL_SCANCODE_F3)) {
 			draw_debug = !draw_debug;
-		}
-
-		if (game.is_key_just_pressed(SDL_SCANCODE_F2)) {
-			if (game.target_fps == 144) {
-				game.target_fps = 30;
-			}
-			else {
-				game.target_fps = 144;
-			}
 		}
 #endif
 	}
