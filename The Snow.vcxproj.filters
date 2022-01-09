@@ -2,29 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Source\Snow.cpp" />
-    <ClCompile Include="Source\Button.cpp" />
-    <ClCompile Include="Source\Vector.cpp" />
-    <ClCompile Include="Source\Text.cpp" />
-    <ClCompile Include="Source\Sprite.cpp" />
-    <ClCompile Include="Source\Particles.cpp" />
-    <ClCompile Include="Source\RandomNumberGenerator.cpp" />
-    <ClCompile Include="Source\Utility.cpp" />
-    <ClCompile Include="Source\Collision.cpp" />
-    <ClCompile Include="Source\Texture.cpp" />
     <ClCompile Include="Extern\Enemy\Enemy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Snow.h" />
-    <ClInclude Include="Include\Vector.h" />
-    <ClInclude Include="Include\Button.h" />
-    <ClInclude Include="Include\Text.h" />
-    <ClInclude Include="Include\Sprite.h" />
-    <ClInclude Include="Include\Particles.h" />
-    <ClInclude Include="Include\RandomNumberGenerator.h" />
-    <ClInclude Include="Include\Utility.h" />
-    <ClInclude Include="Include\Collision.h" />
-    <ClInclude Include="Include\Texture.h" />
     <ClInclude Include="Extern\Enemy\Enemy.h" />
   </ItemGroup>
   <ItemGroup>
@@ -32,16 +12,6 @@
     <Font Include="Pixel.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SDL2\lib\x64\SDL2.dll" />
-    <None Include="SDL2_image\lib\x64\libjpeg-9.dll" />
-    <None Include="SDL2_image\lib\x64\libpng16-16.dll" />
-    <None Include="SDL2_image\lib\x64\libtiff-5.dll" />
-    <None Include="SDL2_image\lib\x64\libwebp-7.dll" />
-    <None Include="SDL2_image\lib\x64\SDL2_image.dll" />
-    <None Include="SDL2_image\lib\x64\zlib1.dll" />
-    <None Include="SDL2_ttf\lib\x64\libfreetype-6.dll" />
-    <None Include="SDL2_ttf\lib\x64\SDL2_ttf.dll" />
-    <None Include="SDL2_ttf\lib\x64\zlib1.dll" />
     <None Include="color basic eula.pdf" />
     <None Include="libfreetype-6.dll" />
     <None Include="libjpeg-9.dll" />
@@ -54,20 +24,18 @@
     <None Include="zlib1.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="SDL2\lib\x64\SDL2.lib" />
-    <Library Include="SDL2\lib\x64\SDL2main.lib" />
-    <Library Include="SDL2\lib\x64\SDL2test.lib" />
-    <Library Include="SDL2_image\lib\x64\SDL2_image.lib" />
-    <Library Include="SDL2_ttf\lib\x64\SDL2_ttf.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="SDL2_image\lib\x64\LICENSE.jpeg.txt" />
-    <Text Include="SDL2_image\lib\x64\LICENSE.png.txt" />
-    <Text Include="SDL2_image\lib\x64\LICENSE.tiff.txt" />
-    <Text Include="SDL2_image\lib\x64\LICENSE.webp.txt" />
-    <Text Include="SDL2_image\lib\x64\LICENSE.zlib.txt" />
-    <Text Include="SDL2_ttf\lib\x64\LICENSE.freetype.txt" />
-    <Text Include="SDL2_ttf\lib\x64\LICENSE.zlib.txt" />
+    <Library Include="SnowEngine\lib\SDL2.lib" />
+    <Library Include="SnowEngine\lib\SDL2_image.lib" />
+    <Library Include="SnowEngine\lib\SDL2_ttf.lib" />
+    <Library Include="SnowEngine\lib\SDL2main.lib" />
+    <Library Include="SnowEngine\lib\SDL2test.lib" />
+    <Library Include="SnowEngine\lib\SnowEngine.lib" />
+    <Library Include="SnowEngine\lib_debug\SDL2.lib" />
+    <Library Include="SnowEngine\lib_debug\SDL2_image.lib" />
+    <Library Include="SnowEngine\lib_debug\SDL2_ttf.lib" />
+    <Library Include="SnowEngine\lib_debug\SDL2main.lib" />
+    <Library Include="SnowEngine\lib_debug\SDL2test.lib" />
+    <Library Include="SnowEngine\lib_debug\SnowEngine.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="sun.png" />
