@@ -59,6 +59,18 @@
     <Library Include="SDL2\lib\x64\SDL2test.lib" />
     <Library Include="SDL2_image\lib\x64\SDL2_image.lib" />
     <Library Include="SDL2_ttf\lib\x64\SDL2_ttf.lib" />
+    <Library Include="SnowEngine_R\lib\SnowEngine.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2_image.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2_ttf.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2main.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2test.lib" />
+    <Library Include="SnowEngine_D\lib\SnowEngine.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2_image.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2_ttf.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2main.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2test.lib" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="SDL2_image\lib\x64\LICENSE.jpeg.txt" />

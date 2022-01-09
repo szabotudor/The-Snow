@@ -116,13 +116,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\Include;$(ProjectDir)\SDL2\include;$(ProjectDir)\SDL2_image\include;$(ProjectDir)\SDL2_ttf\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/SnowEngine_R/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\SDL2\lib\x64;$(ProjectDir)\SDL2_image\lib\x64;$(ProjectDir)\SDL2_ttf\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/SnowEngine_D/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SnowEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -134,15 +134,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\Include;$(ProjectDir)\SDL2\include;$(ProjectDir)\SDL2_image\include;$(ProjectDir)\SDL2_ttf\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/SnowEngine_R/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\SDL2\lib\x64;$(ProjectDir)\SDL2_image\lib\x64;$(ProjectDir)\SDL2_ttf\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/SnowEngine_R/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SnowEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -205,6 +205,18 @@
     <Library Include="SDL2\lib\x64\SDL2test.lib" />
     <Library Include="SDL2_image\lib\x64\SDL2_image.lib" />
     <Library Include="SDL2_ttf\lib\x64\SDL2_ttf.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2main.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2test.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2_image.lib" />
+    <Library Include="SnowEngine_D\lib\SDL2_ttf.lib" />
+    <Library Include="SnowEngine_D\lib\SnowEngine.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2main.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2test.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2_image.lib" />
+    <Library Include="SnowEngine_R\lib\SDL2_ttf.lib" />
+    <Library Include="SnowEngine_R\lib\SnowEngine.lib" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="SDL2_image\lib\x64\LICENSE.jpeg.txt" />
