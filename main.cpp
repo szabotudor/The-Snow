@@ -3,7 +3,7 @@
 
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
-ss::Vector ground_size(game.resolution * 2);
+ss::Vector ground_size(game.resolution * 3);
 ss::Vector camera_offset(180, 90);
 ss::Vector player_position(320, 180);
 ss::Vector player_draw_center;
