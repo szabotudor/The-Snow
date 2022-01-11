@@ -3,6 +3,10 @@
 
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
+ss::Vector ground_size(game.resolution * 3);
+ss::Vector camera_offset(180, 90);
+ss::Vector player_position(320, 180);
+ss::Vector player_draw_center;
 
 #if defined _DEBUG
 string console_text = " ";
@@ -56,6 +60,7 @@ int enemies = 0;
 Enemy* enemy = new Enemy[64];
 
 
+#if defined _DEBUG
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 	if (i < 60) {
 		avg_fps[i] = fps;
@@ -73,6 +78,7 @@ void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 	}
 	text.draw();
 }
+#endif
 
 
 void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
@@ -93,11 +99,33 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		player_move_type = PlayerMoveType::IDLE;
 	}
 	velocity = ss::lerp(velocity, direction, delta / 125);
-	player.position += velocity;
-	player_cs.position = player.position + 2;
+	player_position += velocity;
+
+	//Make the camera follow the player
+	ss::Vector player_size = player.get_size();
+	if ((player.position - player_draw_center).lenght() > 0.1) {
+		camera_offset = lerp(camera_offset, player_position - player_draw_center, delta / 300);
+		if (camera_offset.x < 0) {
+			camera_offset.x = 0;
+		}
+		if (camera_offset.y < 0) {
+			camera_offset.y = 0;
+		}
+
+		if (camera_offset.x + game.resolution.x > ground_size.x) {
+			camera_offset.x = ground_size.x - game.resolution.x;
+		}
+		if (camera_offset.y + game.resolution.y > ground_size.y) {
+			camera_offset.y = ground_size.y - game.resolution.y;
+		}
+	}
 
 	//Stop player from going outside the window
+	player_cs.position = player_position - camera_offset + 2;
 	window_cs.push_in(player_cs);
+	if (player_cs.position.distance_to(player_position - camera_offset + 2) > 1) {
+		player_position = camera_offset + player.position;
+	}
 	player.position = player_cs.position - 2;
 
 	//Calculate collision between player and enemies
@@ -109,9 +137,10 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
 		player_move_type = PlayerMoveType::SHOOTING;
-		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, fire.position.direction_to(game.get_mouse_position()) * 30, delta / 100).normalized() * 30;
-		fire.particle_layer[0].initial_velocity = velocity * 120 / (delta / 10);
+		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()) * 30, delta / 100).normalized() * 30;
+		fire.particle_layer[0].initial_velocity = direction * 25 / (delta / 10);
 		fire.particle_layer[0].initial_velocity_min = 30;
+		camera_offset += fire.particle_layer[0].initial_direction * delta / 150;
 	}
 	else {
 		fire.particle_layer[0].initial_direction = ss::Vector(0, -1);
@@ -183,7 +212,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		break;
 	}
 
-	fire.position = player.position + player.get_size() / 2;
+	fire.position = player_position + player_size / 2;
 }
 
 
@@ -193,7 +222,7 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
 	SDL_FreeSurface(fire1);
-	ptem.add_particle_layer(350, fire1_t, 0.8);
+	ptem.add_particle_layer(250, fire1_t, 0.8);
 
 	//Creating the color gradient to make it look like a fire
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
@@ -247,13 +276,13 @@ int main(int argc, char* args[]) {
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.position = game.resolution / 2 - player.get_size() / 2;
 	player_cs.size = player.get_size() - 4;
+	player_draw_center = game.resolution / 2 - player.get_size() / 2;
 
 	//Creating a particle emitter for the fire
 	ss::ParticleEmitter ptem(game.get_window(), player.position);
 	init_part(ptem, game.get_renderer());
 
 	//Creating the ground
-	ss::Vector ground_size(game.resolution);
 	ss::Texture gnd_tex(game.get_window(), ground_size);
 	bool** ground_b = new bool*[(int)ground_size.x];
 	for (int i = 0; i < ground_size.x; i++) {
@@ -261,6 +290,12 @@ int main(int argc, char* args[]) {
 		for (int j = 0; j < ground_size.y; j++) {
 			int r = rng.randi_range(210, 230);
 			int g = rng.randi_range(r, 230);
+#if defined _DEBUG
+			if (i <= 1 or i >= ground_size.x - 2 or j <= 1 or j >= ground_size.y - 2) {
+				r = 0;
+				g = 0;
+			}
+#endif
 			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 240);
 			ground_b[i][j] = true;
 		}
@@ -295,7 +330,9 @@ int main(int argc, char* args[]) {
 		game.update();
 		game.clear_screen();
 		gnd_tex.update();
+		gnd_tex.position -= camera_offset;
 		gnd_tex.draw();
+		gnd_tex.position += camera_offset;
 		player_process(player, ptem, game, _dt);
 
 		//Spawn an enemy at a random interval
@@ -320,6 +357,7 @@ int main(int argc, char* args[]) {
 			else {
 				//spawn_timer -= _dt / 1000;
 			}
+//Spawn an enemy if there is room for it
 #if defined _DEBUG
 			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL)) {
 				if (game.is_key_just_pressed(SDL_SCANCODE_F1)) {
@@ -356,15 +394,17 @@ int main(int argc, char* args[]) {
 		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
 			ss::Vector p_pos = ptem.get_particle_position(i);
 			//Set color of pixels on ground to green
-			for (int x = p_pos.x - 1; x < p_pos.x + 1; x++) {
-				for (int y = p_pos.y - 1; y < p_pos.y + 1; y++) {
+			for (int x = p_pos.x - 10; x < p_pos.x + 10; x++) {
+				for (int y = p_pos.y - 10; y < p_pos.y + 10; y++) {
 					if (x >= 0 and x < ground_size.x and y >= 0 and y < ground_size.y) {
 						if (ground_b[x][y]) {
-							int r = rng.randi_range(0, 40);
-							int g = rng.randi_range(210, 230);
-							int b = rng.randi_range(0, 40);
-							gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
-							ground_b[x][y] = false;
+							if (p_pos.distance_to(ss::Vector(x, y)) < 140) {
+								int r = rng.randi_range(0, 40);
+								int g = rng.randi_range(210, 230);
+								int b = rng.randi_range(0, 40);
+								gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
+								ground_b[x][y] = false;
+							}
 						}
 					}
 				}
@@ -382,15 +422,7 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		for (int i = 0; i < game.get_num_events(); i++) {
-			if (game.events[i].type == SDL_QUIT) {
-				game.quit();
-			}
-			if (game.is_key_pressed(SDL_SCANCODE_LCTRL) and game.is_key_just_pressed(SDL_SCANCODE_F)) {
-				game.set_fullscreen(!game.get_fullscreen());
-			}
-		}
-
+		ptem.draw_offset = ss::Vector() - camera_offset;
 		ptem.update(_dt);
 		ptem.draw();
 		player.draw(_dt);
@@ -419,6 +451,15 @@ int main(int argc, char* args[]) {
 			}
 		}
 #endif
+		//Process events (for example quit)
+		for (int i = 0; i < game.get_num_events(); i++) {
+			if (game.events[i].type == SDL_QUIT) {
+				game.quit();
+			}
+			if (game.is_key_pressed(SDL_SCANCODE_LCTRL) and game.is_key_just_pressed(SDL_SCANCODE_F)) {
+				game.set_fullscreen(!game.get_fullscreen());
+			}
+		}
 	}
 	return 0;
 }
