@@ -257,6 +257,8 @@ int main(int argc, char* args[]) {
 	window_cs.size = game.resolution;
 	game.resize_window(640, 360);
 	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
+	fps.color.b = 0;
+	fps.color.g = 100;
 	fps.position = ss::Vector(5, 5);
 	SDL_Color text_color = SDL_Color(), border_color = SDL_Color(), fill_color = SDL_Color();
 
@@ -285,17 +287,25 @@ int main(int argc, char* args[]) {
 	//Creating the ground
 	ss::Texture gnd_tex(game.get_window(), ground_size);
 	bool** ground_b = new bool*[(int)ground_size.x];
+	int r = rng.randi_range(235, 255);
+	int g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
 	for (int i = 0; i < ground_size.x; i++) {
 		ground_b[i] = new bool[(int)ground_size.y];
 		for (int j = 0; j < ground_size.y; j++) {
-			int r = rng.randi_range(210, 230);
-			int g = rng.randi_range(r, 230);
 #if defined _DEBUG
 			if (i <= 1 or i >= ground_size.x - 2 or j <= 1 or j >= ground_size.y - 2) {
 				r = 0;
 				g = 0;
 			}
 #endif
+			if (rng.randi() < 50) {
+				r = rng.randi_range(235, 255);
+				g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
+			}
+			else {
+				r = gnd_tex.get_pixel(ss::Vector(i, j)).r;
+				g = gnd_tex.get_pixel(ss::Vector(i, j)).g;
+			}
 			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 240);
 			ground_b[i][j] = true;
 		}
