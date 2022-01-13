@@ -101,25 +101,6 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	velocity = ss::lerp(velocity, direction, delta / 125);
 	player_position += velocity;
 
-	//Make the camera follow the player
-	ss::Vector player_size = player.get_size();
-	if ((player.position - player_draw_center).lenght() > 0.1) {
-		camera_offset = lerp(camera_offset, player_position - player_draw_center, delta / 100);
-		if (camera_offset.x < 0) {
-			camera_offset.x = 0;
-		}
-		if (camera_offset.y < 0) {
-			camera_offset.y = 0;
-		}
-
-		if (camera_offset.x + game.resolution.x > ground_size.x) {
-			camera_offset.x = ground_size.x - game.resolution.x;
-		}
-		if (camera_offset.y + game.resolution.y > ground_size.y) {
-			camera_offset.y = ground_size.y - game.resolution.y;
-		}
-	}
-
 	//Stop player from going outside the window
 	player_cs.position = player_position - camera_offset + 2;
 	window_cs.push_in(player_cs);
@@ -146,6 +127,25 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		fire.particle_layer[0].initial_direction = ss::Vector(0, -1);
 		fire.particle_layer[0].initial_velocity_min = -10;
 		fire.particle_layer[0].initial_velocity = ss::Vector(0);
+	}
+
+	//Make the camera follow the player
+	ss::Vector player_size = player.get_size();
+	if ((player.position - player_draw_center).lenght() > 0.1) {
+		camera_offset = lerp(camera_offset, player_position - player_draw_center, delta / 100);
+		if (camera_offset.x < 0) {
+			camera_offset.x = 0;
+		}
+		if (camera_offset.y < 0) {
+			camera_offset.y = 0;
+		}
+
+		if (camera_offset.x + game.resolution.x > ground_size.x) {
+			camera_offset.x = ground_size.x - game.resolution.x;
+		}
+		if (camera_offset.y + game.resolution.y > ground_size.y) {
+			camera_offset.y = ground_size.y - game.resolution.y;
+		}
 	}
 
 	//Player Animations
