@@ -104,7 +104,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	//Make the camera follow the player
 	ss::Vector player_size = player.get_size();
 	if ((player.position - player_draw_center).lenght() > 0.1) {
-		camera_offset = lerp(camera_offset, player_position - player_draw_center, delta / 300);
+		camera_offset = lerp(camera_offset, player_position - player_draw_center, delta / 100);
 		if (camera_offset.x < 0) {
 			camera_offset.x = 0;
 		}
@@ -140,7 +140,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()) * 30, delta / 100).normalized() * 30;
 		fire.particle_layer[0].initial_velocity = direction * 25 / (delta / 10);
 		fire.particle_layer[0].initial_velocity_min = 30;
-		camera_offset += fire.particle_layer[0].initial_direction * delta / 150;
+		camera_offset += fire.particle_layer[0].initial_direction * delta / 100;
 	}
 	else {
 		fire.particle_layer[0].initial_direction = ss::Vector(0, -1);
@@ -287,6 +287,10 @@ int main(int argc, char* args[]) {
 	//Creating the ground
 	ss::Texture gnd_tex(game.get_window(), ground_size);
 	bool** ground_b = new bool*[(int)ground_size.x];
+	long long snow_pixels = ground_size.x * ground_size.y;
+#if defined _DEBUG
+	print_to_console(to_string(snow_pixels) + " pixels to fill");
+#endif
 	int r = rng.randi_range(235, 255);
 	int g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
 	int ip = 0, jp = 0;
@@ -344,6 +348,7 @@ int main(int argc, char* args[]) {
 	int i = 0;
 
 	double spawn_timer = 2;
+	bool first_frame = true;
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
@@ -433,6 +438,7 @@ int main(int argc, char* args[]) {
 								}
 								gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
 								ground_b[x][y] = false;
+								snow_pixels--;
 							}
 						}
 					}
@@ -478,6 +484,16 @@ int main(int argc, char* args[]) {
 			else {
 				game.target_fps = 144;
 			}
+		}
+
+		if (game.is_key_just_pressed(SDL_SCANCODE_F5)) {
+			" ";
+			print_to_console(to_string(snow_pixels) + " snow left");
+		}
+
+		if (first_frame) {
+			first_frame = false;
+			print_to_console("Game started");
 		}
 #endif
 		//Process events (for example quit)
