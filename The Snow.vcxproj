@@ -170,6 +170,7 @@
     <None Include="zlib1.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="..\SnowEngine\x64\Debug\SnowEngine.lib" />
     <Library Include="SnowEngine\lib\SDL2.lib" />
     <Library Include="SnowEngine\lib\SDL2main.lib" />
     <Library Include="SnowEngine\lib\SDL2test.lib" />

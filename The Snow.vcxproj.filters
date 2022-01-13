@@ -36,6 +36,7 @@
     <Library Include="SnowEngine\lib_debug\SDL2main.lib" />
     <Library Include="SnowEngine\lib_debug\SDL2test.lib" />
     <Library Include="SnowEngine\lib_debug\SnowEngine.lib" />
+    <Library Include="..\SnowEngine\x64\Debug\SnowEngine.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="sun.png" />
