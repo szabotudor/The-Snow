@@ -427,13 +427,13 @@ int main(int argc, char* args[]) {
 							if (p_pos.distance_to(ss::Vector(x, y)) < 140) {
 								if (rng.randi() < 50) {
 									r = rng.randi_range(0, 40);
-									g = rng.randi_range(210, 230);
+									g = rng.randi_range(180, 200);
 									b = rng.randi_range(0, 40);
 								}
 								else {
 									SDL_Color color = gnd_tex.get_pixel(ss::Vector(y - 1, x - rng.randi(1)));
 									r = ss::clamp(0, 40, r);
-									g = ss::clamp(210, 230, g);
+									g = ss::clamp(180, 200, g);
 									b = ss::clamp(0, 40, b);
 								}
 								gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
@@ -489,6 +489,11 @@ int main(int argc, char* args[]) {
 		if (game.is_key_just_pressed(SDL_SCANCODE_F5)) {
 			" ";
 			print_to_console(to_string(snow_pixels) + " snow left");
+		}
+
+		if (snow_pixels == 0) {
+			print_to_console("All snow cleared!");
+			snow_pixels--;
 		}
 
 		if (first_frame) {
