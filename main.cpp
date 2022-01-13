@@ -289,6 +289,7 @@ int main(int argc, char* args[]) {
 	bool** ground_b = new bool*[(int)ground_size.x];
 	int r = rng.randi_range(235, 255);
 	int g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
+	int ip = 0, jp = 0;
 	for (int i = 0; i < ground_size.x; i++) {
 		ground_b[i] = new bool[(int)ground_size.y];
 		for (int j = 0; j < ground_size.y; j++) {
@@ -303,10 +304,19 @@ int main(int argc, char* args[]) {
 				g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
 			}
 			else {
-				r = gnd_tex.get_pixel(ss::Vector(i, j)).r;
-				g = gnd_tex.get_pixel(ss::Vector(i, j)).g;
+				jp = j;
+				ip = i - 1;
+				if (ip < 0) {
+					jp--;
+					ip++;
+				}
+				if (jp < 0) {
+					jp++;
+				}
+				r = gnd_tex.get_pixel(ss::Vector(ip, jp)).r;
+				g = gnd_tex.get_pixel(ss::Vector(ip, jp)).g;
 			}
-			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 240);
+			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 255);
 			ground_b[i][j] = true;
 		}
 	}
@@ -401,6 +411,7 @@ int main(int argc, char* args[]) {
 		}
 
 		//Verify colision of fire particles with snow on the ground and with snowmen
+		int r = 0, g = 0, b = 0;
 		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
 			ss::Vector p_pos = ptem.get_particle_position(i);
 			//Set color of pixels on ground to green
@@ -409,9 +420,17 @@ int main(int argc, char* args[]) {
 					if (x >= 0 and x < ground_size.x and y >= 0 and y < ground_size.y) {
 						if (ground_b[x][y]) {
 							if (p_pos.distance_to(ss::Vector(x, y)) < 140) {
-								int r = rng.randi_range(0, 40);
-								int g = rng.randi_range(210, 230);
-								int b = rng.randi_range(0, 40);
+								if (rng.randi() < 50) {
+									r = rng.randi_range(0, 40);
+									g = rng.randi_range(210, 230);
+									b = rng.randi_range(0, 40);
+								}
+								else {
+									SDL_Color color = gnd_tex.get_pixel(ss::Vector(y - 1, x - rng.randi(1)));
+									r = ss::clamp(0, 40, r);
+									g = ss::clamp(210, 230, g);
+									b = ss::clamp(0, 40, b);
+								}
 								gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
 								ground_b[x][y] = false;
 							}
