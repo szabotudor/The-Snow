@@ -4,8 +4,7 @@
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 ss::Vector ground_size(game.resolution * 3);
-ss::Vector camera_offset(180, 90);
-ss::Vector player_position(320, 180);
+ss::Vector camera_offset(0);
 ss::Vector player_draw_center;
 
 #if defined _DEBUG
@@ -55,6 +54,7 @@ double blink_timer = 1;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
 ss::CollisionShape window_cs;
+ss::CollisionShape ground_cs;
 
 int enemies = 0;
 Enemy* enemy = new Enemy[64];
@@ -99,21 +99,16 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		player_move_type = PlayerMoveType::IDLE;
 	}
 	velocity = ss::lerp(velocity, direction, delta / 125);
-	player_position += velocity;
+	player_cs.position += velocity;
 
 	//Stop player from going outside the window
-	player_cs.position = player_position - camera_offset + 2;
-	window_cs.push_in(player_cs);
-	if (player_cs.position.distance_to(player_position - camera_offset + 2) > 1) {
-		player_position = camera_offset + player.position;
-	}
-	player.position = player_cs.position - 2;
+	ground_cs.push_in(player_cs);
 
 	//Calculate collision between player and enemies
 	for (int i = 0; i < enemies; i++) {
 		enemy[i].collision.push_out(player_cs);
 	}
-	player.position = player_cs.position - 2;
+	player.position = player_cs.position - camera_offset - 2;
 
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
@@ -132,7 +127,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	//Make the camera follow the player
 	ss::Vector player_size = player.get_size();
 	if ((player.position - player_draw_center).lenght() > 0.1) {
-		camera_offset = lerp(camera_offset, player_position - player_draw_center, delta / 100);
+		camera_offset = lerp(camera_offset, player_cs.position - player_draw_center, delta / 100);
 		if (camera_offset.x < 0) {
 			camera_offset.x = 0;
 		}
@@ -212,7 +207,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		break;
 	}
 
-	fire.position = player_position + player_size / 2;
+	fire.position = player_cs.position + player_size / 4;
 }
 
 
@@ -277,6 +272,8 @@ int main(int argc, char* args[]) {
 	};
 	ss::Sprite player = ss::Sprite(game.get_window(), 6, frames);
 	player.position = game.resolution / 2 - player.get_size() / 2;
+	player_cs.position = player.position;
+	camera_offset = player_cs.position - game.resolution / 2;
 	player_cs.size = player.get_size() - 4;
 	player_draw_center = game.resolution / 2 - player.get_size() / 2;
 
@@ -288,6 +285,7 @@ int main(int argc, char* args[]) {
 	ss::Texture gnd_tex(game.get_window(), ground_size);
 	bool** ground_b = new bool*[(int)ground_size.x];
 	long long snow_pixels = ground_size.x * ground_size.y;
+	ground_cs.size = ground_size;
 #if defined _DEBUG
 	print_to_console(to_string(snow_pixels) + " pixels to fill");
 #endif
@@ -297,17 +295,11 @@ int main(int argc, char* args[]) {
 	for (int i = 0; i < ground_size.x; i++) {
 		ground_b[i] = new bool[(int)ground_size.y];
 		for (int j = 0; j < ground_size.y; j++) {
-#if defined _DEBUG
-			if (i <= 1 or i >= ground_size.x - 2 or j <= 1 or j >= ground_size.y - 2) {
-				r = 0;
-				g = 0;
-			}
-#endif
 			if (rng.randi() < 50) {
 				r = rng.randi_range(235, 255);
 				g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
 			}
-			else {
+			else if (i > 0 and j > 0) {
 				jp = j;
 				ip = i - 1;
 				if (ip < 0) {
@@ -368,8 +360,8 @@ int main(int argc, char* args[]) {
 			if (spawn_timer < 0) {
 #endif
 				spawn_timer = rng.randd_range(2, 4);
-				enemy[enemies] = Enemy(player.position + rng.randdir() * rng.randd_range(50, 100));
-				window_cs.push_in(enemy[enemies].collision);
+				enemy[enemies] = Enemy(player_cs.position + rng.randdir() * rng.randd_range(50, 100));
+				ground_cs.push_in(enemy[enemies].collision);
 #if defined _DEBUG
 				enemy[enemies].collision.enable_draw(game.get_window());
 				print_to_console("Enemy " + to_string(enemies) + " spawned");
@@ -387,8 +379,8 @@ int main(int argc, char* args[]) {
 			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL)) {
 				if (game.is_key_just_pressed(SDL_SCANCODE_F1)) {
 					for (enemies; enemies < 64; enemies++) {
-						enemy[enemies] = Enemy(player.position + rng.randdir() * rng.randd_range(50, 100));
-						window_cs.push_in(enemy[enemies].collision);
+						enemy[enemies] = Enemy(player_cs.position + rng.randdir() * rng.randd_range(50, 100));
+						ground_cs.push_in(enemy[enemies].collision);
 						enemy[enemies].collision.enable_draw(game.get_window());
 						print_to_console("Enemy " + to_string(enemies) + " spawned");
 						for (int i = 0; i < enemies; i++) {
@@ -466,9 +458,13 @@ int main(int argc, char* args[]) {
 #if defined _DEBUG
 		frame++;
 		if (draw_debug) {
+			player_cs.position -= camera_offset;
 			player_cs.draw();
+			player_cs.position += camera_offset;
 			for (int i = 0; i < enemies; i++) {
+				enemy[i].collision.position -= camera_offset;
 				enemy[i].collision.draw();
+				enemy[i].collision.position += camera_offset;
 			}
 			console.draw();
 			show_fps(fps, game.get_fps(), i, _rdt);
