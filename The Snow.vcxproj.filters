@@ -41,5 +41,11 @@
   <ItemGroup>
     <Image Include="sun.png" />
     <Image Include="Sprites\ball.png" />
+    <Image Include="Sprites\Snowman\snowman_body0000.png" />
+    <Image Include="Sprites\Snowman\snowman_body0001.png" />
+    <Image Include="Sprites\Snowman\snowman_body0002.png" />
+    <Image Include="Sprites\Snowman\snowman_head0000.png" />
+    <Image Include="Sprites\Snowman\snowman_head0001.png" />
+    <Image Include="Sprites\Snowman\snowman_head0002.png" />
   </ItemGroup>
 </Project>
