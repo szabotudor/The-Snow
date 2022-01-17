@@ -342,6 +342,8 @@ int main(int argc, char* args[]) {
 	double spawn_timer = 2;
 	bool first_frame = true;
 
+	init_enemy(game);
+
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
 		game.update();
@@ -396,6 +398,7 @@ int main(int argc, char* args[]) {
 		//Process enemies
 		for (int i = 0; i < enemies; i++) {
 			enemy[i].process(_dt);
+			enemy[i].draw(camera_offset);
 			if (enemy[i].is_dead()) {
 #if defined _DEBUG
 				print_to_console("Enemy " + to_string(i) + " killed");
@@ -461,11 +464,6 @@ int main(int argc, char* args[]) {
 			player_cs.position -= camera_offset;
 			player_cs.draw();
 			player_cs.position += camera_offset;
-			for (int i = 0; i < enemies; i++) {
-				enemy[i].collision.position -= camera_offset;
-				enemy[i].collision.draw();
-				enemy[i].collision.position += camera_offset;
-			}
 			console.draw();
 			show_fps(fps, game.get_fps(), i, _rdt);
 		}
