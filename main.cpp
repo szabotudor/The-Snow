@@ -356,11 +356,7 @@ int main(int argc, char* args[]) {
 
 		//Spawn an enemy at a random interval
 		if (enemies < 64) {
-#if defined _DEBUG
 			if (spawn_timer < 0 or game.is_key_just_pressed(SDL_SCANCODE_F1)) {
-#else
-			if (spawn_timer < 0) {
-#endif
 				spawn_timer = rng.randd_range(2, 4);
 				enemy[enemies] = Enemy(player_cs.position + rng.randdir() * rng.randd_range(50, 100));
 				ground_cs.push_in(enemy[enemies].collision);
