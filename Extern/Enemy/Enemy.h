@@ -1,14 +1,7 @@
 #pragma once
 #include<Snow.h>
 
-
-static class EnemyUtil {
-public:
-	bool init = false;
-	SDL_Window* window = nullptr;
-	ss::Sprite* enemy_sprite;
-	void init_enemy(ss::Snow& game);
-};
+void init_enemy(ss::Snow& game);
 
 
 class Enemy {
@@ -17,6 +10,14 @@ class Enemy {
 	ss::Vector target;
 	int life = 3;
 	double invulnerability = 1;
+	double lifetime = 0;
+	enum class LookDirection {
+		UP,
+		DOWN,
+		LEFT,
+		RIGHT
+	};
+	LookDirection look_dir = LookDirection::DOWN;
 public:
 	int id = 0;
 	ss::CollisionShape collision;
@@ -26,7 +27,7 @@ public:
 	//Damages the enemy by 1 point and gives it invulnerability for a short time
 	void damage();
 	//Draw all sprites
-	void draw();
+	void draw(ss::Vector camera_offset);
 	//Returns true if the enemy is dead
 	bool is_dead();
 	//Returns the health points (life) of the enemy
