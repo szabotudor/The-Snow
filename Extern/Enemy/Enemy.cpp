@@ -35,7 +35,7 @@ void init_enemy(ss::Snow& game) {
 
 Enemy::Enemy(ss::Vector position) {
 	Enemy::position = position;
-	collision = ss::CollisionShape(ss::Vector(17, 39), position);
+	collision = ss::CollisionShape(ss::Vector(17, 33), position);
 	rng.randomize();
 	rot_speed = rng.randf_range(0.03, 0.06);
 }
@@ -124,12 +124,12 @@ void Enemy::damage() {
 		}
 		switch (life) {
 		case 2:
-			col_draw_offset -= ss::Vector(0, 12);
-			collision.size -= ss::Vector(2, 14);
+			col_draw_offset -= ss::Vector(0, 9);
+			collision.size -= ss::Vector(2, 11);
 			break;
 		case 1:
-			col_draw_offset -= ss::Vector(0, 11);
-			collision.size -= ss::Vector(2, 13);
+			col_draw_offset -= ss::Vector(0, 8);
+			collision.size -= ss::Vector(2, 10);
 			break;
 		default:
 			break;
@@ -139,11 +139,7 @@ void Enemy::damage() {
 
 void Enemy::draw(ss::Vector camera_offset) {
 	enemy_sprite.position = position - camera_offset + ss::Vector(0, 13) - ss::Vector(1, 4);
-#if defined _DEBUG
-	collision.position -= camera_offset;
-	collision.draw();
-	collision.position += camera_offset;
-#endif
+
 	if (invulnerability > 0) {
 		melt_sprite.frame = (int)((1 - invulnerability) * 4);
 		switch (life) {
@@ -250,6 +246,11 @@ void Enemy::draw(ss::Vector camera_offset) {
 			break;
 		}
 	}
+#if defined _DEBUG
+	collision.position -= camera_offset;
+	collision.draw();
+	collision.position += camera_offset;
+#endif
 }
 
 bool Enemy::is_dead() {

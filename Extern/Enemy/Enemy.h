@@ -11,7 +11,7 @@ class Enemy {
 	ss::Vector velocity;
 	double vert_velocity = 0;
 	ss::Vector target;
-	ss::Vector col_draw_offset = ss::Vector(0, 12);
+	ss::Vector col_draw_offset = ss::Vector(0, 6);
 	bool visible;
 	double visibility_timer = 0;
 	double rot_speed = 0;
