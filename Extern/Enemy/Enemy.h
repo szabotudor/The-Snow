@@ -10,7 +10,6 @@ class Enemy {
 	double height = 0;
 	ss::Vector velocity;
 	double vert_velocity = 0;
-	ss::Vector target;
 	ss::Vector col_draw_offset = ss::Vector(0, 6);
 	bool visible;
 	double visibility_timer = 0;
@@ -18,6 +17,7 @@ class Enemy {
 	int life = 3;
 	double invulnerability = 1;
 	double lifetime = 0;
+	double spawn_timer = 0;
 	enum class LookDirection {
 		UP,
 		DOWN,
@@ -31,10 +31,12 @@ class Enemy {
 	};
 	Anim animation = Anim::IDLE;
 	ss::Vector draw_offset = ss::Vector(0);
+	ss::Vector head_offset = 0, middle_offset = 0;
 	double anim_time = 0;
 	LookDirection look_dir = LookDirection::DOWN;
+	ss::Vector ofs = ss::Vector(1, 0);
 public:
-	int id = 0;
+	ss::Vector target;
 	ss::CollisionShape collision;
 	Enemy(ss::Vector position = ss::Vector(0));
 	//Process movement, damage, invulnerability, etc...

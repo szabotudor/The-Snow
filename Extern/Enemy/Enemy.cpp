@@ -106,8 +106,16 @@ void Enemy::process(double delta) {
 #if defined _DEBUG
 		collision.draw_color.r = 255;
 		collision.draw_color.b = 120;
+#endif
 	}
 	else {
+		if (life == 3 and spawn_timer < 1) {
+			if (visible) {
+				spawn_timer += delta;
+			}
+			ofs = ss::lerp(ofs, ss::Vector(1, -9), delta * 5);
+		}
+#if defined _DEBUG
 		collision.draw_color.r = 120;
 		collision.draw_color.b = 255;
 #endif
@@ -140,17 +148,25 @@ void Enemy::draw(ss::Vector camera_offset) {
 	enemy_sprite.position = position - camera_offset + ss::Vector(0, 13) - ss::Vector(1, 4);
 
 	if (invulnerability > 0) {
-		melt_sprite.frame = (int)((1 - invulnerability) * 4);
 		switch (life) {
+		case 3:
+			melt_sprite.frame = (int)(invulnerability * 4);
+			melt_sprite.position = collision.position + ss::Vector(-1, 14) - camera_offset;
+			melt_sprite.draw(1);
+			visible = false;
+			break;
 		case 2:
+			melt_sprite.frame = (int)((1 - invulnerability) * 4);
 			melt_sprite.position = collision.position + ss::Vector(-2, 6) - camera_offset;
 			melt_sprite.draw(1);
 			break;
 		case 1:
+			melt_sprite.frame = (int)((1 - invulnerability) * 4);
 			melt_sprite.position = collision.position + ss::Vector(-3, -7) - camera_offset;
 			melt_sprite.draw(1);
 			break;
 		case 0:
+			melt_sprite.frame = (int)((1 - invulnerability) * 4);
 			melt_sprite.position = collision.position + ss::Vector(-4, -7) - camera_offset;
 			melt_sprite.draw(1);
 			break;
@@ -163,20 +179,19 @@ void Enemy::draw(ss::Vector camera_offset) {
 	}
 
 	if (visible) {
-		ss::Vector ofs(1, -9);
 		switch (look_dir) {
 		case Enemy::LookDirection::UP:
 			enemy_sprite.flip = SDL_FLIP_NONE;
 			if (life > 2) {
 				enemy_sprite.frame = 2;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + draw_offset;
+				enemy_sprite.position += ofs + draw_offset + middle_offset;
 			}
 
 			if (life > 1) {
 				enemy_sprite.frame = 5;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset;
+				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset + head_offset;
 			}
 
 			if (life > 0) {
@@ -189,13 +204,13 @@ void Enemy::draw(ss::Vector camera_offset) {
 			if (life > 2) {
 				enemy_sprite.frame = 1;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + draw_offset;
+				enemy_sprite.position += ofs + draw_offset + middle_offset;
 			}
 
 			if (life > 1) {
 				enemy_sprite.frame = 4;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset;
+				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset + head_offset;
 			}
 
 			if (life > 0) {
@@ -208,13 +223,13 @@ void Enemy::draw(ss::Vector camera_offset) {
 			if (life > 2) {
 				enemy_sprite.frame = 0;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + draw_offset;
+				enemy_sprite.position += ofs + draw_offset + middle_offset;
 			}
 
 			if (life > 1) {
 				enemy_sprite.frame = 3;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset;
+				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset + head_offset;
 			}
 
 			if (life > 0) {
@@ -227,13 +242,13 @@ void Enemy::draw(ss::Vector camera_offset) {
 			if (life > 2) {
 				enemy_sprite.frame = 0;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + draw_offset;
+				enemy_sprite.position += ofs + draw_offset + middle_offset;
 			}
 
 			if (life > 1) {
 				enemy_sprite.frame = 3;
 				enemy_sprite.draw(1);
-				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset;
+				enemy_sprite.position += ofs + ss::Vector(0, 1) + draw_offset + head_offset;
 			}
 
 			if (life > 0) {
@@ -245,11 +260,6 @@ void Enemy::draw(ss::Vector camera_offset) {
 			break;
 		}
 	}
-#if defined _DEBUG
-	collision.position -= camera_offset;
-	collision.draw();
-	collision.position += camera_offset;
-#endif
 }
 
 bool Enemy::is_dead() {
