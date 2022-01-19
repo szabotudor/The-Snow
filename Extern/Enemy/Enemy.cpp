@@ -119,17 +119,16 @@ void Enemy::damage() {
 		life--;
 		invulnerability = 1;
 		vert_velocity = 300;
-		if (life > 0) {
-			collision.position.y += 14;
-		}
 		switch (life) {
 		case 2:
 			col_draw_offset -= ss::Vector(0, 9);
 			collision.size -= ss::Vector(2, 11);
+			collision.position.y += 11;
 			break;
 		case 1:
 			col_draw_offset -= ss::Vector(0, 8);
 			collision.size -= ss::Vector(2, 10);
+			collision.position.y += 10;
 			break;
 		default:
 			break;
