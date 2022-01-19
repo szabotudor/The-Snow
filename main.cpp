@@ -369,9 +369,6 @@ int main(int argc, char* args[]) {
 				}
 				enemies++;
 			}
-			else {
-				//spawn_timer -= _dt / 1000;
-			}
 //Spawn an enemy if there is room for it
 #if defined _DEBUG
 			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL)) {
@@ -392,9 +389,27 @@ int main(int argc, char* args[]) {
 		}
 
 		//Process enemies
+		int r = 0, g = 0, b = 0;
+		ss::Vector p_pos;
 		for (int i = 0; i < enemies; i++) {
 			enemy[i].process(_dt);
 			enemy[i].draw(camera_offset);
+			p_pos = enemy[i].collision.get_center();
+			for (int x = p_pos.x - 10; x < p_pos.x + 10; x++) {
+				for (int y = p_pos.y - 10; y < p_pos.y + 10; y++) {
+					if (x >= 0 and x < ground_size.x and y >= 0 and y < ground_size.y) {
+						if (!ground_b[x][y]) {
+							if (p_pos.distance_to(ss::Vector(x, y)) < 140) {
+								r = rng.randi_range(235, 255);
+								g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
+								gnd_tex.set_pixel(ss::Vector(x, y), r, g, 255);
+								ground_b[x][y] = true;
+								snow_pixels++;
+							}
+						}
+					}
+				}
+			}
 			if (enemy[i].is_dead()) {
 #if defined _DEBUG
 				print_to_console("Enemy " + to_string(i) + " killed");
@@ -407,9 +422,8 @@ int main(int argc, char* args[]) {
 		}
 
 		//Verify colision of fire particles with snow on the ground and with snowmen
-		int r = 0, g = 0, b = 0;
 		for (int i = 0; i < ptem.get_num_of_particles(); i++) {
-			ss::Vector p_pos = ptem.get_particle_position(i);
+			p_pos = ptem.get_particle_position(i);
 			//Set color of pixels on ground to green
 			for (int x = p_pos.x - 10; x < p_pos.x + 10; x++) {
 				for (int y = p_pos.y - 10; y < p_pos.y + 10; y++) {
@@ -422,7 +436,6 @@ int main(int argc, char* args[]) {
 									b = rng.randi_range(0, 40);
 								}
 								else {
-									SDL_Color color = gnd_tex.get_pixel(ss::Vector(y - 1, x - rng.randi(1)));
 									r = ss::clamp(0, 40, r);
 									g = ss::clamp(180, 200, g);
 									b = ss::clamp(0, 40, b);
@@ -460,6 +473,13 @@ int main(int argc, char* args[]) {
 			player_cs.position -= camera_offset;
 			player_cs.draw();
 			player_cs.position += camera_offset;
+
+			for (int i = 0; i < enemies; i++) {
+				enemy[i].collision.position -= camera_offset;
+				enemy[i].collision.draw();
+				enemy[i].collision.position += camera_offset;
+			}
+
 			console.draw();
 			show_fps(fps, game.get_fps(), i, _rdt);
 		}
