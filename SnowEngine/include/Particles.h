@@ -19,12 +19,12 @@ namespace ss {
 			POINT
 		};
 		class ParticleType {
-			SDL_Color* gradient;
-			double* gradient_times;
+			SDL_Color* gradient = nullptr;
+			double* gradient_times = nullptr;
 			int colors = 0;
 
-			double* scale_curve;
-			double* scale_times;
+			double* scale_curve = nullptr;
+			double* scale_times = nullptr;
 			int scales = 0;
 			double max_scale;
 		public:
@@ -64,6 +64,8 @@ namespace ss {
 			double get_scale_at_timestamp(double time);
 			//Returns the number of scales in the scale curve
 			int get_scales_in_scale_curve();
+			//(do not use this, it is inteded for internal use of the particle emitter only) Frees all memory used by particle layer
+			void free();
 		};
 	private:
 		RandomNumberGenerator rng = RandomNumberGenerator(98132479);
@@ -71,6 +73,7 @@ namespace ss {
 		bool use_sec_emitter = false;
 		SDL_Window* window;
 		SDL_Renderer* render;
+		int max_ammount = 0;
 		int ammount = 0;
 		int layer = 0;
 
@@ -82,11 +85,13 @@ namespace ss {
 		int* p_layer;
 		int* p_order;
 		bool* p_drawn;
+		bool* p_first_reset;
 
 		bool init = false;
 	public:
 		bool sort_by_lifetime = false;
 		bool reverse_draw_order = false;
+		bool one_time = false;
 		ParticleType* particle_layer;
 		EmissionShape emission_shape = EmissionShape::POINT;
 		double emission_radius = 1;
@@ -95,7 +100,7 @@ namespace ss {
 
 		ParticleEmitter(SDL_Window* window, Vector position, bool sort_by_lifetie = false);
 		//Adds a specified ammount of the given particle into the next free layer
-		void add_particle_layer(int ammount, SDL_Texture* texture, double lifelimit);
+		void add_particle_layer(int ammount, SDL_Texture* texture, double lifelimit, double explosiveness);
 		//Adds a seccondary emitter (actiong as a seccond layer of particles)
 		void add_seccondary_emitter(ParticleEmitter* emitter);
 		//Turns off and removes the seccondary emitter (if it exists)
@@ -110,7 +115,13 @@ namespace ss {
 		int get_num_of_particles();
 		//Returns the global position of a particle
 		Vector get_particle_position(int i);
+		//Returns the lifetime of a particle
+		double get_particle_lifetime(int i);
 		//Sets the position of the given particle
 		void set_particle_position(int i, Vector pos);
+		//Set the ammount of particles to be drawn
+		void set_draw_ammount(int ammount);
+		//Frees all memory used by the particle emitter
+		void free();
 	};
 }
