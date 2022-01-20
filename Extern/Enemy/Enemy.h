@@ -1,5 +1,7 @@
 #pragma once
 #include<Snow.h>
+#include"../Snowball/Snowball.h"
+
 
 void init_enemy(ss::Snow& game);
 
@@ -35,6 +37,7 @@ class Enemy {
 	double spawn_timer = 0;
 	double shoot_timer = 0;
 	double anim_time = 0;
+	double snowball_timer = 2;
 
 	//Positional offsets
 	ss::Vector col_draw_offset = ss::Vector(0, 6);
@@ -44,15 +47,19 @@ class Enemy {
 	ss::Vector position;
 	ss::Vector velocity;
 public:
-	//The target position (the enemy will move towards the target and attack it)
+	//The enemy will shoot at this position
 	ss::Vector target;
+
+	//The enemy will movie towards this position
+	ss::Vector move_target;
+
 	ss::CollisionShape collision;
 	//The are of effect for freezing the ground
 	double aoe = 0;
 	ss::Vector aoe_offset = ss::Vector(-1, 10);
 	Enemy(ss::Vector position = ss::Vector(0));
 	//Process movement, damage, invulnerability, etc...
-	void process(double delta);
+	void process(double delta, int& num_of_snowballs, ss::Snow& game, Snowball**& snowball_list);
 	//Damages the enemy by 1 point and gives it invulnerability for a short time
 	void damage();
 	//Draw all sprites

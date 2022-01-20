@@ -41,11 +41,13 @@ Enemy::Enemy(ss::Vector position) {
 	rot_speed = rng.randf_range(0.03f, 0.06f);
 }
 
-void Enemy::process(double delta) {
+void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowball**& snowball_list) {
 	delta /= 1000;
 	lifetime += delta;
+
 	//Vertical velocity
 	vert_velocity -= delta * 1500;
+
 	//Change the height according to the velocity
 	if (invulnerability > 0 and life < 3 and height >= 0) {
 		height += vert_velocity * delta;
@@ -113,6 +115,25 @@ void Enemy::process(double delta) {
 	//Increase the area of effect
 	if (aoe < 13) {
 		aoe = ss::lerp(aoe, 13, delta);
+	}
+
+	//Throw snowballs
+	if (num_of_snowballs < 512) {
+		ss::Vector target_p;
+		if (position.distance_to(target) < 110) {
+			target_p = position.direction_to(target + ss::Vector(0, 5));
+		}
+		else {
+			target_p = position.direction_to(target);
+		}
+		if (snowball_timer <= 0) {
+			snowball_list[num_of_snowballs] = new Snowball(game.get_window(), position + ss::Vector(5, 0), target_p);
+			num_of_snowballs++;
+			snowball_timer = rng.randf_range(1.5, 3);
+		}
+		else {
+			snowball_timer -= delta;
+		}
 	}
 
 	//Advance the invulnerability timer
