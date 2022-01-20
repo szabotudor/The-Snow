@@ -1,5 +1,6 @@
 #include<Snow.h>
 #include"Extern/Enemy/Enemy.h"
+#include"Extern/Snowball/Snowball.h"
 
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
@@ -344,6 +345,8 @@ int main(int argc, char* args[]) {
 
 	init_enemy(game);
 
+	Snowball sb(game.get_window(), 50, 0, 1);
+
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
 		game.update();
@@ -394,12 +397,12 @@ int main(int argc, char* args[]) {
 		for (int i = 0; i < enemies; i++) {
 			enemy[i].process(_dt);
 			enemy[i].draw(camera_offset);
-			p_pos = enemy[i].collision.get_center();
-			for (int x = p_pos.x - 10; x < p_pos.x + 10; x++) {
-				for (int y = p_pos.y - 10; y < p_pos.y + 10; y++) {
+			p_pos = enemy[i].collision.get_center() + enemy[i].aoe_offset;
+			for (int x = p_pos.x - 13; x < p_pos.x + 13; x++) {
+				for (int y = p_pos.y - 13; y < p_pos.y + 13; y++) {
 					if (x >= 0 and x < ground_size.x and y >= 0 and y < ground_size.y) {
 						if (!ground_b[x][y]) {
-							if (p_pos.distance_to(ss::Vector(x, y)) < 140) {
+							if (p_pos.distance_to(ss::Vector(x, y)) < enemy[i].aoe) {
 								r = rng.randi_range(235, 255);
 								g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
 								gnd_tex.set_pixel(ss::Vector(x, y), r, g, 255);
@@ -429,7 +432,7 @@ int main(int argc, char* args[]) {
 				for (int y = p_pos.y - 10; y < p_pos.y + 10; y++) {
 					if (x >= 0 and x < ground_size.x and y >= 0 and y < ground_size.y) {
 						if (ground_b[x][y]) {
-							if (p_pos.distance_to(ss::Vector(x, y)) < 140) {
+							if (p_pos.distance_to(ss::Vector(x, y)) < 12.5) {
 								if (rng.randi() < 50) {
 									r = rng.randi_range(0, 40);
 									g = rng.randi_range(180, 200);
@@ -465,6 +468,7 @@ int main(int argc, char* args[]) {
 		ptem.update(_dt);
 		ptem.draw();
 		player.draw(_dt);
+		sb.draw();
 
 		//Draws the CollisionShapes and other debug info to the screen
 #if defined _DEBUG

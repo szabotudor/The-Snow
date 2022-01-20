@@ -38,7 +38,7 @@ Enemy::Enemy(ss::Vector position) {
 	Enemy::position = position;
 	collision = ss::CollisionShape(ss::Vector(17, 33), position);
 	rng.randomize();
-	rot_speed = rng.randf_range(0.03, 0.06);
+	rot_speed = rng.randf_range(0.03f, 0.06f);
 }
 
 void Enemy::process(double delta) {
@@ -109,6 +109,13 @@ void Enemy::process(double delta) {
 	if (life == 3 and spawn_timer < 1) {
 		spawn_timer += delta;
 	}
+
+	//Increase the area of effect
+	if (aoe < 13) {
+		aoe = ss::lerp(aoe, 13, delta);
+	}
+
+	//Advance the invulnerability timer
 	if (invulnerability > 0) {
 		invulnerability -= delta;
 #if defined _DEBUG
@@ -128,6 +135,7 @@ void Enemy::damage() {
 	if (invulnerability <= 0) {
 		life--;
 		invulnerability = 1;
+		aoe = 0;
 
 		//This is for the jumping into the air animation
 		vert_velocity = 300;
@@ -138,11 +146,16 @@ void Enemy::damage() {
 			col_draw_offset -= ss::Vector(0, 9);
 			collision.size -= ss::Vector(2, 11);
 			collision.position.y += 11;
+			aoe_offset = ss::Vector(-0.8, 7);
 			break;
 		case 1:
 			col_draw_offset -= ss::Vector(0, 8);
 			collision.size -= ss::Vector(2, 10);
 			collision.position.y += 10;
+			aoe_offset = ss::Vector(-1, -1);
+			break;
+		case 0:
+			aoe_offset = ss::Vector(-2.5, 2);
 			break;
 		default:
 			break;

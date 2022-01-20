@@ -22,7 +22,7 @@ class Enemy {
 	};
 	LookDirection look_dir = LookDirection::DOWN;
 	Anim animation = Anim::IDLE;
-	bool visible;
+	bool visible = false;
 	int life = 3;
 
 	//Timers and other float counters
@@ -47,6 +47,9 @@ public:
 	//The target position (the enemy will move towards the target and attack it)
 	ss::Vector target;
 	ss::CollisionShape collision;
+	//The are of effect for freezing the ground
+	double aoe = 0;
+	ss::Vector aoe_offset = ss::Vector(-1, 10);
 	Enemy(ss::Vector position = ss::Vector(0));
 	//Process movement, damage, invulnerability, etc...
 	void process(double delta);
