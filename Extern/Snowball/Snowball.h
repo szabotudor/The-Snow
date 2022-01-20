@@ -21,7 +21,7 @@ public:
 
 	Snowball(SDL_Window* window, ss::Vector position, ss::Vector direction, double scale = 1);
 	//Advance the snowball's position forward
-	void update(double delta, ss::Texture& ground_texture, bool**& ground_bool, long long& snow_ammount, ss::CollisionShape& player_cs);
+	void update(double delta, ss::Texture& ground_texture, bool**& ground_bool, long long& snow_ammount, ss::CollisionShape& player_cs, ss::Vector& ground_size);
 	//Draw the snowball on the window
 	void draw(ss::Vector camera_offset);
 	//Returns true if the snowball hit the player or the ground
