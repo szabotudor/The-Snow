@@ -59,6 +59,8 @@ ss::CollisionShape ground_cs;
 
 int enemies = 0;
 Enemy* enemy = new Enemy[64];
+int snowballs;
+Snowball** snowball = new Snowball*[512];
 
 
 #if defined _DEBUG
@@ -114,14 +116,18 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
 		player_move_type = PlayerMoveType::SHOOTING;
-		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()) * 30, delta / 100).normalized() * 30;
-		fire.particle_layer[0].initial_velocity = direction * 25 / (delta / 10);
-		fire.particle_layer[0].initial_velocity_min = 30;
-		camera_offset += fire.particle_layer[0].initial_direction * delta / 100;
+		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()) * 30, delta / 100).normalized();
+		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
+		fire.particle_layer[0].initial_velocity_min = 100;
+		fire.particle_layer[0].initial_velocity_max = 110;
+		fire.particle_layer[0].initial_direction_randomness = 0.2;
+		//camera_offset += fire.particle_layer[0].initial_direction * delta / 1000;
 	}
 	else {
 		fire.particle_layer[0].initial_direction = ss::Vector(0, -1);
-		fire.particle_layer[0].initial_velocity_min = -10;
+		fire.particle_layer[0].initial_velocity_min = -15;
+		fire.particle_layer[0].initial_velocity_max = 30;
+		fire.particle_layer[0].initial_direction_randomness = 0.85;
 		fire.particle_layer[0].initial_velocity = ss::Vector(0);
 	}
 
@@ -218,7 +224,7 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
 	SDL_FreeSurface(fire1);
-	ptem.add_particle_layer(250, fire1_t, 0.8);
+	ptem.add_particle_layer(250, fire1_t, 0.8, 0);
 
 	//Creating the color gradient to make it look like a fire
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
@@ -341,11 +347,11 @@ int main(int argc, char* args[]) {
 	int i = 0;
 
 	double spawn_timer = 2;
+	double snowball_timer = 0.8;
 	bool first_frame = true;
 
 	init_enemy(game);
-
-	Snowball sb(game.get_window(), 50, 0, 1);
+	init_snowballs(game);
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
@@ -395,7 +401,8 @@ int main(int argc, char* args[]) {
 		int r = 0, g = 0, b = 0;
 		ss::Vector p_pos;
 		for (int i = 0; i < enemies; i++) {
-			enemy[i].process(_dt);
+			enemy[i].target = player_cs.get_center();
+			enemy[i].process(_dt, snowballs, game, snowball);
 			enemy[i].draw(camera_offset);
 			p_pos = enemy[i].collision.get_center() + enemy[i].aoe_offset;
 			for (int x = p_pos.x - 13; x < p_pos.x + 13; x++) {
@@ -468,7 +475,20 @@ int main(int argc, char* args[]) {
 		ptem.update(_dt);
 		ptem.draw();
 		player.draw(_dt);
-		sb.draw();
+
+		//Update and draw snowballs
+		for (int i = 0; i < snowballs; i++) {
+			snowball[i]->update(_dt, gnd_tex, ground_b, snow_pixels, player_cs);
+			snowball[i]->draw(camera_offset);
+			if (snowball[i]->is_melted()) {
+				snowball[i]->free();
+				delete[] snowball[i];
+				for (int j = i; j < snowballs - 1; j++) {
+					snowball[j] = snowball[j + 1];
+				}
+				snowballs--;
+			}
+		}
 
 		//Draws the CollisionShapes and other debug info to the screen
 #if defined _DEBUG
@@ -484,6 +504,12 @@ int main(int argc, char* args[]) {
 				enemy[i].collision.position += camera_offset;
 			}
 
+			for (int i = 0; i < snowballs; i++) {
+				snowball[i]->collision.position -= camera_offset;
+				snowball[i]->collision.draw();
+				snowball[i]->collision.position += camera_offset;
+			}
+
 			console.draw();
 			show_fps(fps, game.get_fps(), i, _rdt);
 		}
@@ -493,7 +519,7 @@ int main(int argc, char* args[]) {
 
 		if (game.is_key_just_pressed(SDL_SCANCODE_F2)) {
 			if (game.target_fps == 144) {
-				game.target_fps = 30;
+				game.target_fps = 40;
 			}
 			else {
 				game.target_fps = 144;
