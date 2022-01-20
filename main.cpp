@@ -478,7 +478,7 @@ int main(int argc, char* args[]) {
 
 		//Update and draw snowballs
 		for (int i = 0; i < snowballs; i++) {
-			snowball[i]->update(_dt, gnd_tex, ground_b, snow_pixels, player_cs);
+			snowball[i]->update(_dt, gnd_tex, ground_b, snow_pixels, player_cs, ground_size);
 			snowball[i]->draw(camera_offset);
 			if (snowball[i]->is_melted()) {
 				snowball[i]->free();
