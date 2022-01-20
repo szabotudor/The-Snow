@@ -7,6 +7,7 @@ ss::Sprite enemy_sprite;
 ss::Sprite melt_sprite;
 
 void init_enemy(ss::Snow& game) {
+	//Load all textures
 	init = true;
 	const char* textures[9] = {
 		"Sprites/Snowman/snowman_body0000.png",
@@ -43,42 +44,42 @@ Enemy::Enemy(ss::Vector position) {
 void Enemy::process(double delta) {
 	delta /= 1000;
 	lifetime += delta;
+	//Vertical velocity
 	vert_velocity -= delta * 1500;
+	//Change the height according to the velocity
 	if (invulnerability > 0 and life < 3 and height >= 0) {
 		height += vert_velocity * delta;
 		if (height < 0) {
 			height = 0;
 		}
 	}
-	/*
-	anim_time += delta;
-	switch (animation) {
-	case Enemy::Anim::IDLE:
-		if (anim_time > 0.8) {
-			anim_time = 0;
-			if (draw_offset == ss::Vector(0, -1)) {
-				draw_offset = ss::Vector(0, 1);
-			}
-			else {
-				draw_offset = ss::Vector(0, -1);
-			}
-		}
-		break;
-	case Enemy::Anim::SHOOT:
-		break;
-	case Enemy::Anim::WALK:
-		break;
-	default:
-		break;
-	}
-	*/
+	
+	//Animate the enemy
+	if (spawn_timer >= 1) {
+		anim_time += delta;
+		switch (animation) {
+		case Enemy::Anim::IDLE:
+			ofs = ss::lerp(ofs, ss::Vector(1, -9), delta * 7);
+			break;
+		case Enemy::Anim::SHOOT:
 
+			break;
+		case Enemy::Anim::WALK:
+			break;
+		default:
+			break;
+		}
+	}
+	
+
+	//Flicker effect when the enemy is invulnerable
 	visibility_timer += delta;
 	if (visibility_timer > 0.05) {
 		visible = !visible;
 		visibility_timer = 0;
 	}
 
+	//Rotate the enemy in the air when taking damage
 	if (invulnerability > 0 and height > 0) {
 		if (lifetime > rot_speed) {
 			lifetime = 0;
@@ -100,7 +101,14 @@ void Enemy::process(double delta) {
 			}
 		}
 	}
+
+	//Set the position of the enemy according to the draw offset
 	position = collision.position + col_draw_offset - ss::Vector(0, height);
+
+	//Advance the spawn timer, which is ued to tell wether the spawn animation is done playing
+	if (life == 3 and spawn_timer < 1) {
+		spawn_timer += delta;
+	}
 	if (invulnerability > 0) {
 		invulnerability -= delta;
 #if defined _DEBUG
@@ -109,12 +117,6 @@ void Enemy::process(double delta) {
 #endif
 	}
 	else {
-		if (life == 3 and spawn_timer < 1) {
-			if (visible) {
-				spawn_timer += delta;
-			}
-			ofs = ss::lerp(ofs, ss::Vector(1, -9), delta * 5);
-		}
 #if defined _DEBUG
 		collision.draw_color.r = 120;
 		collision.draw_color.b = 255;
@@ -126,7 +128,11 @@ void Enemy::damage() {
 	if (invulnerability <= 0) {
 		life--;
 		invulnerability = 1;
+
+		//This is for the jumping into the air animation
 		vert_velocity = 300;
+
+		//Update sprite offsets and collision size when parts are knocked off the enemy
 		switch (life) {
 		case 2:
 			col_draw_offset -= ss::Vector(0, 9);
@@ -147,6 +153,7 @@ void Enemy::damage() {
 void Enemy::draw(ss::Vector camera_offset) {
 	enemy_sprite.position = position - camera_offset + ss::Vector(0, 13) - ss::Vector(1, 4);
 
+	//Draw the melt sprite and animate it when the enemy takes damage
 	if (invulnerability > 0) {
 		switch (life) {
 		case 3:
@@ -178,6 +185,7 @@ void Enemy::draw(ss::Vector camera_offset) {
 		visible = true;
 	}
 
+	//Draw the enemy
 	if (visible) {
 		switch (look_dir) {
 		case Enemy::LookDirection::UP:

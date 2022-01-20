@@ -5,19 +5,10 @@ void init_enemy(ss::Snow& game);
 
 
 class Enemy {
+	//Random number generator
 	ss::RandomNumberGenerator rng;
-	ss::Vector position;
-	double height = 0;
-	ss::Vector velocity;
-	double vert_velocity = 0;
-	ss::Vector col_draw_offset = ss::Vector(0, 6);
-	bool visible;
-	double visibility_timer = 0;
-	double rot_speed = 0;
-	int life = 3;
-	double invulnerability = 1;
-	double lifetime = 0;
-	double spawn_timer = 0;
+
+	//Enumerators for the possible states of the enemy
 	enum class LookDirection {
 		UP,
 		DOWN,
@@ -29,13 +20,31 @@ class Enemy {
 		SHOOT,
 		WALK
 	};
+	LookDirection look_dir = LookDirection::DOWN;
 	Anim animation = Anim::IDLE;
+	bool visible;
+	int life = 3;
+
+	//Timers and other float counters
+	double vert_velocity = 0;
+	double height = 0;
+	double rot_speed = 0;
+	double visibility_timer = 0;
+	double invulnerability = 1;
+	double lifetime = 0;
+	double spawn_timer = 0;
+	double shoot_timer = 0;
+	double anim_time = 0;
+
+	//Positional offsets
+	ss::Vector col_draw_offset = ss::Vector(0, 6);
 	ss::Vector draw_offset = ss::Vector(0);
 	ss::Vector head_offset = 0, middle_offset = 0;
-	double anim_time = 0;
-	LookDirection look_dir = LookDirection::DOWN;
 	ss::Vector ofs = ss::Vector(1, 0);
+	ss::Vector position;
+	ss::Vector velocity;
 public:
+	//The target position (the enemy will move towards the target and attack it)
 	ss::Vector target;
 	ss::CollisionShape collision;
 	Enemy(ss::Vector position = ss::Vector(0));
