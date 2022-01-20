@@ -59,5 +59,6 @@
     <Image Include="Sprites\Snowman\snowman_middle0001.png" />
     <Image Include="Sprites\Snowman\snowman_middle0002.png" />
     <Image Include="Sprites\Snowball\Snowball.png" />
+    <Image Include="Sprites\Snowball\Snowball_Shadow.png" />
   </ItemGroup>
 </Project>
