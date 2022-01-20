@@ -150,10 +150,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Extern\Enemy\Enemy.cpp" />
+    <ClCompile Include="Extern\Snowball\Snowball.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Extern\Enemy\Enemy.h" />
+    <ClInclude Include="Extern\Snowball\Snowball.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />
@@ -187,6 +189,7 @@
     <Library Include="SnowEngine\lib_debug\SnowEngine.lib" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Sprites\Snowball\Snowball.png" />
     <Image Include="Sprites\Snowman\melt0000.png" />
     <Image Include="Sprites\Snowman\melt0001.png" />
     <Image Include="Sprites\Snowman\melt0002.png" />

@@ -3,9 +3,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Extern\Enemy\Enemy.cpp" />
+    <ClCompile Include="Extern\Snowball\Snowball.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Extern\Enemy\Enemy.h" />
+    <ClInclude Include="Extern\Snowball\Snowball.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="basic.ttf" />
@@ -29,14 +31,14 @@
     <Library Include="SnowEngine\lib\SDL2_ttf.lib" />
     <Library Include="SnowEngine\lib\SDL2main.lib" />
     <Library Include="SnowEngine\lib\SDL2test.lib" />
-    <Library Include="SnowEngine\lib\SnowEngine.lib" />
     <Library Include="SnowEngine\lib_debug\SDL2.lib" />
     <Library Include="SnowEngine\lib_debug\SDL2_image.lib" />
     <Library Include="SnowEngine\lib_debug\SDL2_ttf.lib" />
     <Library Include="SnowEngine\lib_debug\SDL2main.lib" />
     <Library Include="SnowEngine\lib_debug\SDL2test.lib" />
-    <Library Include="SnowEngine\lib_debug\SnowEngine.lib" />
     <Library Include="..\SnowEngine\x64\Debug\SnowEngine.lib" />
+    <Library Include="SnowEngine\lib\SnowEngine.lib" />
+    <Library Include="SnowEngine\lib_debug\SnowEngine.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="sun.png" />
@@ -56,5 +58,6 @@
     <Image Include="Sprites\Snowman\snowman_middle0000.png" />
     <Image Include="Sprites\Snowman\snowman_middle0001.png" />
     <Image Include="Sprites\Snowman\snowman_middle0002.png" />
+    <Image Include="Sprites\Snowball\Snowball.png" />
   </ItemGroup>
 </Project>
