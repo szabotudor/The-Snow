@@ -50,12 +50,14 @@ void Snowball::update(double delta, ss::Texture& ground_texture, bool**& ground_
 				ss::Vector p_pos = ptem->get_particle_position(i);
 				for (int x = p_pos.x - 3; x < p_pos.x + 3; x++) {
 					for (int y = p_pos.y - 3; y < p_pos.y + 3; y++) {
-						if (!ground_bool[x][y]) {
-							if (p_pos.distance_to(ss::Vector(x, y)) < 3) {
-								int r = rng.randi_range(235, 255);
-								int g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
-								ground_texture.set_pixel(ss::Vector(x, y), r, g, 255);
-								ground_bool[x][y] = true;
+						if (x >= 0 and y >= 0) {
+							if (!ground_bool[x][y]) {
+								if (p_pos.distance_to(ss::Vector(x, y)) < 3) {
+									int r = rng.randi_range(235, 255);
+									int g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
+									ground_texture.set_pixel(ss::Vector(x, y), r, g, 255);
+									ground_bool[x][y] = true;
+								}
 							}
 						}
 					}
