@@ -116,7 +116,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
 		player_move_type = PlayerMoveType::SHOOTING;
-		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()) * 30, delta / 100).normalized();
+		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 80).normalized();
 		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
 		fire.particle_layer[0].initial_velocity_min = 100;
 		fire.particle_layer[0].initial_velocity_max = 110;
@@ -126,7 +126,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	else {
 		fire.particle_layer[0].initial_direction = ss::Vector(0, -1);
 		fire.particle_layer[0].initial_velocity_min = -15;
-		fire.particle_layer[0].initial_velocity_max = 30;
+		fire.particle_layer[0].initial_velocity_max = 15;
 		fire.particle_layer[0].initial_direction_randomness = 0.85;
 		fire.particle_layer[0].initial_velocity = ss::Vector(0);
 	}
