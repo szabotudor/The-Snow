@@ -36,7 +36,7 @@ Snowball::Snowball(SDL_Window* window, ss::Vector position, ss::Vector direction
 	collision = ss::CollisionShape(6, position, window);
 }
 
-void Snowball::update(double delta, ss::Texture& ground_texture, bool**& ground_bool, long long& snow_ammount, ss::CollisionShape& player_cs, ss::Vector& ground_size) {
+void Snowball::update(double delta, ss::Texture& ground_texture, bool**& ground_bool, long long& snow_ammount, ss::CollisionShape& player_cs, ss::Vector& ground_size, bool& hit_player) {
 	if (height < 0) {
 		visible = false;
 		ptem->position = position + ss::Vector(2);
@@ -76,6 +76,7 @@ void Snowball::update(double delta, ss::Texture& ground_texture, bool**& ground_
 			position.y -= height;
 			height = 0;
 			v_velocity = 0;
+			hit_player = true;
 		}
 	}
 }
@@ -93,6 +94,10 @@ void Snowball::draw(ss::Vector camera_offset) {
 			ptem->draw();
 		}
 	}
+}
+
+ss::Vector Snowball::get_direction() {
+	return direction;
 }
 
 bool Snowball::is_melted() {
