@@ -45,13 +45,19 @@ void print_to_console(string text) {
 enum class PlayerMoveType {
 	IDLE,
 	MOVING,
-	SHOOTING
+	SHOOTING,
+	DEAD
 };
 ss::RandomNumberGenerator rng;
 int avg_fps[60];
 
 ss::Vector velocity;
+float invulnerability = 1;
 double blink_timer = 1;
+double player_visibility_timer = 0;
+bool player_visible = true;
+bool player_dead = false;
+int fire_ammount = 300;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
 ss::CollisionShape window_cs;
@@ -83,26 +89,54 @@ void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 }
 #endif
 
+void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game, ss::Vector direction, float delta) {
+	if (invulnerability < 0) {
+		velocity += direction * delta / 4;
+		invulnerability = 1;
+		fire_ammount -= 120;
+#if defined _DEBUG
+		print_to_console("Player damaged");
+#endif
+	}
+}
 
 void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
-	ss::Vector direction;
+	fire.set_draw_ammount(lerp(fire.get_draw_ammount(), fire_ammount, delta / 80000));
 
-	//Calculate the velocity with which the player should pe moving, and move him with that velocity
-	direction.y = game.is_key_pressed(SDL_SCANCODE_S) - game.is_key_pressed(SDL_SCANCODE_W);
-	direction.x = game.is_key_pressed(SDL_SCANCODE_D) - game.is_key_pressed(SDL_SCANCODE_A);
-	if (direction.lenght() > 0) {
-		direction.normalize();
-		direction *= delta / 10;
-		player_move_type = PlayerMoveType::MOVING;
+	if (invulnerability > 0) {
+		invulnerability -= delta / 1000;
+		if (player_visibility_timer > 0.03) {
+			player_visible = !player_visible;
+			player_visibility_timer = 0;
+		}
+		else {
+			player_visibility_timer += delta / 1000;
+		}
 	}
 	else {
-		if (player_move_type != PlayerMoveType::IDLE) {
-			player.frame = 0;
-		}
-		player_move_type = PlayerMoveType::IDLE;
+		player_visible = true;
 	}
-	velocity = ss::lerp(velocity, direction, delta / 125);
-	player_cs.position += velocity;
+
+	ss::Vector direction;
+
+	if (!player_dead) {
+		//Calculate the velocity with which the player should pe moving, and move him with that velocity
+		direction.y = game.is_key_pressed(SDL_SCANCODE_S) - game.is_key_pressed(SDL_SCANCODE_W);
+		direction.x = game.is_key_pressed(SDL_SCANCODE_D) - game.is_key_pressed(SDL_SCANCODE_A);
+		if (direction.lenght() > 0) {
+			direction.normalize();
+			direction *= delta / 10;
+			player_move_type = PlayerMoveType::MOVING;
+		}
+		else {
+			if (player_move_type != PlayerMoveType::IDLE and player_move_type != PlayerMoveType::DEAD) {
+				player.frame = 0;
+			}
+			player_move_type = PlayerMoveType::IDLE;
+		}
+		velocity = ss::lerp(velocity, direction, delta / 125);
+		player_cs.position += velocity;
+	}
 
 	//Stop player from going outside the window
 	ground_cs.push_in(player_cs);
@@ -148,6 +182,10 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		if (camera_offset.y + game.resolution.y > ground_size.y) {
 			camera_offset.y = ground_size.y - game.resolution.y;
 		}
+	}
+
+	if (fire.get_draw_ammount() == 0) {
+		player_move_type = PlayerMoveType::DEAD;
 	}
 
 	//Player Animations
@@ -210,6 +248,13 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 			}
 		}
 		break;
+	case PlayerMoveType::DEAD:
+		if (!player_dead) {
+			print_to_console("Player killed");
+			player.play(0, 2, 2, false);
+			player_dead = true;
+		}
+		break;
 	default:
 		break;
 	}
@@ -224,7 +269,7 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 	SDL_FillRect(fire1, NULL, SDL_MapRGB(fire1->format, 255, 255, 255));
 	SDL_Texture* fire1_t = SDL_CreateTextureFromSurface(render, fire1);
 	SDL_FreeSurface(fire1);
-	ptem.add_particle_layer(250, fire1_t, 0.8, 0);
+	ptem.add_particle_layer(300, fire1_t, 0.8, 0);
 
 	//Creating the color gradient to make it look like a fire
 	ptem.particle_layer[0].add_color_to_gradient(255, 255, 10, 0);
@@ -474,11 +519,14 @@ int main(int argc, char* args[]) {
 		ptem.draw_offset = ss::Vector() - camera_offset;
 		ptem.update(_dt);
 		ptem.draw();
-		player.draw(_dt);
+		if (player_visible) {
+			player.draw(_dt);
+		}
 
 		//Update and draw snowballs
 		for (int i = 0; i < snowballs; i++) {
-			snowball[i]->update(_dt, gnd_tex, ground_b, snow_pixels, player_cs, ground_size);
+			bool hit_player = false;
+			snowball[i]->update(_dt, gnd_tex, ground_b, snow_pixels, player_cs, ground_size, hit_player);
 			snowball[i]->draw(camera_offset);
 			if (snowball[i]->is_melted()) {
 				snowball[i]->free();
@@ -487,6 +535,9 @@ int main(int argc, char* args[]) {
 					snowball[j] = snowball[j + 1];
 				}
 				snowballs--;
+			}
+			if (hit_player) {
+				damage_player(player, ptem, game, snowball[i]->get_direction(), _dt);
 			}
 		}
 
