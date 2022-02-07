@@ -64,7 +64,6 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 			ofs = ss::lerp(ofs, ss::Vector(1, -9), delta * 7);
 			break;
 		case Enemy::Anim::SHOOT:
-
 			break;
 		case Enemy::Anim::WALK:
 			break;
@@ -111,6 +110,9 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 	if (life == 3 and spawn_timer < 1) {
 		spawn_timer += delta;
 	}
+	else {
+		spawn_timer = 2;
+	}
 
 	//Increase the area of effect
 	if (aoe < 13) {
@@ -135,6 +137,45 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 			snowball_timer -= delta;
 		}
 	}
+
+	if (spawn_timer >= 1) {
+		if (invulnerability <= 0) {
+			//Move towards player
+			ss::Vector direction = collision.position.direction_to(target).normalized();
+			if (collision.position.distance_to(target) > 100) {
+				velocity = ss::lerp(velocity, direction * delta * 45, delta * 5);
+			}
+			else if (collision.position.distance_to(target) < 86) {
+				velocity = ss::lerp(velocity, ss::Vector() - direction * delta * 45, delta * 5);
+			}
+			else {
+				velocity = ss::lerp(velocity, 0, delta * 5);
+			}
+
+			//Look towards player
+			if (ss::natural(direction.x) > ss::natural(direction.y)) {
+				if (direction.x > 0) {
+					look_dir = LookDirection::RIGHT;
+				}
+				else if (direction.x < 0) {
+					look_dir = LookDirection::LEFT;
+				}
+			}
+			else {
+				if (direction.y > 0) {
+					look_dir = LookDirection::DOWN;
+				}
+				else if (direction.y < 0) {
+					look_dir = LookDirection::UP;
+				}
+			}
+		}
+		else {
+			velocity = ss::lerp(velocity, 0, delta * 5);
+		}
+	}
+
+	collision.position += velocity;
 
 	//Advance the invulnerability timer
 	if (invulnerability > 0) {
