@@ -4,7 +4,7 @@
 
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
-ss::Vector ground_size(game.resolution * 3);
+ss::Vector ground_size(game.resolution * 2.3);
 ss::Vector camera_offset(0);
 ss::Vector player_draw_center;
 
@@ -70,6 +70,7 @@ Snowball** snowball = new Snowball*[512];
 
 
 #if defined _DEBUG
+bool god_mode = false;
 void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 	if (i < 60) {
 		avg_fps[i] = fps;
@@ -90,6 +91,11 @@ void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 #endif
 
 void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game, ss::Vector direction, float delta) {
+#if defined _DEBUG
+	if (god_mode) {
+		return;
+	}
+#endif
 	if (invulnerability < 0) {
 		velocity += direction * delta / 4;
 		invulnerability = 1;
@@ -99,6 +105,7 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 #endif
 	}
 }
+
 
 void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
 	fire.set_draw_ammount(lerp(fire.get_draw_ammount(), fire_ammount, delta / 80000));
@@ -152,8 +159,8 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		player_move_type = PlayerMoveType::SHOOTING;
 		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 80).normalized();
 		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
-		fire.particle_layer[0].initial_velocity_min = 100;
-		fire.particle_layer[0].initial_velocity_max = 110;
+		fire.particle_layer[0].initial_velocity_min = 180;
+		fire.particle_layer[0].initial_velocity_max = 200;
 		fire.particle_layer[0].initial_direction_randomness = 0.2;
 		//camera_offset += fire.particle_layer[0].initial_direction * delta / 1000;
 	}
@@ -250,7 +257,9 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		break;
 	case PlayerMoveType::DEAD:
 		if (!player_dead) {
+#if defined _DEBUG
 			print_to_console("Player killed");
+#endif
 			player.play(0, 2, 2, false);
 			player_dead = true;
 		}
@@ -337,6 +346,7 @@ int main(int argc, char* args[]) {
 	ss::Texture gnd_tex(game.get_window(), ground_size);
 	bool** ground_b = new bool*[(int)ground_size.x];
 	long long snow_pixels = ground_size.x * ground_size.y;
+	long long max_snow_pixels = snow_pixels;
 	ground_cs.size = ground_size;
 #if defined _DEBUG
 	print_to_console(to_string(snow_pixels) + " pixels to fill");
@@ -409,10 +419,15 @@ int main(int argc, char* args[]) {
 		player_process(player, ptem, game, _dt);
 
 		//Spawn an enemy at a random interval
-		if (enemies < 64) {
+		if (enemies < 64 and snow_pixels > 50) {
 			if (spawn_timer < 0 or game.is_key_just_pressed(SDL_SCANCODE_F1)) {
-				spawn_timer = rng.randd_range(2, 4);
-				enemy[enemies] = Enemy(player_cs.position + rng.randdir() * rng.randd_range(50, 100));
+				double time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 5;
+				spawn_timer = rng.randd_range(0 + time_change, 5 + time_change);
+				ss::Vector spawn_position = player_cs.position + rng.randdir() * rng.randd_range(50, 100);
+				spawn_position.x = ss::clamp(0, ground_size.x, spawn_position.x);
+				spawn_position.y = ss::clamp(0, ground_size.y, spawn_position.y);
+
+				enemy[enemies] = Enemy(spawn_position);
 				ground_cs.push_in(enemy[enemies].collision);
 #if defined _DEBUG
 				enemy[enemies].collision.enable_draw(game.get_window());
@@ -422,6 +437,9 @@ int main(int argc, char* args[]) {
 					enemy[i].collision.push_out(enemy[enemies].collision);
 				}
 				enemies++;
+			}
+			else {
+				spawn_timer -= _dt / 1000;
 			}
 //Spawn an enemy if there is room for it
 #if defined _DEBUG
@@ -441,6 +459,10 @@ int main(int argc, char* args[]) {
 			}
 #endif
 		}
+		else if (snow_pixels < 50) {
+			//Placeholder for win screen
+			game.quit();
+		}
 
 		//Process enemies
 		int r = 0, g = 0, b = 0;
@@ -448,6 +470,7 @@ int main(int argc, char* args[]) {
 		for (int i = 0; i < enemies; i++) {
 			enemy[i].target = player_cs.get_center();
 			enemy[i].process(_dt, snowballs, game, snowball);
+			ground_cs.push_in(enemy[i].collision);
 			enemy[i].draw(camera_offset);
 			p_pos = enemy[i].collision.get_center() + enemy[i].aoe_offset;
 			for (int x = p_pos.x - 13; x < p_pos.x + 13; x++) {
@@ -578,8 +601,17 @@ int main(int argc, char* args[]) {
 		}
 
 		if (game.is_key_just_pressed(SDL_SCANCODE_F5)) {
-			" ";
 			print_to_console(to_string(snow_pixels) + " snow left");
+		}
+
+		if (game.is_key_just_pressed(SDL_SCANCODE_F10)) {
+			god_mode = !god_mode;
+			if (god_mode) {
+				print_to_console("Toggled god mode (ON)");
+			}
+			else {
+				print_to_console("Toggled god mode (OFF)");
+			}
 		}
 
 		if (snow_pixels == 0) {
