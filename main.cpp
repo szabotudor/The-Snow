@@ -66,6 +66,7 @@ double spawn_timer = 0.5;
 double blink_timer = 1;
 double player_visibility_timer = 0;
 double insn_change_timer = 0;
+double camera_shake = 0;
 bool player_visible = true;
 bool player_dead = false;
 bool in_menu = true;
@@ -142,13 +143,15 @@ void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels
 	select_screen = false;
 	in_menu = false;
 	difficulty = game_difficulty;
-	if (snow_pixels < 50 or fire_ammount == 0) {
+	if (snow_pixels < 50 or player_dead) {
 		make_ground(ground_b, gnd_tex, snow_pixels);
+		score = 0;
 	}
 	fire_ammount = 300;
 	spawn_timer = 0.5;
 	player_dead = false;
 	player_move_type = PlayerMoveType::IDLE;
+	velocity = 0;
 }
 
 
@@ -188,10 +191,10 @@ void process_menu(double delta, ss::Button& playbtn, ss::Button& quitbtn, ss::Bu
 		if (insn_change_timer <= 0) {
 			char* txt = new char[9](0);
 			for (int i = 0; i < 8; i++) {
-				txt[i] = rng.randi_range(1, 255);
+				txt[i] = rng.randi_range(32, 126);
 			}
 			insn.set_text(txt);
-			insn_change_timer = 0.02;
+			insn_change_timer = 0.03;
 			delete[] txt;
 		}
 		else {
@@ -232,6 +235,8 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 		return;
 	}
 #endif
+	if (in_menu) return;
+
 	if (invulnerability < 0) {
 		velocity += direction * delta / 4;
 		invulnerability = 1;
@@ -240,6 +245,7 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 		print_to_console("Player damaged");
 #endif
 	}
+	camera_shake = 2;
 }
 
 
@@ -477,32 +483,32 @@ int main(int argc, char* args[]) {
 	//Play button
 	ss::Button playbtn = ss::Button(game.get_window(), text_color, "PLAY", "stfont.ttf", 16);
 	playbtn.update();
-	playbtn.position = ss::Vector(game.resolution / 2 - playbtn.bounding_box.size / 2 - ss::Vector(0, 20));
+	playbtn.position = ss::Vector(game.resolution / 2 - playbtn.bounding_box.size / 2 - ss::Vector(0, 20)) + ss::Vector(0, 0.5);
 
 	//Quit button
 	ss::Button quitbtn = ss::Button(game.get_window(), text_color, "QUIT", "stfont.ttf", 16);
 	quitbtn.update();
-	quitbtn.position = ss::Vector(game.resolution / 2 - quitbtn.bounding_box.size / 2 + ss::Vector(0, 20));
+	quitbtn.position = ss::Vector(game.resolution / 2 - quitbtn.bounding_box.size / 2 + ss::Vector(0, 20)) + ss::Vector(0, 0.5);
 
 	//Normal difficulty selector button
 	ss::Button normbtn = ss::Button(game.get_window(), text_color, "NORMAL", "stfont.ttf", 16);
 	normbtn.update();
-	normbtn.position = ss::Vector(game.resolution / 2 - normbtn.bounding_box.size / 2 + ss::Vector(0, -60));
+	normbtn.position = ss::Vector(game.resolution / 2 - normbtn.bounding_box.size / 2 + ss::Vector(0, -60)) + ss::Vector(0, 0.5);
 
 	//Hard difficulty selector button
 	ss::Button hardbtn = ss::Button(game.get_window(), text_color, "????", "stfont.ttf", 16);
 	hardbtn.update();
-	hardbtn.position = ss::Vector(game.resolution / 2 - hardbtn.bounding_box.size / 2 + ss::Vector(0, -20));
+	hardbtn.position = ss::Vector(game.resolution / 2 - hardbtn.bounding_box.size / 2 + ss::Vector(0, -20)) + ss::Vector(0, 0.5);
 
 	//Impossible difficulty selector button
 	ss::Button imposbtn = ss::Button(game.get_window(), text_color, "??????????", "stfont.ttf", 16);
 	imposbtn.update();
-	imposbtn.position = ss::Vector(game.resolution / 2 - imposbtn.bounding_box.size / 2 + ss::Vector(0, 20));
+	imposbtn.position = ss::Vector(game.resolution / 2 - imposbtn.bounding_box.size / 2 + ss::Vector(0, 20)) + ss::Vector(0, 0.5);
 
 	//Impossible difficulty selector button
 	ss::Button insnbtn = ss::Button(game.get_window(), text_color, "????????", "stfont.ttf", 16);
 	insnbtn.update();
-	insnbtn.position = ss::Vector(game.resolution / 2 - insnbtn.bounding_box.size / 2 + ss::Vector(0, 60));
+	insnbtn.position = ss::Vector(game.resolution / 2 - insnbtn.bounding_box.size / 2 + ss::Vector(0, 60)) + ss::Vector(0, 0.5);
 
 	//Back button
 	ss::Button backbtn = ss::Button(game.get_window(), text_color, "BACK", "stfont.ttf", 8);
@@ -590,6 +596,16 @@ int main(int argc, char* args[]) {
 
 	uint32_t score_to_add = 0;
 	double add_score_timer = 0;
+
+	for (int i = 0; i < 3; i++) {
+		ss::Vector spawn_position = player_cs.position + rng.randdir() * rng.randd_range(50, 100);
+		spawn_position.x = ss::clamp(0, ground_size.x, spawn_position.x);
+		spawn_position.y = ss::clamp(0, ground_size.y, spawn_position.y);
+
+		enemy[i] = Enemy(spawn_position);
+		ground_cs.push_in(enemy[i].collision);
+	}
+	enemies = 3;
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
@@ -763,6 +779,10 @@ int main(int argc, char* args[]) {
 			}
 		}
 
+		if (camera_shake > 0.1) {
+			camera_shake = ss::lerp(camera_shake, 0, _dt / 300);
+			camera_offset += rng.randdir() * camera_shake;
+		}
 		ptem.draw_offset = ss::Vector() - camera_offset;
 		ptem.update(_dt);
 		ptem.draw();
