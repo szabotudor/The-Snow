@@ -201,7 +201,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 				else {
 					velocity = 0;
 				}
-				random_move_timer = rng.randi_range(3, 10);
+				random_move_timer = rng.randi_range(3, 5);
 			}
 			else {
 				random_move_timer -= delta;
