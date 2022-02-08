@@ -139,39 +139,68 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 	}
 
 	if (spawn_timer >= 1) {
-		if (invulnerability <= 0) {
-			//Move towards player
-			ss::Vector direction = collision.position.direction_to(target).normalized();
-			if (collision.position.distance_to(target) > 100) {
-				velocity = ss::lerp(velocity, direction * delta * 45, delta * 5);
-			}
-			else if (collision.position.distance_to(target) < 86) {
-				velocity = ss::lerp(velocity, ss::Vector() - direction * delta * 45, delta * 5);
+		if (attacking) {
+			if (invulnerability <= 0) {
+				//Move towards player
+				ss::Vector direction = collision.position.direction_to(target).normalized();
+				if (collision.position.distance_to(target) > 100 and collision.position.distance_to(target) < 200) {
+					velocity = ss::lerp(velocity, direction * delta * 45, delta * 5);
+				}
+				else if (collision.position.distance_to(target) < 86) {
+					velocity = ss::lerp(velocity, ss::Vector() - direction * delta * 45, delta * 5);
+				}
+				else {
+					velocity = ss::lerp(velocity, 0, delta * 5);
+				}
+
+				//Look towards player
+				if (ss::natural(direction.x) > ss::natural(direction.y)) {
+					if (direction.x > 0) {
+						look_dir = LookDirection::RIGHT;
+					}
+					else if (direction.x < 0) {
+						look_dir = LookDirection::LEFT;
+					}
+				}
+				else {
+					if (direction.y > 0) {
+						look_dir = LookDirection::DOWN;
+					}
+					else if (direction.y < 0) {
+						look_dir = LookDirection::UP;
+					}
+				}
 			}
 			else {
 				velocity = ss::lerp(velocity, 0, delta * 5);
 			}
-
-			//Look towards player
-			if (ss::natural(direction.x) > ss::natural(direction.y)) {
-				if (direction.x > 0) {
-					look_dir = LookDirection::RIGHT;
-				}
-				else if (direction.x < 0) {
-					look_dir = LookDirection::LEFT;
-				}
-			}
-			else {
-				if (direction.y > 0) {
-					look_dir = LookDirection::DOWN;
-				}
-				else if (direction.y < 0) {
-					look_dir = LookDirection::UP;
-				}
-			}
 		}
 		else {
-			velocity = ss::lerp(velocity, 0, delta * 5);
+			if (random_move_timer <= 0) {
+				if (rng.randi() < 60) {
+					look_dir = (LookDirection)rng.randi(3);
+					switch (look_dir) {
+					case Enemy::LookDirection::UP:
+						velocity = ss::Vector(0, -1);
+						break;
+					case Enemy::LookDirection::DOWN:
+						velocity = ss::Vector(0, 1);
+						break;
+					case Enemy::LookDirection::LEFT:
+						velocity = ss::Vector(-1, 0);
+						break;
+					case Enemy::LookDirection::RIGHT:
+						velocity = ss::Vector(1, 0);
+						break;
+					default:
+						break;
+					}
+				}
+				random_move_timer = rng.randi_range(3, 10);
+			}
+			else {
+				random_move_timer -= delta;
+			}
 		}
 	}
 

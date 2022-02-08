@@ -36,6 +36,7 @@ class Enemy {
 	double lifetime = 0;
 	double spawn_timer = 0;
 	double shoot_timer = 0;
+	double random_move_timer = 0;
 	double anim_time = 0;
 	double snowball_timer = 2;
 
@@ -47,6 +48,7 @@ class Enemy {
 	ss::Vector position;
 	ss::Vector velocity;
 public:
+	bool attacking = false;
 	//The enemy will shoot at this position
 	ss::Vector target;
 
