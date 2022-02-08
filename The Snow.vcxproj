@@ -162,6 +162,7 @@
   <ItemGroup>
     <Font Include="basic.ttf" />
     <Font Include="Pixel.ttf" />
+    <Font Include="stfont.ttf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="color basic eula.pdf" />
