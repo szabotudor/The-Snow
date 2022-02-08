@@ -40,6 +40,8 @@ class Enemy {
 	double anim_time = 0;
 	double snowball_timer = 2;
 
+	double total_lifetime = 0;
+
 	//Positional offsets
 	ss::Vector col_draw_offset = ss::Vector(0, 6);
 	ss::Vector draw_offset = ss::Vector(0);
@@ -72,4 +74,6 @@ public:
 	int get_hp();
 	//Returns true if the enemy is invulnerable
 	bool is_invulnerable();
+	//Returns the total lifetime of the enemy
+	uint32_t get_lifetime();
 };

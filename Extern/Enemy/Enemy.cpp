@@ -44,6 +44,7 @@ Enemy::Enemy(ss::Vector position) {
 void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowball**& snowball_list) {
 	delta /= 1000;
 	lifetime += delta;
+	total_lifetime += delta;
 
 	//Vertical velocity
 	vert_velocity -= delta * 1500;
@@ -195,6 +196,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 					default:
 						break;
 					}
+					velocity /= 10;
 				}
 				random_move_timer = rng.randi_range(3, 10);
 			}
@@ -384,4 +386,8 @@ int Enemy::get_hp() {
 
 bool Enemy::is_invulnerable() {
 	return invulnerability >= 0;
+}
+
+uint32_t Enemy::get_lifetime() {
+	return total_lifetime;
 }
