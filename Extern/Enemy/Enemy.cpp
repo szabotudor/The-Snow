@@ -121,7 +121,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 	}
 
 	//Throw snowballs
-	if (num_of_snowballs < 512) {
+	if (num_of_snowballs < 512 and attacking) {
 		ss::Vector target_p;
 		if (position.distance_to(target) < 110) {
 			target_p = position.direction_to(target + ss::Vector(0, 5));
@@ -197,6 +197,9 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 						break;
 					}
 					velocity /= 10;
+				}
+				else {
+					velocity = 0;
 				}
 				random_move_timer = rng.randi_range(3, 10);
 			}
