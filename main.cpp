@@ -4,7 +4,7 @@
 
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
-ss::Vector ground_size(game.resolution * 2.3);
+ss::Vector ground_size(game.resolution * 1.8);
 ss::Vector camera_offset(0);
 ss::Vector player_draw_center;
 
@@ -48,6 +48,14 @@ enum class PlayerMoveType {
 	SHOOTING,
 	DEAD
 };
+enum class Diff {
+	INSANE,
+	IMPOSSIBLE,
+	HARD,
+	NORMAL
+};
+Diff difficulty = Diff::NORMAL;
+Diff unlocked = Diff::NORMAL;
 ss::RandomNumberGenerator rng;
 int avg_fps[60];
 
@@ -55,8 +63,11 @@ ss::Vector velocity;
 float invulnerability = 1;
 double blink_timer = 1;
 double player_visibility_timer = 0;
+double insn_change_timer = 0;
 bool player_visible = true;
 bool player_dead = false;
+bool in_menu = true;
+bool select_screen = false;
 int fire_ammount = 300;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
@@ -64,7 +75,8 @@ ss::CollisionShape window_cs;
 ss::CollisionShape ground_cs;
 
 int enemies = 0;
-Enemy* enemy = new Enemy[64];
+uint16_t max_enemies = 6;
+Enemy* enemy = nullptr;
 int snowballs;
 Snowball** snowball = new Snowball*[512];
 
@@ -90,9 +102,73 @@ void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 }
 #endif
 
+
+void do_unlock(ss::Button& hard, ss::Button& impos, ss::Button& insn) {
+	switch (unlocked) {
+	case Diff::INSANE:
+		insn.set_text((char*)">s{:1?=u");
+	case Diff::IMPOSSIBLE:
+		impos.set_text((char*)"IMPOSSIBLE");
+	case Diff::HARD:
+		hard.set_text((char*)"HARD");
+		break;
+	case Diff::NORMAL:
+		break;
+	default:
+		break;
+	}
+}
+
+
+void process_menu(double delta, ss::Button& playbtn, ss::Button& quitbtn, ss::Button& norm, ss::Button& hard, ss::Button& impos, ss::Button& insn) {
+	playbtn.update();
+	quitbtn.update();
+	norm.update();
+	hard.update();
+	impos.update();
+
+	if (unlocked == Diff::INSANE) {
+		if (insn_change_timer <= 0) {
+			char* txt = new char[9](0);
+			for (int i = 0; i < 8; i++) {
+				txt[i] = rng.randi_range(1, 255);
+			}
+			insn.set_text(txt);
+			insn_change_timer = 0.02;
+			delete[] txt;
+		}
+		else {
+			insn_change_timer -= delta / 1000;
+		}
+	}
+	insn.update();
+
+	if (!select_screen) {
+		if (playbtn.hovered) playbtn.draw_offset = ss::lerp(playbtn.draw_offset, ss::Vector(0, -3), delta / 40);
+		else playbtn.draw_offset = ss::lerp(playbtn.draw_offset, ss::Vector(0, 0), delta / 40);
+
+		if (quitbtn.hovered) quitbtn.draw_offset = ss::lerp(quitbtn.draw_offset, ss::Vector(0, -3), delta / 40);
+		else quitbtn.draw_offset = ss::lerp(quitbtn.draw_offset, ss::Vector(0, 0), delta / 40);
+	}
+	else {
+		if (norm.hovered) norm.draw_offset = ss::lerp(norm.draw_offset, ss::Vector(0, -3), delta / 40);
+		else norm.draw_offset = ss::lerp(norm.draw_offset, ss::Vector(0, 0), delta / 40);
+
+		if (hard.hovered) hard.draw_offset = ss::lerp(hard.draw_offset, ss::Vector(0, -3), delta / 40);
+		else hard.draw_offset = ss::lerp(hard.draw_offset, ss::Vector(0, 0), delta / 40);
+
+		if (impos.hovered) impos.draw_offset = ss::lerp(impos.draw_offset, ss::Vector(0, -3), delta / 40);
+		else impos.draw_offset = ss::lerp(impos.draw_offset, ss::Vector(0, 0), delta / 40);
+
+		if (insn.hovered) insn.draw_offset = ss::lerp(insn.draw_offset, ss::Vector(0, -3), delta / 40);
+		else insn.draw_offset = ss::lerp(insn.draw_offset, ss::Vector(0, 0), delta / 40);
+	}
+}
+
+
 void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game, ss::Vector direction, float delta) {
 #if defined _DEBUG
-	if (god_mode) {
+	if (god_mode or in_menu) {
 		return;
 	}
 #endif
@@ -110,6 +186,7 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
 	fire.set_draw_ammount(lerp(fire.get_draw_ammount(), fire_ammount, delta / 80000));
 
+	//Flicker the player sprite when invulnerable
 	if (invulnerability > 0) {
 		invulnerability -= delta / 1000;
 		if (player_visibility_timer > 0.03) {
@@ -126,8 +203,8 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 
 	ss::Vector direction;
 
-	if (!player_dead) {
-		//Calculate the velocity with which the player should pe moving, and move him with that velocity
+	//Calculate the velocity with which the player should pe moving, and move him with that velocity
+	if (!(player_dead or in_menu)) {
 		direction.y = game.is_key_pressed(SDL_SCANCODE_S) - game.is_key_pressed(SDL_SCANCODE_W);
 		direction.x = game.is_key_pressed(SDL_SCANCODE_D) - game.is_key_pressed(SDL_SCANCODE_A);
 		if (direction.lenght() > 0) {
@@ -155,7 +232,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	player.position = player_cs.position - camera_offset - 2;
 
 	//Shooting
-	if (game.is_button_pressed(SDL_BUTTON_LEFT)) {
+	if (game.is_button_pressed(SDL_BUTTON_LEFT) and !in_menu) {
 		player_move_type = PlayerMoveType::SHOOTING;
 		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 80).normalized();
 		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
@@ -191,6 +268,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		}
 	}
 
+	//Check if player has died
 	if (fire.get_draw_ammount() == 0) {
 		player_move_type = PlayerMoveType::DEAD;
 	}
@@ -309,18 +387,49 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 
 
 int main(int argc, char* args[]) {
+	enemy = new Enemy[max_enemies];
 	rng.randomize();
 	window_cs.size = game.resolution;
 	game.resize_window(640, 360);
-	ss::Text fps(game.get_window(), "", "basic.ttf", 9);
+	ss::Text fps(game.get_window(), "", "stfont.ttf", 8);
 	fps.color.b = 0;
 	fps.color.g = 100;
 	fps.position = ss::Vector(5, 5);
 	SDL_Color text_color = SDL_Color(), border_color = SDL_Color(), fill_color = SDL_Color();
 
-	text_color.r = 255; text_color.g = 255; text_color.b = 255; text_color.a = 255;
+	text_color.r = 60; text_color.g = 80; text_color.b = 255; text_color.a = 255;
 	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
 	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
+
+	//Play button
+	ss::Button playbtn = ss::Button(game.get_window(), text_color, "PLAY", "stfont.ttf", 16);
+	playbtn.update();
+	playbtn.position = ss::Vector(game.resolution / 2 - playbtn.bounding_box.size / 2 - ss::Vector(0, 20));
+
+	//Quit button
+	ss::Button quitbtn = ss::Button(game.get_window(), text_color, "QUIT", "stfont.ttf", 16);
+	quitbtn.update();
+	quitbtn.position = ss::Vector(game.resolution / 2 - quitbtn.bounding_box.size / 2 + ss::Vector(0, 20));
+
+	//Normal difficulty selector button
+	ss::Button normbtn = ss::Button(game.get_window(), text_color, "NORMAL", "stfont.ttf", 16);
+	normbtn.update();
+	normbtn.position = ss::Vector(game.resolution / 2 - normbtn.bounding_box.size / 2 + ss::Vector(0, -60));
+
+	//Hard difficulty selector button
+	ss::Button hardbtn = ss::Button(game.get_window(), text_color, "????", "stfont.ttf", 16);
+	hardbtn.update();
+	hardbtn.position = ss::Vector(game.resolution / 2 - hardbtn.bounding_box.size / 2 + ss::Vector(0, -20));
+
+	//Impossible difficulty selector button
+	ss::Button imposbtn = ss::Button(game.get_window(), text_color, "??????????", "stfont.ttf", 16);
+	imposbtn.update();
+	imposbtn.position = ss::Vector(game.resolution / 2 - imposbtn.bounding_box.size / 2 + ss::Vector(0, 20));
+
+	//Impossible difficulty selector button
+	ss::Button insnbtn = ss::Button(game.get_window(), text_color, "????????", "stfont.ttf", 16);
+	insnbtn.update();
+	insnbtn.position = ss::Vector(game.resolution / 2 - insnbtn.bounding_box.size / 2 + ss::Vector(0, 60));
 
 	//Creating the player sprite
 	const char* frames[6] = {
@@ -408,6 +517,15 @@ int main(int argc, char* args[]) {
 	init_enemy(game);
 	init_snowballs(game);
 
+	ifstream fin("game.data", ios::binary);
+	if (fin.is_open()) {
+		int unlkd = 0;
+		fin >> unlkd;
+		unlocked = (Diff)unlkd;
+		do_unlock(hardbtn, imposbtn, insnbtn);
+		fin.close();
+	}
+
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
 		game.update();
@@ -419,10 +537,26 @@ int main(int argc, char* args[]) {
 		player_process(player, ptem, game, _dt);
 
 		//Spawn an enemy at a random interval
-		if (enemies < 64 and snow_pixels > 50) {
+		if (enemies < max_enemies and snow_pixels > 50 and !in_menu) {
 			if (spawn_timer < 0 or game.is_key_just_pressed(SDL_SCANCODE_F1)) {
-				double time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 5;
-				spawn_timer = rng.randd_range(0 + time_change, 5 + time_change);
+				double time_change = 0.0;
+				switch (difficulty) {
+				case Diff::INSANE:
+					time_change = 1.0 - (double)snow_pixels / max_snow_pixels;
+					break;
+				case Diff::IMPOSSIBLE:
+					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 3.5;
+					break;
+				case Diff::HARD:
+					time_change = (2.0 - (double)snow_pixels / max_snow_pixels) * 6.5;
+					break;
+				case Diff::NORMAL:
+					time_change = (3.0 - (double)snow_pixels / max_snow_pixels) * 10;
+					break;
+				default:
+					break;
+				}
+				spawn_timer = rng.randd_range((double)difficulty / 1.5, time_change);
 				ss::Vector spawn_position = player_cs.position + rng.randdir() * rng.randd_range(50, 100);
 				spawn_position.x = ss::clamp(0, ground_size.x, spawn_position.x);
 				spawn_position.y = ss::clamp(0, ground_size.y, spawn_position.y);
@@ -433,19 +567,16 @@ int main(int argc, char* args[]) {
 				enemy[enemies].collision.enable_draw(game.get_window());
 				print_to_console("Enemy " + to_string(enemies) + " spawned");
 #endif
-				for (int i = 0; i < enemies; i++) {
-					enemy[i].collision.push_out(enemy[enemies].collision);
-				}
 				enemies++;
 			}
 			else {
 				spawn_timer -= _dt / 1000;
 			}
-//Spawn an enemy if there is room for it
+			//Spawn an enemy if there is room for it
 #if defined _DEBUG
 			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL)) {
 				if (game.is_key_just_pressed(SDL_SCANCODE_F1)) {
-					for (enemies; enemies < 64; enemies++) {
+					for (enemies; enemies < max_enemies; enemies++) {
 						enemy[enemies] = Enemy(player_cs.position + rng.randdir() * rng.randd_range(50, 100));
 						ground_cs.push_in(enemy[enemies].collision);
 						enemy[enemies].collision.enable_draw(game.get_window());
@@ -459,15 +590,21 @@ int main(int argc, char* args[]) {
 			}
 #endif
 		}
-		else if (snow_pixels < 50) {
+		else if (snow_pixels < 50 and !in_menu) {
 			//Placeholder for win screen
-			game.quit();
+			in_menu = true;
+			enemies = 0;
+			if (unlocked > Diff::INSANE) {
+				unlocked = (Diff)((uint8_t)unlocked - 1);
+				do_unlock(hardbtn, imposbtn, insnbtn);
+			}
 		}
 
 		//Process enemies
 		int r = 0, g = 0, b = 0;
 		ss::Vector p_pos;
 		for (int i = 0; i < enemies; i++) {
+			enemy[i].attacking = !in_menu;
 			enemy[i].target = player_cs.get_center();
 			enemy[i].process(_dt, snowballs, game, snowball);
 			ground_cs.push_in(enemy[i].collision);
@@ -542,8 +679,49 @@ int main(int argc, char* args[]) {
 		ptem.draw_offset = ss::Vector() - camera_offset;
 		ptem.update(_dt);
 		ptem.draw();
-		if (player_visible) {
+		if (player_visible and !in_menu) {
 			player.draw(_dt);
+		}
+
+		if (in_menu) {
+			process_menu(_dt, playbtn, quitbtn, normbtn, hardbtn, imposbtn, insnbtn);
+			if (!select_screen) {
+				playbtn.draw();
+				quitbtn.draw();
+				if (quitbtn.just_pressed)
+					game.quit();
+				if (playbtn.just_pressed)
+					select_screen = true;
+			}
+			else {
+				normbtn.draw();
+				hardbtn.draw();
+				imposbtn.draw();
+				insnbtn.draw();
+				if (normbtn.just_pressed) {
+					select_screen = false;
+					in_menu = false;
+					difficulty = Diff::NORMAL;
+				}
+				if (hardbtn.just_pressed and unlocked <= Diff::HARD) {
+					select_screen = false;
+					in_menu = false;
+					difficulty = Diff::HARD;
+				}
+				if (imposbtn.just_pressed and unlocked <= Diff::IMPOSSIBLE) {
+					select_screen = false;
+					in_menu = false;
+					difficulty = Diff::IMPOSSIBLE;
+				}
+				if (imposbtn.just_pressed and unlocked <= Diff::INSANE) {
+					select_screen = false;
+					in_menu = false;
+					difficulty = Diff::INSANE;
+				}
+			}
+		}
+		else {
+			in_menu = game.is_key_just_pressed(SDL_SCANCODE_ESCAPE);
 		}
 
 		//Update and draw snowballs
