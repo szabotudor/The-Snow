@@ -7,6 +7,7 @@ ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RE
 ss::Vector ground_size(game.resolution * 1.8);
 ss::Vector camera_offset(0);
 ss::Vector player_draw_center;
+uint64_t score = 0, score_record = 0;
 
 #if defined _DEBUG
 string console_text = " ";
@@ -61,6 +62,7 @@ int avg_fps[60];
 
 ss::Vector velocity;
 float invulnerability = 1;
+double spawn_timer = 0.5;
 double blink_timer = 1;
 double player_visibility_timer = 0;
 double insn_change_timer = 0;
@@ -103,6 +105,53 @@ void show_fps(ss::Text& text, unsigned int fps, int &i, float delta) {
 #endif
 
 
+void make_ground(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels) {
+	snow_pixels = ground_size.x * ground_size.y;
+	int r = rng.randi_range(235, 255);
+	int g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
+	int ip = 0, jp = 0;
+	for (int i = 0; i < ground_size.x; i++) {
+		ground_b[i] = new bool[(int)ground_size.y];
+		for (int j = 0; j < ground_size.y; j++) {
+			if (rng.randi() < 50) {
+				r = rng.randi_range(235, 255);
+				g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
+			}
+			else if (i > 0 and j > 0) {
+				jp = j;
+				ip = i - 1;
+				if (ip < 0) {
+					jp--;
+					ip++;
+				}
+				if (jp < 0) {
+					jp++;
+				}
+				r = gnd_tex.get_pixel(ss::Vector(ip, jp)).r;
+				g = gnd_tex.get_pixel(ss::Vector(ip, jp)).g;
+			}
+			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 255);
+			ground_b[i][j] = true;
+		}
+	}
+	gnd_tex.update();
+}
+
+
+void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels, Diff game_difficulty) {
+	select_screen = false;
+	in_menu = false;
+	difficulty = game_difficulty;
+	if (snow_pixels < 50 or fire_ammount == 0) {
+		make_ground(ground_b, gnd_tex, snow_pixels);
+	}
+	fire_ammount = 300;
+	spawn_timer = 0.5;
+	player_dead = false;
+	player_move_type = PlayerMoveType::IDLE;
+}
+
+
 void do_unlock(ss::Button& hard, ss::Button& impos, ss::Button& insn) {
 	switch (unlocked) {
 	case Diff::INSANE:
@@ -120,12 +169,20 @@ void do_unlock(ss::Button& hard, ss::Button& impos, ss::Button& insn) {
 }
 
 
-void process_menu(double delta, ss::Button& playbtn, ss::Button& quitbtn, ss::Button& norm, ss::Button& hard, ss::Button& impos, ss::Button& insn) {
+void save_data() {
+	ofstream fout("game.data", ios::binary);
+	fout << (uint16_t)unlocked << " " << score_record;
+	fout.close();
+}
+
+
+void process_menu(double delta, ss::Button& playbtn, ss::Button& quitbtn, ss::Button& norm, ss::Button& hard, ss::Button& impos, ss::Button& insn, ss::Button& back) {
 	playbtn.update();
 	quitbtn.update();
 	norm.update();
 	hard.update();
 	impos.update();
+	back.update();
 
 	if (unlocked == Diff::INSANE) {
 		if (insn_change_timer <= 0) {
@@ -162,6 +219,9 @@ void process_menu(double delta, ss::Button& playbtn, ss::Button& quitbtn, ss::Bu
 
 		if (insn.hovered) insn.draw_offset = ss::lerp(insn.draw_offset, ss::Vector(0, -3), delta / 40);
 		else insn.draw_offset = ss::lerp(insn.draw_offset, ss::Vector(0, 0), delta / 40);
+
+		if (back.hovered) back.draw_offset = ss::lerp(back.draw_offset, ss::Vector(0, -3), delta / 40);
+		else back.draw_offset = ss::lerp(back.draw_offset, ss::Vector(0, 0), delta / 40);
 	}
 }
 
@@ -184,7 +244,7 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 
 
 void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
-	fire.set_draw_ammount(lerp(fire.get_draw_ammount(), fire_ammount, delta / 80000));
+	fire.set_draw_ammount(fire_ammount);
 
 	//Flicker the player sprite when invulnerable
 	if (invulnerability > 0) {
@@ -340,6 +400,8 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 #endif
 			player.play(0, 2, 2, false);
 			player_dead = true;
+			in_menu = true;
+			enemies = 0;
 		}
 		break;
 	default:
@@ -383,6 +445,17 @@ void init_part(ss::ParticleEmitter& ptem, SDL_Renderer* render) {
 	ptem.particle_layer[0].lifetime_random = 0.3;
 	ptem.emission_shape = ss::ParticleEmitter::EmissionShape::CIRCLE;
 	ptem.emission_radius = 5;
+}
+
+
+void add_to_score(ss::Text& score_text, uint32_t add) {
+	score += add;
+	score_text.set_text(to_string(score));
+	if (score > score_record) {
+		score_record = score;
+	}
+	score_text.scale = 1.2;
+	score_text.position.x = 310 - score_text.get_text().length() * 8;
 }
 
 
@@ -431,6 +504,12 @@ int main(int argc, char* args[]) {
 	insnbtn.update();
 	insnbtn.position = ss::Vector(game.resolution / 2 - insnbtn.bounding_box.size / 2 + ss::Vector(0, 60));
 
+	//Back button
+	ss::Button backbtn = ss::Button(game.get_window(), text_color, "BACK", "stfont.ttf", 8);
+	backbtn.update();
+	backbtn.position = ss::Vector(5, game.resolution.y - 13);
+
+
 	//Creating the player sprite
 	const char* frames[6] = {
 		"Sprites/Player/player_idle0000.png",
@@ -460,34 +539,7 @@ int main(int argc, char* args[]) {
 #if defined _DEBUG
 	print_to_console(to_string(snow_pixels) + " pixels to fill");
 #endif
-	int r = rng.randi_range(235, 255);
-	int g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
-	int ip = 0, jp = 0;
-	for (int i = 0; i < ground_size.x; i++) {
-		ground_b[i] = new bool[(int)ground_size.y];
-		for (int j = 0; j < ground_size.y; j++) {
-			if (rng.randi() < 50) {
-				r = rng.randi_range(235, 255);
-				g = rng.randi_range(ss::clamp(235, 255, r + 10), 255);
-			}
-			else if (i > 0 and j > 0) {
-				jp = j;
-				ip = i - 1;
-				if (ip < 0) {
-					jp--;
-					ip++;
-				}
-				if (jp < 0) {
-					jp++;
-				}
-				r = gnd_tex.get_pixel(ss::Vector(ip, jp)).r;
-				g = gnd_tex.get_pixel(ss::Vector(ip, jp)).g;
-			}
-			gnd_tex.set_pixel(ss::Vector(i, j), r, g, 255);
-			ground_b[i][j] = true;
-		}
-	}
-	gnd_tex.update();
+	make_ground(ground_b, gnd_tex, snow_pixels);
 
 	//Enables drawing of CollisionShapes in debug mode
 #if defined _DEBUG
@@ -510,21 +562,34 @@ int main(int argc, char* args[]) {
 	float _rdt = 0.0f;
 	int i = 0;
 
-	double spawn_timer = 2;
 	double snowball_timer = 0.8;
 	bool first_frame = true;
 
 	init_enemy(game);
 	init_snowballs(game);
 
+	ss::Text highscore(game.get_window(), "High Score: 0", "stfont.ttf", 8);
+	highscore.color = text_color;
+	highscore.position.y = 10;
+	highscore.position.x = 310 - highscore.get_text().length() * 8;
+	highscore.scale = 1.2;
+
 	ifstream fin("game.data", ios::binary);
 	if (fin.is_open()) {
 		int unlkd = 0;
-		fin >> unlkd;
+
+		fin >> unlkd >> score_record;
+
 		unlocked = (Diff)unlkd;
 		do_unlock(hardbtn, imposbtn, insnbtn);
+		highscore.set_text("High Score: " + to_string(score_record));
+		highscore.position.x = 310 - highscore.get_text().length() * 8;
+
 		fin.close();
 	}
+
+	uint32_t score_to_add = 0;
+	double add_score_timer = 0;
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
@@ -538,17 +603,17 @@ int main(int argc, char* args[]) {
 
 		//Spawn an enemy at a random interval
 		if (enemies < max_enemies and snow_pixels > 50 and !in_menu) {
-			if (spawn_timer < 0 or game.is_key_just_pressed(SDL_SCANCODE_F1)) {
+			if (spawn_timer < 0) {
 				double time_change = 0.0;
 				switch (difficulty) {
 				case Diff::INSANE:
 					time_change = 1.0 - (double)snow_pixels / max_snow_pixels;
 					break;
 				case Diff::IMPOSSIBLE:
-					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 3.5;
+					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 4;
 					break;
 				case Diff::HARD:
-					time_change = (2.0 - (double)snow_pixels / max_snow_pixels) * 6.5;
+					time_change = (2.0 - (double)snow_pixels / max_snow_pixels) * 7;
 					break;
 				case Diff::NORMAL:
 					time_change = (3.0 - (double)snow_pixels / max_snow_pixels) * 10;
@@ -595,8 +660,26 @@ int main(int argc, char* args[]) {
 			in_menu = true;
 			enemies = 0;
 			if (unlocked > Diff::INSANE) {
-				unlocked = (Diff)((uint8_t)unlocked - 1);
+				switch (difficulty) {
+				case Diff::INSANE:
+					break;
+				case Diff::IMPOSSIBLE:
+					if (unlocked >= Diff::IMPOSSIBLE)
+						unlocked = Diff::INSANE;
+					break;
+				case Diff::HARD:
+					if (unlocked >= Diff::HARD)
+						unlocked = Diff::IMPOSSIBLE;
+					break;
+				case Diff::NORMAL:
+					if (unlocked >= Diff::NORMAL)
+						unlocked = Diff::HARD;
+					break;
+				default:
+					break;
+				}
 				do_unlock(hardbtn, imposbtn, insnbtn);
+				save_data();
 			}
 		}
 
@@ -658,6 +741,9 @@ int main(int argc, char* args[]) {
 								gnd_tex.set_pixel(ss::Vector(x, y), r, g, b);
 								ground_b[x][y] = false;
 								snow_pixels--;
+								if (rng.randi() < 7 and !in_menu) {
+									score_to_add++;
+								}
 							}
 						}
 					}
@@ -671,6 +757,7 @@ int main(int argc, char* args[]) {
 						print_to_console("Enemy " + to_string(j) + " damaged (" + to_string(enemy[j].get_hp()) + " hp)");
 					}
 #endif
+					score_to_add += ss::clamp(80, 200, 200 - enemy[j].get_lifetime());
 					enemy[j].damage();
 				}
 			}
@@ -683,8 +770,11 @@ int main(int argc, char* args[]) {
 			player.draw(_dt);
 		}
 
+		if (!select_screen) highscore.draw();
+
 		if (in_menu) {
-			process_menu(_dt, playbtn, quitbtn, normbtn, hardbtn, imposbtn, insnbtn);
+			highscore.scale = 1.0;
+			process_menu(_dt, playbtn, quitbtn, normbtn, hardbtn, imposbtn, insnbtn, backbtn);
 			if (!select_screen) {
 				playbtn.draw();
 				quitbtn.draw();
@@ -698,30 +788,35 @@ int main(int argc, char* args[]) {
 				hardbtn.draw();
 				imposbtn.draw();
 				insnbtn.draw();
+				backbtn.draw();
 				if (normbtn.just_pressed) {
-					select_screen = false;
-					in_menu = false;
-					difficulty = Diff::NORMAL;
+					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::NORMAL);
 				}
 				if (hardbtn.just_pressed and unlocked <= Diff::HARD) {
-					select_screen = false;
-					in_menu = false;
-					difficulty = Diff::HARD;
+					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::HARD);
 				}
 				if (imposbtn.just_pressed and unlocked <= Diff::IMPOSSIBLE) {
-					select_screen = false;
-					in_menu = false;
-					difficulty = Diff::IMPOSSIBLE;
+					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::IMPOSSIBLE);
 				}
-				if (imposbtn.just_pressed and unlocked <= Diff::INSANE) {
+				if (insnbtn.just_pressed and unlocked <= Diff::INSANE) {
+					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::INSANE);
+				}
+				if (backbtn.just_pressed) {
 					select_screen = false;
-					in_menu = false;
-					difficulty = Diff::INSANE;
 				}
 			}
 		}
 		else {
 			in_menu = game.is_key_just_pressed(SDL_SCANCODE_ESCAPE);
+			if (add_score_timer <= 0 and score_to_add) {
+				add_to_score(highscore, score_to_add);
+				score_to_add = 0;
+				add_score_timer = 0.05;
+			}
+			else {
+				add_score_timer -= _dt / 1000;
+			}
+			highscore.scale = ss::lerp(highscore.scale, 1.0, _dt / 25);
 		}
 
 		//Update and draw snowballs
@@ -812,5 +907,6 @@ int main(int argc, char* args[]) {
 			}
 		}
 	}
+	save_data();
 	return 0;
 }
