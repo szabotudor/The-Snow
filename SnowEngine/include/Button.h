@@ -45,6 +45,8 @@ namespace ss {
 		SDL_Rect rect, border_rect;
 
 	public:
+		CollisionShape bounding_box;
+		ss::Vector draw_offset;
 		Button(SDL_Window* window, const char* text = "Button", const char* font = "basic.ttf", unsigned int font_size = 18);
 		Button(SDL_Window* window, SDL_Color bgd_color, SDL_Color border_color, SDL_Color text_color, unsigned int border_thickness, const char* text, const char* font = "basic.ttf", unsigned int font_size = 18);
 		Button(SDL_Window* window, SDL_Color text_color, const char* text, const char* font = "basic.ttf", unsigned int font_size = 18);
