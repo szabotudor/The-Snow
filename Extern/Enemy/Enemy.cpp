@@ -132,7 +132,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 		if (snowball_timer <= 0) {
 			snowball_list[num_of_snowballs] = new Snowball(game.get_window(), position + ss::Vector(5, 0), target_p);
 			num_of_snowballs++;
-			snowball_timer = rng.randf_range(1.5, 3);
+			snowball_timer = rng.randf_range(snowball_throw_delay, snowball_throw_delay + 2);
 		}
 		else {
 			snowball_timer -= delta;

@@ -620,19 +620,22 @@ int main(int argc, char* args[]) {
 		//Spawn an enemy at a random interval
 		if (enemies < max_enemies and snow_pixels > 50 and !in_menu) {
 			if (spawn_timer < 0) {
-				double time_change = 0.0;
+				double time_change = 0.0, st_delay = 2;
 				switch (difficulty) {
 				case Diff::INSANE:
 					time_change = 1.0 - (double)snow_pixels / max_snow_pixels;
+					st_delay = 0.25;
 					break;
 				case Diff::IMPOSSIBLE:
 					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 4;
+					st_delay = 0.75;
 					break;
 				case Diff::HARD:
 					time_change = (2.0 - (double)snow_pixels / max_snow_pixels) * 7;
+					st_delay = 1.5;
 					break;
 				case Diff::NORMAL:
-					time_change = (3.0 - (double)snow_pixels / max_snow_pixels) * 10;
+					time_change = (3.0 - (double)snow_pixels / max_snow_pixels) * 9.5;
 					break;
 				default:
 					break;
@@ -643,6 +646,7 @@ int main(int argc, char* args[]) {
 				spawn_position.y = ss::clamp(0, ground_size.y, spawn_position.y);
 
 				enemy[enemies] = Enemy(spawn_position);
+				enemy[enemies].snowball_throw_delay = st_delay;
 				ground_cs.push_in(enemy[enemies].collision);
 #if defined _DEBUG
 				enemy[enemies].collision.enable_draw(game.get_window());

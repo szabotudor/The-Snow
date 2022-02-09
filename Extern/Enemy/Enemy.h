@@ -50,6 +50,7 @@ class Enemy {
 	ss::Vector position;
 	ss::Vector velocity;
 public:
+	double snowball_throw_delay = 2;
 	bool attacking = false;
 	//The enemy will shoot at this position
 	ss::Vector target;
