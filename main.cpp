@@ -597,16 +597,8 @@ int main(int argc, char* args[]) {
 
 	uint32_t score_to_add = 0;
 	double add_score_timer = 0;
-
-	for (int i = 0; i < 3; i++) {
-		ss::Vector spawn_position = player_cs.position + rng.randdir() * rng.randd_range(50, 100);
-		spawn_position.x = ss::clamp(0, ground_size.x, spawn_position.x);
-		spawn_position.y = ss::clamp(0, ground_size.y, spawn_position.y);
-
-		enemy[i] = Enemy(spawn_position);
-		ground_cs.push_in(enemy[i].collision);
-	}
-	enemies = 3;
+	uint8_t force_spawn_enemies = rng.randi(3);
+	print_to_console("Force spawning " + to_string(force_spawn_enemies) + " enemies");
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
@@ -619,8 +611,10 @@ int main(int argc, char* args[]) {
 		player_process(player, ptem, game, _dt);
 
 		//Spawn an enemy at a random interval
-		if (enemies < max_enemies and snow_pixels > 50 and !in_menu) {
-			if (spawn_timer < 0) {
+		if (enemies < max_enemies and snow_pixels > 50 and !in_menu or force_spawn_enemies) {
+			if (spawn_timer < 0 or force_spawn_enemies) {
+				if (force_spawn_enemies) force_spawn_enemies--;
+
 				double time_change = 0.0, st_delay = 2;
 				switch (difficulty) {
 				case Diff::INSANE:
@@ -658,23 +652,6 @@ int main(int argc, char* args[]) {
 			else {
 				spawn_timer -= _dt / 1000;
 			}
-			//Spawn an enemy if there is room for it
-#if defined _DEBUG
-			if (game.is_key_pressed(SDL_SCANCODE_LSHIFT) and game.is_key_pressed(SDL_SCANCODE_LCTRL)) {
-				if (game.is_key_just_pressed(SDL_SCANCODE_F1)) {
-					for (enemies; enemies < max_enemies; enemies++) {
-						enemy[enemies] = Enemy(player_cs.position + rng.randdir() * rng.randd_range(50, 100));
-						ground_cs.push_in(enemy[enemies].collision);
-						enemy[enemies].collision.enable_draw(game.get_window());
-						print_to_console("Enemy " + to_string(enemies) + " spawned");
-						for (int i = 0; i < enemies; i++) {
-							enemy[i].collision.push_out(enemy[enemies].collision);
-						}
-					}
-					enemies--;
-				}
-			}
-#endif
 		}
 		else if (snow_pixels < 50 and !in_menu) {
 			//Placeholder for win screen
@@ -869,6 +846,12 @@ int main(int argc, char* args[]) {
 			player_cs.position -= camera_offset;
 			player_cs.draw();
 			player_cs.position += camera_offset;
+
+			for (int i = 0; i < enemies; i++) {
+				enemy[i].collision.position -= camera_offset;
+				enemy[i].collision.draw();
+				enemy[i].collision.position += camera_offset;
+			}
 
 			for (int i = 0; i < snowballs; i++) {
 				snowball[i]->collision.position -= camera_offset;
