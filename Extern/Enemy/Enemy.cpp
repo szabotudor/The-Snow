@@ -129,7 +129,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 		else {
 			target_p = position.direction_to(target);
 		}
-		if (snowball_timer <= 0) {
+		if (snowball_timer <= 0 and collision.position.distance_to(target) < 200) {
 			snowball_list[num_of_snowballs] = new Snowball(game.get_window(), position + ss::Vector(5, 0), target_p);
 			num_of_snowballs++;
 			snowball_timer = rng.randf_range(snowball_throw_delay, snowball_throw_delay + 2);
@@ -144,7 +144,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 			if (invulnerability <= 0) {
 				//Move towards player
 				ss::Vector direction = collision.position.direction_to(target).normalized();
-				if (collision.position.distance_to(target) > 100 and collision.position.distance_to(target) < 200) {
+				if (collision.position.distance_to(target) > 100 and collision.position.distance_to(target) < 250) {
 					velocity = ss::lerp(velocity, direction * delta * 45, delta * 5);
 				}
 				else if (collision.position.distance_to(target) < 86) {
