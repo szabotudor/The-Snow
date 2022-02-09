@@ -67,6 +67,7 @@ double blink_timer = 1;
 double player_visibility_timer = 0;
 double insn_change_timer = 0;
 double camera_shake = 0;
+double natural_shake = 0;
 bool player_visible = true;
 bool player_dead = false;
 bool in_menu = true;
@@ -628,7 +629,7 @@ int main(int argc, char* args[]) {
 					break;
 				case Diff::IMPOSSIBLE:
 					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 4;
-					st_delay = 0.75;
+					st_delay = 1;
 					break;
 				case Diff::HARD:
 					time_change = (2.0 - (double)snow_pixels / max_snow_pixels) * 7;
@@ -783,8 +784,8 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		if (camera_shake > 0.0) {
-			camera_shake = ss::lerp(camera_shake, 0, _dt / 300);
+		if (camera_shake > 0.1) {
+			camera_shake = ss::lerp(camera_shake, natural_shake, _dt / 300);
 			camera_offset += rng.randdir() * camera_shake;
 		}
 		ptem.draw_offset = ss::Vector() - camera_offset;
@@ -868,12 +869,6 @@ int main(int argc, char* args[]) {
 			player_cs.position -= camera_offset;
 			player_cs.draw();
 			player_cs.position += camera_offset;
-
-			for (int i = 0; i < enemies; i++) {
-				enemy[i].collision.position -= camera_offset;
-				enemy[i].collision.draw();
-				enemy[i].collision.position += camera_offset;
-			}
 
 			for (int i = 0; i < snowballs; i++) {
 				snowball[i]->collision.position -= camera_offset;
