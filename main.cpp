@@ -779,7 +779,7 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		if (camera_shake > 0.1) {
+		if (camera_shake > 0.0) {
 			camera_shake = ss::lerp(camera_shake, 0, _dt / 300);
 			camera_offset += rng.randdir() * camera_shake;
 		}
