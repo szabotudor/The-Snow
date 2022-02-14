@@ -598,7 +598,9 @@ int main(int argc, char* args[]) {
 	uint32_t score_to_add = 0;
 	double add_score_timer = 0;
 	uint8_t force_spawn_enemies = rng.randi(3);
+#if defined _DEBUG
 	print_to_console("Force spawning " + to_string(force_spawn_enemies) + " enemies");
+#endif
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
