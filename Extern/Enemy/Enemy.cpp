@@ -2,6 +2,7 @@
 #include<SDL_mixer.h>
 #include"Enemy.h"
 
+Mix_Chunk* snd_snowman_hit = NULL;
 Mix_Chunk* thrw;
 
 bool init = false;
@@ -10,8 +11,10 @@ ss::Sprite enemy_sprite;
 ss::Sprite melt_sprite;
 
 void init_enemy(ss::Snow& game) {
+	snd_snowman_hit = Mix_LoadWAV("Sounds/Effects/snowman_hit.wav");
 	thrw = Mix_LoadWAV("Sounds/Effects/throw.wav");
-	Mix_VolumeChunk(thrw, 32);
+	Mix_VolumeChunk(snd_snowman_hit, 18);
+	Mix_VolumeChunk(thrw, 128);
 	//Load all textures
 	init = true;
 	const char* textures[9] = {
@@ -235,6 +238,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 
 void Enemy::damage() {
 	if (invulnerability <= 0) {
+		Mix_PlayChannel(CH_SNOWMAN_HIT, snd_snowman_hit, 0);
 		life--;
 		invulnerability = 1;
 		aoe = 0;

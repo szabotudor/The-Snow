@@ -7,6 +7,8 @@
 
 Mix_Chunk* snd_player_hit = NULL;
 Mix_Chunk* snd_fire = NULL;
+Mix_Chunk* snd_melt = NULL;
+Mix_Chunk* snd_click = NULL;
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 ss::Vector ground_size(game.resolution * 1.8);
@@ -65,6 +67,7 @@ bool player_visible = true;
 bool player_dead = false;
 bool in_menu = true;
 bool select_screen = false;
+bool first_boot = true;
 int fire_ammount = 300;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
@@ -134,6 +137,7 @@ void make_ground(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels)
 
 
 void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels, Diff game_difficulty) {
+	first_boot = false;
 	select_screen = false;
 	in_menu = false;
 	difficulty = game_difficulty;
@@ -295,7 +299,6 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT) and !in_menu) {
-		Mix_VolumeChunk(snd_fire, 128);
 		player_move_type = PlayerMoveType::SHOOTING;
 		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 80).normalized();
 		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
@@ -305,7 +308,6 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		//camera_offset += fire.particle_layer[0].initial_direction * delta / 1000;
 	}
 	else {
-		Mix_VolumeChunk(snd_fire, 64);
 		fire.particle_layer[0].initial_direction = ss::Vector(0, -1);
 		fire.particle_layer[0].initial_velocity_min = -15;
 		fire.particle_layer[0].initial_velocity_max = 15;
@@ -469,11 +471,17 @@ int main(int argc, char* args[]) {
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 		throw runtime_error("Could not start audio straming");
 	}
-	Mix_AllocateChannels(4);
+	Mix_AllocateChannels(8);
 	snd_player_hit = Mix_LoadWAV("Sounds/Effects/hit.wav");
 	snd_fire = Mix_LoadWAV("Sounds/Effects/fire.wav");
+	snd_melt = Mix_LoadWAV("Sounds/Effects/melt.wav");
+	snd_click = Mix_LoadWAV("Sounds/Effects/click.wav");
+
 	Mix_VolumeChunk(snd_player_hit, 32);
 	Mix_VolumeChunk(snd_fire, 72);
+	Mix_VolumeChunk(snd_melt, 64);
+	Mix_VolumeChunk(snd_click, 32);
+	float melt_volume = 0;
 
 	enemy = new Enemy[max_enemies];
 	rng.randomize();
@@ -612,12 +620,19 @@ int main(int argc, char* args[]) {
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
-		if (!player_dead) {
+		if (!player_dead and first_boot) {
 			if (!Mix_Playing(CH_FIRE)) Mix_PlayChannel(CH_FIRE, snd_fire, 1);
 		}
 		else {
-			Mix_FadeOutChannel(CH_FIRE, 1000);
+			first_boot = false;
+			Mix_Volume(CH_FIRE, 0);
 		}
+		if (!Mix_Playing(CH_MELT)) Mix_PlayChannel(CH_MELT, snd_melt, 1);
+		melt_volume = ss::clamp(0, 16, melt_volume);
+		if (melt_volume > 0) melt_volume = ss::lerp(melt_volume, 0, _dt / 100);
+		else melt_volume = 0;
+		Mix_Volume(CH_MELT, (int)melt_volume);
+
 		game.update();
 		game.clear_screen();
 		gnd_tex.update();
@@ -742,6 +757,7 @@ int main(int argc, char* args[]) {
 					if (x >= 0 and x < ground_size.x and y >= 0 and y < ground_size.y) {
 						if (ground_b[x][y]) {
 							if (p_pos.distance_to(ss::Vector(x, y)) < 12.5) {
+								melt_volume += 0.005;
 								if (rng.randi() < 50) {
 									r = rng.randi_range(0, 40);
 									g = rng.randi_range(180, 200);
@@ -796,10 +812,14 @@ int main(int argc, char* args[]) {
 			if (!select_screen) {
 				playbtn.draw();
 				quitbtn.draw();
-				if (quitbtn.just_pressed)
+				if (quitbtn.just_pressed) {
+					Mix_PlayChannel(CH_UI, snd_click, 0);
 					game.quit();
-				if (playbtn.just_pressed)
+				}
+				if (playbtn.just_pressed) {
 					select_screen = true;
+					Mix_PlayChannel(CH_UI, snd_click, 0);
+				}
 			}
 			else {
 				normbtn.draw();
@@ -809,18 +829,23 @@ int main(int argc, char* args[]) {
 				backbtn.draw();
 				if (normbtn.just_pressed) {
 					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::NORMAL);
+					Mix_PlayChannel(CH_UI, snd_click, 0);
 				}
 				if (hardbtn.just_pressed and unlocked <= Diff::HARD) {
 					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::HARD);
+					Mix_PlayChannel(CH_UI, snd_click, 0);
 				}
 				if (imposbtn.just_pressed and unlocked <= Diff::IMPOSSIBLE) {
 					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::IMPOSSIBLE);
+					Mix_PlayChannel(CH_UI, snd_click, 0);
 				}
 				if (insnbtn.just_pressed and unlocked <= Diff::INSANE) {
 					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::INSANE);
+					Mix_PlayChannel(CH_UI, snd_click, 0);
 				}
 				if (backbtn.just_pressed) {
 					select_screen = false;
+					Mix_PlayChannel(CH_UI, snd_click, 0);
 				}
 			}
 		}

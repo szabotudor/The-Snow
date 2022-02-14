@@ -16,6 +16,7 @@ class Snowball {
 	ss::ParticleEmitter* ptem;
 	bool visible = true;
 	bool melted = false;
+	bool first_play = true;
 public:
 	ss::CollisionShape collision;
 

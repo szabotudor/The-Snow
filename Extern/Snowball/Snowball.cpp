@@ -1,12 +1,17 @@
-#include "Snowball.h"
+#include"../Setup.h"
+#include"SDL_mixer.h"
+#include"Snowball.h"
 
 
 ss::Texture* snowball_tex;
 ss::Texture* snowball_shadow;
 SDL_Texture* snowball_p_tex;
+Mix_Chunk* snd_snowball = NULL;
 
 
 void init_snowballs(ss::Snow& game) {
+	snd_snowball = Mix_LoadWAV("Sounds/Effects/snowball.wav");
+	Mix_VolumeChunk(snd_snowball, 8);
 	snowball_tex = new ss::Texture(game.get_window(), "Sprites/Snowball/Snowball.png", SDL_BLENDMODE_BLEND);
 	snowball_shadow = new ss::Texture(game.get_window(), "Sprites/Snowball/Snowball_Shadow.png", SDL_BLENDMODE_BLEND);
 	SDL_Surface* pt_sfc = SDL_CreateRGBSurface(NULL, 2, 2, 32, NULL, NULL, NULL, NULL);
@@ -38,6 +43,10 @@ Snowball::Snowball(SDL_Window* window, ss::Vector position, ss::Vector direction
 
 void Snowball::update(double delta, ss::Texture& ground_texture, bool**& ground_bool, long long& snow_ammount, ss::CollisionShape& player_cs, ss::Vector& ground_size, bool& hit_player) {
 	if (height < 0) {
+		if (first_play) {
+			Mix_PlayChannel(CH_SNOWBALL, snd_snowball, 0);
+			first_play = false;
+		}
 		visible = false;
 		ptem->position = position + ss::Vector(2);
 		ptem->update(delta * 10);
