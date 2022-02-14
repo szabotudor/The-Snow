@@ -1,7 +1,12 @@
+#include"Extern/Setup.h"
 #include<Snow.h>
+#include<SDL_mixer.h>
 #include"Extern/Enemy/Enemy.h"
 #include"Extern/Snowball/Snowball.h"
 
+
+Mix_Chunk* snd_player_hit = NULL;
+Mix_Chunk* snd_fire = NULL;
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 ss::Vector ground_size(game.resolution * 1.8);
@@ -43,18 +48,6 @@ void print_to_console(string text) {
 #endif
 
 
-enum class PlayerMoveType {
-	IDLE,
-	MOVING,
-	SHOOTING,
-	DEAD
-};
-enum class Diff {
-	INSANE,
-	IMPOSSIBLE,
-	HARD,
-	NORMAL
-};
 Diff difficulty = Diff::NORMAL;
 Diff unlocked = Diff::NORMAL;
 ss::RandomNumberGenerator rng;
@@ -153,6 +146,7 @@ void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels
 	player_dead = false;
 	player_move_type = PlayerMoveType::IDLE;
 	velocity = 0;
+	Mix_FadeInChannel(CH_FIRE, snd_fire, 1, 1000);
 }
 
 
@@ -239,6 +233,7 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 	if (in_menu) return;
 
 	if (invulnerability < 0) {
+		Mix_PlayChannel(CH_PLAYER_HIT, snd_player_hit, 0);
 		velocity += direction * delta / 4;
 		invulnerability = 1;
 		fire_ammount -= 120;
@@ -300,6 +295,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT) and !in_menu) {
+		Mix_VolumeChunk(snd_fire, 128);
 		player_move_type = PlayerMoveType::SHOOTING;
 		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 80).normalized();
 		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
@@ -309,6 +305,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		//camera_offset += fire.particle_layer[0].initial_direction * delta / 1000;
 	}
 	else {
+		Mix_VolumeChunk(snd_fire, 64);
 		fire.particle_layer[0].initial_direction = ss::Vector(0, -1);
 		fire.particle_layer[0].initial_velocity_min = -15;
 		fire.particle_layer[0].initial_velocity_max = 15;
@@ -467,6 +464,17 @@ void add_to_score(ss::Text& score_text, uint32_t add) {
 
 
 int main(int argc, char* args[]) {
+	Mix_Init(MIX_INIT_MP3);
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		throw runtime_error("Could not start audio straming");
+	}
+	Mix_AllocateChannels(4);
+	snd_player_hit = Mix_LoadWAV("Sounds/Effects/hit.wav");
+	snd_fire = Mix_LoadWAV("Sounds/Effects/fire.wav");
+	Mix_VolumeChunk(snd_player_hit, 32);
+	Mix_VolumeChunk(snd_fire, 72);
+
 	enemy = new Enemy[max_enemies];
 	rng.randomize();
 	window_cs.size = game.resolution;
@@ -604,6 +612,12 @@ int main(int argc, char* args[]) {
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
+		if (!player_dead) {
+			if (!Mix_Playing(CH_FIRE)) Mix_PlayChannel(CH_FIRE, snd_fire, 1);
+		}
+		else {
+			Mix_FadeOutChannel(CH_FIRE, 1000);
+		}
 		game.update();
 		game.clear_screen();
 		gnd_tex.update();

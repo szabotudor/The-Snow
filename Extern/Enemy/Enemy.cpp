@@ -1,5 +1,8 @@
+#include"../Setup.h"
+#include<SDL_mixer.h>
 #include"Enemy.h"
 
+Mix_Chunk* thrw;
 
 bool init = false;
 SDL_Window* window = nullptr;
@@ -7,6 +10,8 @@ ss::Sprite enemy_sprite;
 ss::Sprite melt_sprite;
 
 void init_enemy(ss::Snow& game) {
+	thrw = Mix_LoadWAV("Sounds/Effects/throw.wav");
+	Mix_VolumeChunk(thrw, 32);
 	//Load all textures
 	init = true;
 	const char* textures[9] = {
@@ -130,6 +135,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 			target_p = position.direction_to(target);
 		}
 		if (snowball_timer <= 0 and collision.position.distance_to(target) < 200) {
+			Mix_PlayChannel(CH_ENEMY_THROW, thrw, 0);
 			snowball_list[num_of_snowballs] = new Snowball(game.get_window(), position + ss::Vector(5, 0), target_p);
 			num_of_snowballs++;
 			snowball_timer = rng.randf_range(snowball_throw_delay, snowball_throw_delay + 2);
