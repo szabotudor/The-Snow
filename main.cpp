@@ -10,6 +10,11 @@ Mix_Chunk* snd_fire = NULL;
 Mix_Chunk* snd_melt = NULL;
 Mix_Chunk* snd_click = NULL;
 
+Mix_Music* mus_intro = NULL;
+Mix_Music* mus_body1 = NULL;
+Mix_Music* mus_body2 = NULL;
+Mix_Music* mus_outro = NULL;
+
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 ss::Vector ground_size(game.resolution * 1.8);
 ss::Vector camera_offset(0);
@@ -471,7 +476,7 @@ int main(int argc, char* args[]) {
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 		throw runtime_error("Could not start audio straming");
 	}
-	Mix_AllocateChannels(8);
+	Mix_AllocateChannels(9);
 	snd_player_hit = Mix_LoadWAV("Sounds/Effects/hit.wav");
 	snd_fire = Mix_LoadWAV("Sounds/Effects/fire.wav");
 	snd_melt = Mix_LoadWAV("Sounds/Effects/melt.wav");
@@ -482,6 +487,11 @@ int main(int argc, char* args[]) {
 	Mix_VolumeChunk(snd_melt, 64);
 	Mix_VolumeChunk(snd_click, 32);
 	float melt_volume = 0;
+
+	mus_intro = Mix_LoadMUS("Sounds/Music/music-intro.mp3");
+	mus_body1 = Mix_LoadMUS("Sounds/Music/music-body-1.mp3");
+	mus_body2 = Mix_LoadMUS("Sounds/Music/music-body-2.mp3");
+	mus_outro = Mix_LoadMUS("Sounds/Music/music-outro.mp3");
 
 	enemy = new Enemy[max_enemies];
 	rng.randomize();
@@ -617,6 +627,8 @@ int main(int argc, char* args[]) {
 #if defined _DEBUG
 	print_to_console("Force spawning " + to_string(force_spawn_enemies) + " enemies");
 #endif
+
+	uint64_t mus_pos = 0;
 
 	//Main loop, runs every frame
 	while (game.running(_dt, _rdt)) {
@@ -848,6 +860,11 @@ int main(int argc, char* args[]) {
 					Mix_PlayChannel(CH_UI, snd_click, 0);
 				}
 			}
+
+			if (Mix_PlayingMusic() and mus_pos != 3) {
+				Mix_PlayMusic(mus_outro, 0);
+				mus_pos = 3;
+			}
 		}
 		else {
 			in_menu = game.is_key_just_pressed(SDL_SCANCODE_ESCAPE);
@@ -860,6 +877,28 @@ int main(int argc, char* args[]) {
 				add_score_timer -= _dt / 1000;
 			}
 			highscore.scale = ss::lerp(highscore.scale, 1.0, _dt / 25);
+
+			if (!Mix_PlayingMusic()) {
+				switch (mus_pos) {
+				case 0:
+					Mix_PlayMusic(mus_intro, 0);
+					mus_pos = 1;
+					break;
+				case 1:
+					Mix_PlayMusic(mus_body1, 0);
+					mus_pos = 2;
+					break;
+				case 2:
+					Mix_PlayMusic(mus_body2, 0);
+					mus_pos = 1;
+					break;
+				case 3:
+					mus_pos = 0;
+					break;
+				default:
+					break;
+				}
+			}
 		}
 
 		//Update and draw snowballs
