@@ -73,6 +73,7 @@ bool player_dead = false;
 bool in_menu = true;
 bool select_screen = false;
 bool first_boot = true;
+bool mouse_pressed = false;
 int fire_ammount = 300;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
@@ -824,13 +825,15 @@ int main(int argc, char* args[]) {
 			if (!select_screen) {
 				playbtn.draw();
 				quitbtn.draw();
-				if (quitbtn.just_pressed) {
-					Mix_PlayChannel(CH_UI, snd_click, 0);
-					game.quit();
-				}
-				if (playbtn.just_pressed) {
-					select_screen = true;
-					Mix_PlayChannel(CH_UI, snd_click, 0);
+				if (!mouse_pressed) {
+					if (quitbtn.just_pressed) {
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+						game.quit();
+					}
+					if (playbtn.just_pressed) {
+						select_screen = true;
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
 				}
 			}
 			else {
@@ -839,25 +842,27 @@ int main(int argc, char* args[]) {
 				imposbtn.draw();
 				insnbtn.draw();
 				backbtn.draw();
-				if (normbtn.just_pressed) {
-					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::NORMAL);
-					Mix_PlayChannel(CH_UI, snd_click, 0);
-				}
-				if (hardbtn.just_pressed and unlocked <= Diff::HARD) {
-					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::HARD);
-					Mix_PlayChannel(CH_UI, snd_click, 0);
-				}
-				if (imposbtn.just_pressed and unlocked <= Diff::IMPOSSIBLE) {
-					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::IMPOSSIBLE);
-					Mix_PlayChannel(CH_UI, snd_click, 0);
-				}
-				if (insnbtn.just_pressed and unlocked <= Diff::INSANE) {
-					prepare_game(ground_b, gnd_tex, snow_pixels, Diff::INSANE);
-					Mix_PlayChannel(CH_UI, snd_click, 0);
-				}
-				if (backbtn.just_pressed) {
-					select_screen = false;
-					Mix_PlayChannel(CH_UI, snd_click, 0);
+				if (!mouse_pressed) {
+					if (normbtn.just_pressed) {
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::NORMAL);
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
+					if (hardbtn.just_pressed and unlocked <= Diff::HARD) {
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::HARD);
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
+					if (imposbtn.just_pressed and unlocked <= Diff::IMPOSSIBLE) {
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::IMPOSSIBLE);
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
+					if (insnbtn.just_pressed and unlocked <= Diff::INSANE) {
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::INSANE);
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
+					if (backbtn.just_pressed) {
+						select_screen = false;
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
 				}
 			}
 
@@ -900,6 +905,8 @@ int main(int argc, char* args[]) {
 				}
 			}
 		}
+
+		mouse_pressed = game.is_button_pressed(SDL_BUTTON_LEFT);
 
 		//Update and draw snowballs
 		for (int i = 0; i < snowballs; i++) {
