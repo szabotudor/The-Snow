@@ -794,7 +794,7 @@ int main(int argc, char* args[]) {
 			}
 			//Verify collision between fire particles and snowmen
 			for (int j = 0; j < enemies; j++) {
-				if (enemy[j].collision.is_colliding_with(p_pos)) {
+				if (enemy[j].collision.is_colliding_with(p_pos) and !in_menu) {
 #if defined _DEBUG
 					if (!enemy[j].is_invulnerable()) {
 						print_to_console("Enemy " + to_string(j) + " damaged (" + to_string(enemy[j].get_hp()) + " hp)");
