@@ -74,6 +74,7 @@ bool in_menu = true;
 bool select_screen = false;
 bool first_boot = true;
 bool mouse_pressed = false;
+bool force_reset = false;
 int fire_ammount = 300;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
@@ -142,12 +143,13 @@ void make_ground(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels)
 }
 
 
-void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels, Diff game_difficulty) {
+void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels, Diff game_difficulty, ss::Sprite& heart) {
+	heart.frame = 0;
 	first_boot = false;
 	select_screen = false;
 	in_menu = false;
 	difficulty = game_difficulty;
-	if (snow_pixels < 50 or player_dead) {
+	if (snow_pixels < 50 or player_dead or force_reset) {
 		make_ground(ground_b, gnd_tex, snow_pixels);
 		score = 0;
 	}
@@ -234,7 +236,7 @@ void process_menu(double delta, ss::Button& playbtn, ss::Button& quitbtn, ss::Bu
 }
 
 
-void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game, ss::Vector direction, float delta) {
+void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game, ss::Vector direction, float delta, ss::Sprite& heart) {
 #if defined _DEBUG
 	if (god_mode or in_menu) {
 		return;
@@ -243,6 +245,7 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 	if (in_menu) return;
 
 	if (invulnerability < 0) {
+		heart.frame++;
 		Mix_PlayChannel(CH_PLAYER_HIT, snd_player_hit, 0);
 		velocity += direction * delta / 4;
 		invulnerability = 1;
@@ -508,15 +511,19 @@ int main(int argc, char* args[]) {
 	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
 	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
 
+	ss::Text title_text{ game.get_window(), "Reign of The\nEvil Snowmen", "stfont.ttf", 16 };
+	title_text.position = ss::Vector(70, 25);
+	title_text.color = fill_color;
+
 	//Play button
 	ss::Button playbtn = ss::Button(game.get_window(), text_color, "PLAY", "stfont.ttf", 16);
 	playbtn.update();
-	playbtn.position = ss::Vector(game.resolution / 2 - playbtn.bounding_box.size / 2 - ss::Vector(0, 20)) + ss::Vector(0, 0.5);
+	playbtn.position = ss::Vector(game.resolution / 2 - playbtn.bounding_box.size / 2 - ss::Vector(0, 20)) + ss::Vector(0, 15);
 
 	//Quit button
 	ss::Button quitbtn = ss::Button(game.get_window(), text_color, "QUIT", "stfont.ttf", 16);
 	quitbtn.update();
-	quitbtn.position = ss::Vector(game.resolution / 2 - quitbtn.bounding_box.size / 2 + ss::Vector(0, 20)) + ss::Vector(0, 0.5);
+	quitbtn.position = ss::Vector(game.resolution / 2 - quitbtn.bounding_box.size / 2 + ss::Vector(0, 20)) + ss::Vector(0, 15);
 
 	//Normal difficulty selector button
 	ss::Button normbtn = ss::Button(game.get_window(), text_color, "NORMAL", "stfont.ttf", 16);
@@ -559,6 +566,16 @@ int main(int argc, char* args[]) {
 	camera_offset = player_cs.position - game.resolution / 2;
 	player_cs.size = player.get_size() - 4;
 	player_draw_center = game.resolution / 2 - player.get_size() / 2;
+
+	const char* heart_frames[4] = {
+		"Sprites/Heart/heart0000.png",
+		"Sprites/Heart/heart0001.png",
+		"Sprites/Heart/heart0002.png",
+		"Sprites/Heart/heart0003.png"
+	};
+	ss::Sprite heart{game.get_window(), 4, heart_frames};
+	heart.position = ss::Vector(8, 8);
+	float heart_timer = 1;
 
 	//Creating a particle emitter for the fire
 	ss::ParticleEmitter ptem(game.get_window(), player.position);
@@ -699,6 +716,7 @@ int main(int argc, char* args[]) {
 		}
 		else if (snow_pixels < 50 and !in_menu) {
 			//Placeholder for win screen
+			force_reset = true;
 			in_menu = true;
 			enemies = 0;
 			if (unlocked > Diff::INSANE) {
@@ -729,6 +747,9 @@ int main(int argc, char* args[]) {
 		int r = 0, g = 0, b = 0;
 		ss::Vector p_pos;
 		for (int i = 0; i < enemies; i++) {
+			for (int j = 0; j < enemies; j++) {
+				if (j != i) enemy[j].collision.push_out(enemy[i].collision);
+			}
 			enemy[i].attacking = !in_menu;
 			enemy[i].target = player_cs.get_center();
 			enemy[i].process(_dt, snowballs, game, snowball);
@@ -817,6 +838,23 @@ int main(int argc, char* args[]) {
 			player.draw(_dt);
 		}
 
+		heart.draw(_dt);
+		if (heart_timer > 0) {
+			heart_timer -= _dt / 1000 * (heart.frame * 2 + 1);
+		}
+		else if (heart.frame != 3) {
+			heart_timer = 1;
+			if (heart.position.y > 7) {
+				heart.position.y = 7;
+			}
+			else {
+				heart.position.y = 8;
+			}
+		}
+		else {
+			heart.position.y = 8;
+		}
+
 		if (!select_screen) highscore.draw();
 
 		if (in_menu) {
@@ -825,6 +863,7 @@ int main(int argc, char* args[]) {
 			if (!select_screen) {
 				playbtn.draw();
 				quitbtn.draw();
+				title_text.draw();
 				if (!mouse_pressed) {
 					if (quitbtn.just_pressed) {
 						Mix_PlayChannel(CH_UI, snd_click, 0);
@@ -844,19 +883,19 @@ int main(int argc, char* args[]) {
 				backbtn.draw();
 				if (!mouse_pressed) {
 					if (normbtn.just_pressed) {
-						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::NORMAL);
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::NORMAL, heart);	
 						Mix_PlayChannel(CH_UI, snd_click, 0);
 					}
 					if (hardbtn.just_pressed and unlocked <= Diff::HARD) {
-						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::HARD);
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::HARD, heart);
 						Mix_PlayChannel(CH_UI, snd_click, 0);
 					}
 					if (imposbtn.just_pressed and unlocked <= Diff::IMPOSSIBLE) {
-						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::IMPOSSIBLE);
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::IMPOSSIBLE, heart);
 						Mix_PlayChannel(CH_UI, snd_click, 0);
 					}
 					if (insnbtn.just_pressed and unlocked <= Diff::INSANE) {
-						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::INSANE);
+						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::INSANE, heart);
 						Mix_PlayChannel(CH_UI, snd_click, 0);
 					}
 					if (backbtn.just_pressed) {
@@ -922,7 +961,7 @@ int main(int argc, char* args[]) {
 				snowballs--;
 			}
 			if (hit_player) {
-				damage_player(player, ptem, game, snowball[i]->get_direction(), _dt);
+				damage_player(player, ptem, game, snowball[i]->get_direction(), _dt, heart);
 			}
 		}
 

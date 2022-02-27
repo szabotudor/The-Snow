@@ -73,6 +73,10 @@
     <Image Include="Sprites\Snowman\snowman_middle0002.png" />
     <Image Include="Sprites\Snowball\Snowball.png" />
     <Image Include="Sprites\Snowball\Snowball_Shadow.png" />
+    <Image Include="Sprites\Heart\heart0000.png" />
+    <Image Include="Sprites\Heart\heart0001.png" />
+    <Image Include="Sprites\Heart\heart0002.png" />
+    <Image Include="Sprites\Heart\heart0003.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="SDLmixer\lib\LICENSE.FLAC.txt" />
