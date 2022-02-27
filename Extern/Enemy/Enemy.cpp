@@ -154,10 +154,10 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 				//Move towards player
 				ss::Vector direction = collision.position.direction_to(target).normalized();
 				if (collision.position.distance_to(target) > 100 and collision.position.distance_to(target) < 250) {
-					velocity = ss::lerp(velocity, direction * delta * 45, delta * 5);
+					velocity = ss::lerp(velocity, direction * delta * move_speed, delta * 5);
 				}
 				else if (collision.position.distance_to(target) < 86) {
-					velocity = ss::lerp(velocity, ss::Vector() - direction * delta * 45, delta * 5);
+					velocity = ss::lerp(velocity, ss::Vector() - direction * delta * move_speed, delta * 5);
 				}
 				else {
 					velocity = ss::lerp(velocity, 0, delta * 5);

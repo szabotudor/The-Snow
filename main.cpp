@@ -14,6 +14,7 @@ Mix_Music* mus_intro = NULL;
 Mix_Music* mus_body1 = NULL;
 Mix_Music* mus_body2 = NULL;
 Mix_Music* mus_outro = NULL;
+Mix_Music* mus_win = NULL;
 
 ss::Snow game("The Snow", ss::Vector(320, 180), SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, 144);
 ss::Vector ground_size(game.resolution * 1.8);
@@ -496,6 +497,7 @@ int main(int argc, char* args[]) {
 	mus_body1 = Mix_LoadMUS("Sounds/Music/music-body-1.mp3");
 	mus_body2 = Mix_LoadMUS("Sounds/Music/music-body-2.mp3");
 	mus_outro = Mix_LoadMUS("Sounds/Music/music-outro.mp3");
+	mus_win = Mix_LoadMUS("Sounds/Music/music-win.mp3");
 
 	enemy = new Enemy[max_enemies];
 	rng.randomize();
@@ -683,7 +685,7 @@ int main(int argc, char* args[]) {
 					st_delay = 0.25;
 					break;
 				case Diff::IMPOSSIBLE:
-					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 4;
+					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 5;
 					st_delay = 1;
 					break;
 				case Diff::HARD:
@@ -702,6 +704,8 @@ int main(int argc, char* args[]) {
 				spawn_position.y = ss::clamp(0, ground_size.y, spawn_position.y);
 
 				enemy[enemies] = Enemy(spawn_position);
+				if (difficulty == Diff::IMPOSSIBLE)
+					enemy[enemies].move_speed = 100;
 				enemy[enemies].snowball_throw_delay = st_delay;
 				ground_cs.push_in(enemy[enemies].collision);
 #if defined _DEBUG
@@ -906,12 +910,20 @@ int main(int argc, char* args[]) {
 			}
 
 			if (Mix_PlayingMusic() and mus_pos != 3) {
-				Mix_PlayMusic(mus_outro, 0);
+				if (player_dead) {
+					Mix_PlayMusic(mus_outro, 0);
+				}
+				else {
+					Mix_PlayMusic(mus_win, 0);
+				}
 				mus_pos = 3;
 			}
 		}
 		else {
-			in_menu = game.is_key_just_pressed(SDL_SCANCODE_ESCAPE);
+			if (game.is_key_just_pressed(SDL_SCANCODE_ESCAPE)) {
+				in_menu = true;
+				mus_pos = 3;
+			}
 			if (add_score_timer <= 0 and score_to_add) {
 				add_to_score(highscore, score_to_add);
 				score_to_add = 0;
