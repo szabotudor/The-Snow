@@ -682,7 +682,7 @@ int main(int argc, char* args[]) {
 				switch (difficulty) {
 				case Diff::INSANE:
 					time_change = 1.0 - (double)snow_pixels / max_snow_pixels;
-					st_delay = 0.25;
+					st_delay = 0;
 					break;
 				case Diff::IMPOSSIBLE:
 					time_change = (1.0 - (double)snow_pixels / max_snow_pixels) * 5;
@@ -704,7 +704,7 @@ int main(int argc, char* args[]) {
 				spawn_position.y = ss::clamp(0, ground_size.y, spawn_position.y);
 
 				enemy[enemies] = Enemy(spawn_position);
-				if (difficulty == Diff::IMPOSSIBLE)
+				if (difficulty == Diff::INSANE)
 					enemy[enemies].move_speed = 100;
 				enemy[enemies].snowball_throw_delay = st_delay;
 				ground_cs.push_in(enemy[enemies].collision);
