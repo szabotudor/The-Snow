@@ -78,4 +78,6 @@ public:
 	bool is_invulnerable();
 	//Returns the total lifetime of the enemy
 	uint32_t get_lifetime();
+	//Returns the position of the enemy
+	ss::Vector get_position();
 };

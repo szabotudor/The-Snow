@@ -404,3 +404,7 @@ bool Enemy::is_invulnerable() {
 uint32_t Enemy::get_lifetime() {
 	return total_lifetime;
 }
+
+ss::Vector Enemy::get_position() {
+	return position;
+}

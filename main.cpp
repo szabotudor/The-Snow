@@ -9,6 +9,7 @@ Mix_Chunk* snd_player_hit = NULL;
 Mix_Chunk* snd_fire = NULL;
 Mix_Chunk* snd_melt = NULL;
 Mix_Chunk* snd_click = NULL;
+Mix_Chunk* snd_coin = NULL;
 
 Mix_Music* mus_intro = NULL;
 Mix_Music* mus_body1 = NULL;
@@ -76,7 +77,7 @@ bool select_screen = false;
 bool first_boot = true;
 bool mouse_pressed = false;
 bool force_reset = false;
-int fire_ammount = 300;
+uint8_t life = 3;
 PlayerMoveType player_move_type = PlayerMoveType::IDLE;
 ss::CollisionShape player_cs(ss::Vector(12), ss::Vector(0));
 ss::CollisionShape window_cs;
@@ -87,6 +88,14 @@ uint16_t max_enemies = 6;
 Enemy* enemy = nullptr;
 int snowballs;
 Snowball** snowball = new Snowball*[512];
+
+uint32_t coins = 0;
+uint32_t coins_to_draw = 0;
+uint32_t max_coins_to_draw = 256;
+ss::Vector* coin_positions = new ss::Vector[256];
+
+uint32_t total_hearts = 1;
+uint32_t heart_cost = 12;
 
 
 #if defined _DEBUG
@@ -145,7 +154,7 @@ void make_ground(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels)
 
 
 void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels, Diff game_difficulty, ss::Sprite& heart) {
-	heart.frame = 0;
+	life = 3 * total_hearts;
 	first_boot = false;
 	select_screen = false;
 	in_menu = false;
@@ -153,8 +162,8 @@ void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels
 	if (snow_pixels < 50 or player_dead or force_reset) {
 		make_ground(ground_b, gnd_tex, snow_pixels);
 		score = 0;
+		coins_to_draw = 0;
 	}
-	fire_ammount = 300;
 	spawn_timer = 0.5;
 	player_dead = false;
 	player_move_type = PlayerMoveType::IDLE;
@@ -182,7 +191,7 @@ void do_unlock(ss::Button& hard, ss::Button& impos, ss::Button& insn) {
 
 void save_data() {
 	ofstream fout("game.data", ios::binary);
-	fout << (uint16_t)unlocked << " " << score_record;
+	fout << (uint16_t)unlocked << " " << score_record << " " << coins << " " << total_hearts << " " << heart_cost;
 	fout.close();
 }
 
@@ -246,13 +255,12 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 	if (in_menu) return;
 
 	if (invulnerability < 0) {
-		heart.frame++;
+		life--;
 		Mix_PlayChannel(CH_PLAYER_HIT, snd_player_hit, 0);
 		velocity += direction * delta / 4;
 		invulnerability = 1;
-		fire_ammount -= 120;
 #if defined _DEBUG
-		print_to_console("Player damaged");
+		print_to_console("Player damaged (" + to_string(life) + " life left)");
 #endif
 	}
 	camera_shake = 2;
@@ -260,8 +268,6 @@ void damage_player(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow& game
 
 
 void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &game, float delta) {
-	fire.set_draw_ammount(fire_ammount);
-
 	//Flicker the player sprite when invulnerable
 	if (invulnerability > 0) {
 		invulnerability -= delta / 1000;
@@ -310,7 +316,7 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	//Shooting
 	if (game.is_button_pressed(SDL_BUTTON_LEFT) and !in_menu) {
 		player_move_type = PlayerMoveType::SHOOTING;
-		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 80).normalized();
+		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 60).normalized();
 		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
 		fire.particle_layer[0].initial_velocity_min = 180;
 		fire.particle_layer[0].initial_velocity_max = 200;
@@ -345,8 +351,12 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 	}
 
 	//Check if player has died
-	if (fire.get_draw_ammount() == 0) {
+	if (life == 0) {
+		fire.set_draw_ammount(0);
 		player_move_type = PlayerMoveType::DEAD;
+	}
+	else {
+		fire.set_draw_ammount(300);
 	}
 
 	//Player Animations
@@ -481,16 +491,18 @@ int main(int argc, char* args[]) {
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 		throw runtime_error("Could not start audio straming");
 	}
-	Mix_AllocateChannels(9);
+	Mix_AllocateChannels(10);
 	snd_player_hit = Mix_LoadWAV("Sounds/Effects/hit.wav");
 	snd_fire = Mix_LoadWAV("Sounds/Effects/fire.wav");
 	snd_melt = Mix_LoadWAV("Sounds/Effects/melt.wav");
 	snd_click = Mix_LoadWAV("Sounds/Effects/click.wav");
+	snd_coin = Mix_LoadWAV("Sounds/Effects/coin.wav");
 
-	Mix_VolumeChunk(snd_player_hit, 32);
+	Mix_VolumeChunk(snd_player_hit, 44);
 	Mix_VolumeChunk(snd_fire, 72);
 	Mix_VolumeChunk(snd_melt, 64);
 	Mix_VolumeChunk(snd_click, 32);
+	Mix_VolumeChunk(snd_coin, 32);
 	float melt_volume = 0;
 
 	mus_intro = Mix_LoadMUS("Sounds/Music/music-intro.mp3");
@@ -507,10 +519,9 @@ int main(int argc, char* args[]) {
 	fps.color.b = 0;
 	fps.color.g = 100;
 	fps.position = ss::Vector(5, 5);
-	SDL_Color text_color = SDL_Color(), border_color = SDL_Color(), fill_color = SDL_Color();
+	SDL_Color text_color = SDL_Color(), fill_color = SDL_Color();
 
 	text_color.r = 60; text_color.g = 80; text_color.b = 255; text_color.a = 255;
-	border_color.r = 120; border_color.g = 140; border_color.b = 160; border_color.a = 255;
 	fill_color.r = 60; fill_color.g = 80; fill_color.b = 100; fill_color.a = 255;
 
 	ss::Text title_text{ game.get_window(), "Reign of The\nEvil Snowmen", "stfont.ttf", 16 };
@@ -552,6 +563,13 @@ int main(int argc, char* args[]) {
 	backbtn.update();
 	backbtn.position = ss::Vector(5, game.resolution.y - 13);
 
+	//Buy life button
+	ss::Button buy_life{ game.get_window(), text_color, "BUY", "stfont.ttf", 8 };
+	buy_life.update();
+	buy_life.position = ss::Vector(24, 148);
+	ss::Text buy_life_text{ game.get_window(), "COST:12", "stfont.ttf", 8 };
+	buy_life_text.color = text_color;
+	buy_life_text.position = ss::Vector(24, 166);
 
 	//Creating the player sprite
 	const char* frames[6] = {
@@ -627,19 +645,39 @@ int main(int argc, char* args[]) {
 	highscore.position.x = 310 - highscore.get_text().length() * 8;
 	highscore.scale = 1.2;
 
+	//Loading
 	ifstream fin("game.data", ios::binary);
 	if (fin.is_open()) {
 		int unlkd = 0;
 
-		fin >> unlkd >> score_record;
+		fin >> unlkd >> score_record >> coins >> total_hearts >> heart_cost;
 
+		life = 3 * total_hearts;
 		unlocked = (Diff)unlkd;
 		do_unlock(hardbtn, imposbtn, insnbtn);
 		highscore.set_text("High Score: " + to_string(score_record));
 		highscore.position.x = 310 - highscore.get_text().length() * 8;
+		buy_life_text.set_text("COST:" + to_string(heart_cost));
 
 		fin.close();
 	}
+
+	//Coins
+	const char* coin_textures[6] = {
+		"Sprites/Coin/coin0000.png",
+		"Sprites/Coin/coin0001.png",
+		"Sprites/Coin/coin0002.png",
+		"Sprites/Coin/coin0003.png",
+		"Sprites/Coin/coin0004.png",
+		"Sprites/Coin/coin0005.png"
+	};
+	ss::Sprite coin_sprite{ game.get_window(), 6, coin_textures };
+	coin_sprite.play(0, 5, 12, true);
+	coin_sprite.position = ss::Vector(6, 24);
+	string temp_coin_text0 = "X" + to_string(coins);
+	ss::Text coin_text{ game.get_window(), temp_coin_text0.c_str(), "stfont.ttf", 8};
+	coin_text.color = text_color;
+	coin_text.position = ss::Vector(24, 28);
 
 	uint32_t score_to_add = 0;
 	double add_score_timer = 0;
@@ -718,8 +756,10 @@ int main(int argc, char* args[]) {
 				spawn_timer -= _dt / 1000;
 			}
 		}
-		else if (snow_pixels < 50 and !in_menu) {
+		else if (snow_pixels < 100 and !in_menu) {
 			//Placeholder for win screen
+			coins += ss::clamp(0, 23, heart_cost / 2);
+			coin_text.set_text("X" + to_string(coins));
 			force_reset = true;
 			in_menu = true;
 			enemies = 0;
@@ -779,6 +819,10 @@ int main(int argc, char* args[]) {
 #if defined _DEBUG
 				print_to_console("Enemy " + to_string(i) + " killed");
 #endif
+				if (coins_to_draw < max_coins_to_draw) {
+					coin_positions[coins_to_draw] = enemy[i].get_position() + ss::Vector(4, 4);
+					coins_to_draw++;
+				}
 				for (int j = i; j < enemies - 1; j++) {
 					enemy[j] = enemy[j + 1];
 				}
@@ -842,7 +886,21 @@ int main(int argc, char* args[]) {
 			player.draw(_dt);
 		}
 
-		heart.draw(_dt);
+		for (int i = 0; i < total_hearts; i++) {
+			if (life / 3 > i) {
+				heart.frame = 0;
+				heart.draw(_dt);
+				heart.position.x += 14;
+			}
+			else if (life / 3 == i) {
+				heart.frame = 3 - life % 3;
+				if (heart.frame != 3) {
+					heart.draw(_dt);
+					heart.position.x += 14;
+				}
+			}
+		}
+		heart.position.x = 8;
 		if (heart_timer > 0) {
 			heart_timer -= _dt / 1000 * (heart.frame * 2 + 1);
 		}
@@ -861,6 +919,25 @@ int main(int argc, char* args[]) {
 
 		if (!select_screen) highscore.draw();
 
+		//Coin code
+		coin_sprite.draw(_dt);
+		coin_text.draw();
+		for (int i = 0; i < coins_to_draw; i++) {
+			coin_sprite.position = coin_positions[i] - camera_offset;
+			coin_sprite.draw(0);
+
+			if (player_cs.position.distance_to(coin_positions[i]) < 15) {
+				coins++;
+				coin_text.set_text("X" + to_string(coins));
+				for (int j = i; j < coins_to_draw; j++) {
+					coin_positions[j] = coin_positions[j + 1];
+				}
+				coins_to_draw--;
+				Mix_PlayChannel(CH_COIN, snd_coin, 0);
+			}
+		}
+		coin_sprite.position = ss::Vector(6, 24);
+
 		if (in_menu) {
 			highscore.scale = 1.0;
 			process_menu(_dt, playbtn, quitbtn, normbtn, hardbtn, imposbtn, insnbtn, backbtn);
@@ -878,6 +955,42 @@ int main(int argc, char* args[]) {
 						Mix_PlayChannel(CH_UI, snd_click, 0);
 					}
 				}
+
+				uint8_t heart_prev_frame = heart.frame;
+				heart.frame = 0;
+				if (buy_life.is_hovered()) {
+					heart.position += ss::Vector(0, 135);
+					buy_life.draw_offset = ss::Vector(0, -2);
+				}
+				else {
+					heart.position += ss::Vector(0, 137);
+					buy_life.draw_offset = ss::Vector(0);
+				}
+				coin_sprite.position += ss::Vector(-1, 137);
+				heart.draw(0);
+				buy_life.draw();
+				buy_life_text.draw();
+				coin_sprite.draw(0);
+				heart.position -= ss::Vector(0, 135 + (!buy_life.is_hovered()) * 2);
+				coin_sprite.position -= ss::Vector(-1, 137);
+				heart.frame = heart_prev_frame;
+
+				buy_life.update();
+				if (buy_life.just_pressed) {
+					if (coins >= heart_cost) {
+						coins -= heart_cost;
+						heart_cost *= 2.2;
+						buy_life_text.set_text("COST:" + to_string(heart_cost));
+						total_hearts++;
+						life += 3;
+						coin_text.set_text("X" + to_string(coins));
+						save_data();
+						Mix_PlayChannel(CH_UI, snd_coin, 0);
+					}
+					else {
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
+				}
 			}
 			else {
 				normbtn.draw();
@@ -889,18 +1002,33 @@ int main(int argc, char* args[]) {
 					if (normbtn.just_pressed) {
 						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::NORMAL, heart);	
 						Mix_PlayChannel(CH_UI, snd_click, 0);
+						delete[] enemy;
+						enemy = new Enemy[max_enemies];
+						enemies = 0;
 					}
 					if (hardbtn.just_pressed and unlocked <= Diff::HARD) {
 						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::HARD, heart);
 						Mix_PlayChannel(CH_UI, snd_click, 0);
+						max_enemies = 10;
+						delete[] enemy;
+						enemy = new Enemy[max_enemies];
+						enemies = 0;
 					}
 					if (imposbtn.just_pressed and unlocked <= Diff::IMPOSSIBLE) {
 						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::IMPOSSIBLE, heart);
 						Mix_PlayChannel(CH_UI, snd_click, 0);
+						max_enemies = 20;
+						delete[] enemy;
+						enemy = new Enemy[max_enemies];
+						enemies = 0;
 					}
 					if (insnbtn.just_pressed and unlocked <= Diff::INSANE) {
 						prepare_game(ground_b, gnd_tex, snow_pixels, Diff::INSANE, heart);
 						Mix_PlayChannel(CH_UI, snd_click, 0);
+						max_enemies = 64;
+						delete[] enemy;
+						enemy = new Enemy[max_enemies];
+						enemies = 0;
 					}
 					if (backbtn.just_pressed) {
 						select_screen = false;

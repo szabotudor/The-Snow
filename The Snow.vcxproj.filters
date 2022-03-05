@@ -77,6 +77,18 @@
     <Image Include="Sprites\Heart\heart0001.png" />
     <Image Include="Sprites\Heart\heart0002.png" />
     <Image Include="Sprites\Heart\heart0003.png" />
+    <Image Include="Sprites\Coin\coin0000.png" />
+    <Image Include="Sprites\Coin\coin0001.png" />
+    <Image Include="Sprites\Coin\coin0002.png" />
+    <Image Include="Sprites\Coin\coin0003.png" />
+    <Image Include="Sprites\Coin\coin0004.png" />
+    <Image Include="Sprites\Coin\coin0005.png" />
+    <Image Include="Sprites\Player\player_idle0000.png" />
+    <Image Include="Sprites\Player\player_idle0001.png" />
+    <Image Include="Sprites\Player\player_idle0002.png" />
+    <Image Include="Sprites\Player\player_idle0003.png" />
+    <Image Include="Sprites\Player\player_idle0004.png" />
+    <Image Include="Sprites\Player\player_idle0005.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="SDLmixer\lib\LICENSE.FLAC.txt" />
@@ -85,5 +97,15 @@
     <Text Include="SDLmixer\lib\LICENSE.ogg-vorbis.txt" />
     <Text Include="SDLmixer\lib\LICENSE.opus.txt" />
     <Text Include="SDLmixer\lib\LICENSE.opusfile.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sounds\Effects\click.wav" />
+    <Media Include="Sounds\Effects\coin.wav" />
+    <Media Include="Sounds\Effects\fire.wav" />
+    <Media Include="Sounds\Effects\hit.wav" />
+    <Media Include="Sounds\Effects\melt.wav" />
+    <Media Include="Sounds\Effects\snowball.wav" />
+    <Media Include="Sounds\Effects\snowman_hit.wav" />
+    <Media Include="Sounds\Effects\throw.wav" />
   </ItemGroup>
 </Project>

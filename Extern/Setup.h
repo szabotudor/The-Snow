@@ -20,5 +20,6 @@ enum {
 	CH_MELT,
 	CH_SNOWBALL,
 	CH_SNOWMAN_HIT,
-	CH_UI
+	CH_UI,
+	CH_COIN
 };
