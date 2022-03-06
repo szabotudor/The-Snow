@@ -29,6 +29,8 @@ public:
 	ss::Vector get_direction();
 	//Returns true if the snowball hit the player or the ground
 	bool is_melted();
+	//Force the snowball to melt
+	void force_melt();
 	//Frees all components in the snowball
 	void free();
 };

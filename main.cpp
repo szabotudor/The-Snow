@@ -97,6 +97,10 @@ ss::Vector* coin_positions = new ss::Vector[256];
 uint32_t total_hearts = 1;
 uint32_t heart_cost = 12;
 
+ss::Vector tree_positions[8];
+uint8_t tree_states[8];
+float tree_timers[8];
+
 
 #if defined _DEBUG
 bool god_mode = false;
@@ -150,6 +154,10 @@ void make_ground(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels)
 		}
 	}
 	gnd_tex.update();
+
+	for (int i = 0; i < 8; i++) {
+		tree_states[i] = 4;
+	}
 }
 
 
@@ -159,7 +167,7 @@ void prepare_game(bool**& ground_b, ss::Texture& gnd_tex, long long& snow_pixels
 	select_screen = false;
 	in_menu = false;
 	difficulty = game_difficulty;
-	if (snow_pixels < 50 or player_dead or force_reset) {
+	if (snow_pixels < 200 or player_dead or force_reset) {
 		make_ground(ground_b, gnd_tex, snow_pixels);
 		score = 0;
 		coins_to_draw = 0;
@@ -586,7 +594,8 @@ int main(int argc, char* args[]) {
 	camera_offset = player_cs.position - game.resolution / 2;
 	player_cs.size = player.get_size() - 4;
 	player_draw_center = game.resolution / 2 - player.get_size() / 2;
-
+	
+	//Load hearts
 	const char* heart_frames[4] = {
 		"Sprites/Heart/heart0000.png",
 		"Sprites/Heart/heart0001.png",
@@ -596,6 +605,20 @@ int main(int argc, char* args[]) {
 	ss::Sprite heart{game.get_window(), 4, heart_frames};
 	heart.position = ss::Vector(8, 8);
 	float heart_timer = 1;
+
+	//Load trees
+	const char* tree_frames[5] = {
+		"Sprites/Tree/tree0000.png",
+		"Sprites/Tree/tree0001.png",
+		"Sprites/Tree/tree0002.png",
+		"Sprites/Tree/tree0003.png",
+		"Sprites/Tree/tree0004.png",
+	};
+	ss::Sprite tree{ game.get_window(), 5, tree_frames };
+	ss::CollisionShape tree_cs{ tree.get_size() };
+#if defined _DEBUG
+	tree_cs.enable_draw(game.get_window());
+#endif
 
 	//Creating a particle emitter for the fire
 	ss::ParticleEmitter ptem(game.get_window(), player.position);
@@ -662,6 +685,20 @@ int main(int argc, char* args[]) {
 		fin.close();
 	}
 
+	//Place trees
+	for (int i = 0; i < 8; i++) {
+		tree_positions[i] = rng.randv_range(ss::Vector(0), ground_size);
+		tree_cs.position = tree_positions[i];
+		ground_cs.push_in(tree_cs);
+		tree_positions[i] = tree_cs.position;
+		for (int j = 0; j < j; j++) {
+			ss::CollisionShape temp_tree_cs{ tree.get_size(), tree_positions[j] };
+			tree_cs.push_out(temp_tree_cs);
+			tree_positions[j] = temp_tree_cs.position;
+		}
+		tree_states[i] = 4;
+	}
+
 	//Coins
 	const char* coin_textures[6] = {
 		"Sprites/Coin/coin0000.png",
@@ -709,6 +746,34 @@ int main(int argc, char* args[]) {
 		gnd_tex.position -= camera_offset;
 		gnd_tex.draw();
 		gnd_tex.position += camera_offset;
+
+		//Trees
+		for (int i = 0; i < 8; i++) {
+			tree.position = tree_positions[i] - camera_offset;
+			tree.frame = tree_states[i];
+			tree_cs.position = tree_positions[i];
+			tree_cs.push_out(player_cs);
+			for (int j = 0; j < enemies; j++) {
+				tree_cs.push_out(enemy[j].collision);
+			}
+			for (int j = 0; j < snowballs; j++) {
+				if (tree_cs.is_colliding_with(snowball[j]->collision)) {
+					snowball[j]->force_melt();
+					if (tree_timers[i] <= 0) {
+						if (tree_states[i] < 4) {
+							tree_states[i]++;
+							tree_timers[i] = 0.35;
+						}
+					}
+				}
+			}
+			tree.draw(0);
+
+			if (tree_timers[i] > 0) {
+				tree_timers[i] -= _dt / 1000;
+			}
+		}
+
 		player_process(player, ptem, game, _dt);
 
 		//Spawn an enemy at a random interval
@@ -756,7 +821,7 @@ int main(int argc, char* args[]) {
 				spawn_timer -= _dt / 1000;
 			}
 		}
-		else if (snow_pixels < 100 and !in_menu) {
+		else if (snow_pixels < 200 and !in_menu) {
 			//Placeholder for win screen
 			coins += ss::clamp(0, 23, heart_cost / 2);
 			coin_text.set_text("X" + to_string(coins));
@@ -873,6 +938,19 @@ int main(int argc, char* args[]) {
 					enemy[j].damage();
 				}
 			}
+
+			//Verify collision with trees
+			for (int j = 0; j < 8; j++) {
+				tree_cs.position = tree_positions[j];
+				if (tree_cs.is_colliding_with(p_pos)) {
+					if (tree_timers[j] <= 0) {
+						if (tree_states[j] > 0) {
+							tree_states[j]--;
+							tree_timers[j] = 0.35;
+						}
+					}
+				}
+			}
 		}
 
 		if (camera_shake > 0.1) {
@@ -924,16 +1002,18 @@ int main(int argc, char* args[]) {
 		coin_text.draw();
 		for (int i = 0; i < coins_to_draw; i++) {
 			coin_sprite.position = coin_positions[i] - camera_offset;
-			coin_sprite.draw(0);
+			if (window_cs.is_colliding_with(coin_sprite.position)) {
+				coin_sprite.draw(0);
 
-			if (player_cs.position.distance_to(coin_positions[i]) < 15) {
-				coins++;
-				coin_text.set_text("X" + to_string(coins));
-				for (int j = i; j < coins_to_draw; j++) {
-					coin_positions[j] = coin_positions[j + 1];
+				if (player_cs.position.distance_to(coin_positions[i]) < 15) {
+					coins++;
+					coin_text.set_text("X" + to_string(coins));
+					for (int j = i; j < coins_to_draw; j++) {
+						coin_positions[j] = coin_positions[j + 1];
+					}
+					coins_to_draw--;
+					Mix_PlayChannel(CH_COIN, snd_coin, 0);
 				}
-				coins_to_draw--;
-				Mix_PlayChannel(CH_COIN, snd_coin, 0);
 			}
 		}
 		coin_sprite.position = ss::Vector(6, 24);
@@ -1123,6 +1203,11 @@ int main(int argc, char* args[]) {
 				snowball[i]->collision.position -= camera_offset;
 				snowball[i]->collision.draw();
 				snowball[i]->collision.position += camera_offset;
+			}
+
+			for (int i = 0; i < 8; i++) {
+				tree_cs.position = tree_positions[i] - camera_offset;
+				tree_cs.draw();
 			}
 
 			console.draw();

@@ -89,6 +89,11 @@
     <Image Include="Sprites\Player\player_idle0003.png" />
     <Image Include="Sprites\Player\player_idle0004.png" />
     <Image Include="Sprites\Player\player_idle0005.png" />
+    <Image Include="Sprites\Tree\tree0000.png" />
+    <Image Include="Sprites\Tree\tree0001.png" />
+    <Image Include="Sprites\Tree\tree0002.png" />
+    <Image Include="Sprites\Tree\tree0003.png" />
+    <Image Include="Sprites\Tree\tree0004.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="SDLmixer\lib\LICENSE.FLAC.txt" />

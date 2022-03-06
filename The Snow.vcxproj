@@ -237,6 +237,11 @@
     <Image Include="Sprites\Snowman\snowman_middle0000.png" />
     <Image Include="Sprites\Snowman\snowman_middle0001.png" />
     <Image Include="Sprites\Snowman\snowman_middle0002.png" />
+    <Image Include="Sprites\Tree\tree0000.png" />
+    <Image Include="Sprites\Tree\tree0001.png" />
+    <Image Include="Sprites\Tree\tree0002.png" />
+    <Image Include="Sprites\Tree\tree0003.png" />
+    <Image Include="Sprites\Tree\tree0004.png" />
     <Image Include="sun.png" />
     <Image Include="Sprites\ball.png" />
   </ItemGroup>

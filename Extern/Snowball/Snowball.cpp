@@ -113,6 +113,10 @@ bool Snowball::is_melted() {
 	return melted;
 }
 
+void Snowball::force_melt() {
+	melted = true;
+}
+
 void Snowball::free() {
 	ptem->free();
 }

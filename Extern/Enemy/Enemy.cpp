@@ -137,7 +137,7 @@ void Enemy::process(double delta, int& num_of_snowballs, ss::Snow& game, Snowbal
 		else {
 			target_p = position.direction_to(target);
 		}
-		if (snowball_timer <= 0 and collision.position.distance_to(target) < 200) {
+		if (snowball_timer <= 0 and collision.position.distance_to(target) < 200 and life > 0) {
 			Mix_PlayChannel(CH_ENEMY_THROW, thrw, 0);
 			snowball_list[num_of_snowballs] = new Snowball(game.get_window(), position + ss::Vector(5, 0), target_p);
 			num_of_snowballs++;
