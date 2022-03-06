@@ -96,6 +96,8 @@ ss::Vector* coin_positions = new ss::Vector[256];
 
 uint32_t total_hearts = 1;
 uint32_t heart_cost = 12;
+uint32_t fire_power = 200;
+uint32_t fire_cost = 12;
 
 ss::Vector tree_positions[8];
 uint8_t tree_states[8];
@@ -199,7 +201,7 @@ void do_unlock(ss::Button& hard, ss::Button& impos, ss::Button& insn) {
 
 void save_data() {
 	ofstream fout("game.data", ios::binary);
-	fout << (uint16_t)unlocked << " " << score_record << " " << coins << " " << total_hearts << " " << heart_cost;
+	fout << (uint16_t)unlocked << " " << score_record << " " << coins << " " << total_hearts << " " << heart_cost << " " << fire_power << " " << fire_cost;
 	fout.close();
 }
 
@@ -326,8 +328,8 @@ void player_process(ss::Sprite& player, ss::ParticleEmitter& fire, ss::Snow &gam
 		player_move_type = PlayerMoveType::SHOOTING;
 		fire.particle_layer[0].initial_direction = lerp(fire.particle_layer[0].initial_direction, player.position.direction_to(game.get_mouse_position()), delta / 60).normalized();
 		fire.particle_layer[0].initial_velocity = velocity / (delta / 1000);
-		fire.particle_layer[0].initial_velocity_min = 180;
-		fire.particle_layer[0].initial_velocity_max = 200;
+		fire.particle_layer[0].initial_velocity_min = 0.95 * fire_power;
+		fire.particle_layer[0].initial_velocity_max = 1.05 * fire_power;
 		fire.particle_layer[0].initial_direction_randomness = 0.2;
 		//camera_offset += fire.particle_layer[0].initial_direction * delta / 1000;
 	}
@@ -579,6 +581,14 @@ int main(int argc, char* args[]) {
 	buy_life_text.color = text_color;
 	buy_life_text.position = ss::Vector(24, 166);
 
+	//Buy fire button
+	ss::Button buy_fire{ game.get_window(), text_color, "BUY", "stfont.ttf", 8 };
+	buy_fire.update();
+	buy_fire.position = ss::Vector(272, 148);
+	ss::Text buy_fire_text{ game.get_window(), "COST:12", "stfont.ttf", 8 };
+	buy_fire_text.color = text_color;
+	buy_fire_text.position = ss::Vector(240, 166);
+
 	//Creating the player sprite
 	const char* frames[6] = {
 		"Sprites/Player/player_idle0000.png",
@@ -673,7 +683,7 @@ int main(int argc, char* args[]) {
 	if (fin.is_open()) {
 		int unlkd = 0;
 
-		fin >> unlkd >> score_record >> coins >> total_hearts >> heart_cost;
+		fin >> unlkd >> score_record >> coins >> total_hearts >> heart_cost >> fire_power >> fire_cost;
 
 		life = 3 * total_hearts;
 		unlocked = (Diff)unlkd;
@@ -681,8 +691,12 @@ int main(int argc, char* args[]) {
 		highscore.set_text("High Score: " + to_string(score_record));
 		highscore.position.x = 310 - highscore.get_text().length() * 8;
 		buy_life_text.set_text("COST:" + to_string(heart_cost));
+		buy_fire_text.set_text("COST:" + to_string(fire_cost));
 
 		fin.close();
+	}
+	else {
+		save_data();
 	}
 
 	//Place trees
@@ -1054,7 +1068,6 @@ int main(int argc, char* args[]) {
 				heart.position -= ss::Vector(0, 135 + (!buy_life.is_hovered()) * 2);
 				coin_sprite.position -= ss::Vector(-1, 137);
 				heart.frame = heart_prev_frame;
-
 				buy_life.update();
 				if (buy_life.just_pressed) {
 					if (coins >= heart_cost) {
@@ -1066,6 +1079,38 @@ int main(int argc, char* args[]) {
 						coin_text.set_text("X" + to_string(coins));
 						save_data();
 						Mix_PlayChannel(CH_UI, snd_coin, 0);
+					}
+					else {
+						Mix_PlayChannel(CH_UI, snd_click, 0);
+					}
+				}
+
+				buy_fire.update();
+				if (buy_fire.hovered) {
+					ptem.draw_offset = ss::Vector(306, 150) - ptem.position;
+					buy_fire.draw_offset = ss::Vector(0, -2);
+				}
+				else {
+					ptem.draw_offset = ss::Vector(306, 152) - ptem.position;
+					buy_fire.draw_offset = ss::Vector(0);
+				}
+				coin_sprite.position += ss::Vector(293, 137);
+				coin_sprite.draw(0);
+				buy_fire.draw();
+				ptem.draw();
+				buy_fire_text.draw();
+				ptem.draw_offset = ss::Vector(0);
+				coin_sprite.position -= ss::Vector(293, 137);
+
+				if (buy_fire.just_pressed) {
+					if (coins > fire_cost) {
+						coins -= fire_cost;
+						fire_cost *= 3.4;
+						buy_fire_text.set_text("COST:" + to_string(fire_cost));
+						fire_power *= 1.2;
+						coin_text.set_text("X" + to_string(coins));
+						save_data();
+						Mix_PlayChannel(CH_COIN, snd_coin, 0);
 					}
 					else {
 						Mix_PlayChannel(CH_UI, snd_click, 0);
