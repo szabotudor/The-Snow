@@ -14,7 +14,7 @@ void init_enemy(ss::Snow& game) {
 	snd_snowman_hit = Mix_LoadWAV("Sounds/Effects/snowman_hit.wav");
 	thrw = Mix_LoadWAV("Sounds/Effects/throw.wav");
 	Mix_VolumeChunk(snd_snowman_hit, 18);
-	Mix_VolumeChunk(thrw, 128);
+	Mix_VolumeChunk(thrw, 40);
 	//Load all textures
 	init = true;
 	const char* textures[9] = {
